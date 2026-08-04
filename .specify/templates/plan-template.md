@@ -1,113 +1,78 @@
-# Implementation Plan: [FEATURE]
+# 구현 계획: [기능명]
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**브랜치**: `[###-기능명]` | **작성일**: [날짜] | **명세**: [링크]
 
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+**입력**: `/specs/[###-기능명]/spec.md`의 기능 명세
 
-**Note**: This template is filled in by the `/speckit-plan` command; its definition describes the execution workflow.
+**안내**: 이 템플릿은 `/speckit-plan` 명령으로 작성한다.
 
-## Summary
+## 요약
 
-[Extract from feature spec: primary requirement + technical approach from research]
+[기능의 핵심 요구사항과 기술 접근 방법을 간단히 작성]
 
-## Technical Context
+## 기술 배경
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
+**언어/버전**: JavaScript / [프로젝트 버전 또는 확인 필요]
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**주요 의존성**: Next.js, React, Sass / [추가 의존성이 있으면 작성]
 
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**저장소**: [해당하는 경우 작성, 아니면 해당 없음]
 
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**테스트**: [사용할 검증 방법 또는 확인 필요]
 
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
+**대상 플랫폼**: 웹 브라우저
 
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**프로젝트 유형**: Next.js 웹 애플리케이션
 
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]
+**성능 목표**: [명세에 정의된 목표 또는 해당 없음]
 
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
+**제약 사항**: [기능별 기술·일정 제약]
 
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
+**작업 규모**: [영향받는 화면, 컴포넌트, 사용자 범위]
 
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+## 헌법 점검
 
-## Constitution Check
+*관문: 0단계 조사 전에 통과해야 하며 1단계 설계 후 다시 확인한다.*
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+- [ ] `AGENTS.md`, 관련 `docs/specs`, 기존 코드를 확인했다.
+- [ ] Next.js App Router, JavaScript, SCSS, `@/*` 별칭을 유지한다.
+- [ ] 승인되지 않은 의존성, 폴더, 데이터 통신 구조를 추가하지 않는다.
+- [ ] 기존 공통 컴포넌트 재사용 여부와 변경 영향 범위를 확인했다.
+- [ ] 한 가지 기능과 승인된 파일 범위만 다룬다.
+- [ ] 모든 Spec Kit 산출물을 한국어로 작성한다.
 
-[Gates determined based on constitution file]
+## 프로젝트 구조
 
-## Project Structure
-
-### Documentation (this feature)
+### 이 기능의 문서
 
 ```text
-specs/[###-feature]/
-├── plan.md              # This file (/speckit-plan command output)
-├── research.md          # Phase 0 output (/speckit-plan command)
-├── data-model.md        # Phase 1 output (/speckit-plan command)
-├── quickstart.md        # Phase 1 output (/speckit-plan command)
-├── contracts/           # Phase 1 output (/speckit-plan command)
-└── tasks.md             # Phase 2 output (/speckit-tasks command - NOT created by /speckit-plan)
+specs/[###-기능명]/
+├── plan.md              # 구현 계획
+├── research.md          # 조사 결과
+├── data-model.md        # 데이터 모델(필요한 경우)
+├── quickstart.md        # 검증 안내
+├── contracts/           # 인터페이스 계약(필요한 경우)
+└── tasks.md             # 작업 목록(/speckit-tasks에서 생성)
 ```
 
-### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
+### 소스 코드
+
+`AGENTS.md`에 정의된 기존 구조에서 이 기능이 실제로 사용하는 경로만 작성한다. 새 폴더가
+필요하면 구현 전에 사용자 승인을 받는다.
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
 src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+├── app/
+├── components/
+└── styles/
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**구조 결정**: [사용할 실제 경로와 선택 이유]
 
-## Complexity Tracking
+## 복잡성 기록
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+> 헌법 점검을 위반해야 하는 예외가 있을 때만 작성한다.
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| 위반 항목 | 필요한 이유 | 더 단순한 대안을 사용하지 못한 이유 |
+|----------|------------|-------------------------------------|
+| [위반 내용] | [구체적인 필요성] | [대안이 부적합한 이유] |

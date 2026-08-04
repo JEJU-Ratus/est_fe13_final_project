@@ -1,50 +1,79 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+동기화 영향 보고서
+- 버전 변경: 초기 템플릿 → 1.0.0
+- 수정된 원칙: 없음(최초 제정)
+- 추가된 원칙: 명세 우선 및 추측 금지, 기술 스택과 프로젝트 구조 준수,
+  단순한 구현과 작업 범위 통제, 기존 컴포넌트 재사용과 Next.js 규칙 준수,
+  기능 브랜치·승인·검토 중심의 협업
+- 추가된 섹션: 기술 및 문서 제약, 개발 절차
+- 제거된 섹션: 없음
+- 동기화 대상:
+  ✅ .specify/templates/constitution-template.md
+  ✅ .specify/templates/plan-template.md
+  ✅ .specify/templates/spec-template.md
+  ✅ .specify/templates/tasks-template.md
+  ✅ .specify/templates/checklist-template.md
+- 후속 조치: 없음
+-->
+# Front Digest AI 프로젝트 헌법
 
-## Core Principles
+## 핵심 원칙
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. 명세 우선 및 추측 금지
+모든 구현은 `AGENTS.md`, 관련 `docs/specs` 문서, 승인된 Spec Kit 산출물을 근거로 해야 한다.
+명세에 없거나 디자인만으로 판단할 수 없는 동작은 임의로 결정하지 않고 사용자에게 확인해야 한다.
+명세와 기존 코드가 충돌하면 수정 전에 충돌 내용과 영향 범위를 알려야 한다.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. 기술 스택과 프로젝트 구조 준수
+Next.js App Router, JavaScript, SCSS, `@/*` import 별칭을 유지해야 한다. 기존 폴더와 파일의
+위치를 임의로 변경하거나 명세에 없는 폴더·라이브러리를 추가해서는 안 된다. Supabase 인증,
+데이터베이스, 서버 통신 구조는 구체적인 명세가 있을 때만 구현해야 한다.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. 단순한 구현과 작업 범위 통제
+한 번에 하나의 기능만 구현하고 요청 범위에 필요한 최소 변경만 수행해야 한다. 요청하지 않은
+리팩터링, 추상화, 최적화, 애니메이션, 상태 관리 도구 도입은 금지한다. 부트캠프 팀 프로젝트의
+일정과 유지보수 수준에 맞춰 이해하기 쉬운 구현을 우선한다.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. 기존 컴포넌트 재사용과 Next.js 규칙 준수
+기존 공통 컴포넌트를 우선 재사용하고 같은 역할의 컴포넌트를 중복 생성해서는 안 된다. 정해진
+경로 이동에는 `next/link`를 우선 사용하고 조건부 이동에만 `useRouter`를 사용한다. 상태, 이벤트,
+브라우저 API가 필요한 파일에만 `"use client"`를 선언한다. 공통 컴포넌트 변경은 영향 범위를 먼저
+확인하고 알려야 한다.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. 기능 브랜치·승인·검토 중심의 협업
+작업은 `feature/*` 브랜치에서 기능 단위로 진행해야 하며 `main`에 직접 push해서는 안 된다.
+구현 전에 수정·생성할 파일과 계획을 제시하고 사용자 승인을 받아야 한다. 완료된 변경은 검증 후
+Pull Request로 제출하고 팀원의 리뷰를 거쳐 병합해야 한다.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## 기술 및 문서 제약
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- 전역 스타일은 `src/app/globals.scss`, 공통 스타일 자원은 `src/styles`, 페이지와 컴포넌트
+  전용 스타일은 대응하는 SCSS Module에서 관리해야 한다.
+- 컴포넌트는 PascalCase, JavaScript 식별자는 camelCase, CSS 클래스는 kebab-case를 사용해야 한다.
+- 이벤트 처리 함수는 `handle`, Boolean 값은 가능한 경우 `is`, `has`, `can`, `should` 접두사를
+  사용해야 한다.
+- 모든 Spec Kit 산출물과 사용자 대상 템플릿 문구는 한국어로 작성해야 한다. 명령어, 코드,
+  파일명, 경로, 고유 기술 용어는 원문 표기를 유지할 수 있다.
+- TypeScript, Tailwind CSS, React Router, 상태 관리 또는 데이터 요청 라이브러리는 명시적인 요청
+  없이 도입해서는 안 된다.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## 개발 절차
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+1. 구현 전에 `AGENTS.md`와 관련 명세 및 기존 코드를 확인한다.
+2. 수정하거나 생성할 파일, 구현 범위, 영향 범위를 제시하고 승인을 받는다.
+3. 승인된 한 가지 기능만 구현하며 범위 밖 파일은 변경하지 않는다.
+4. 변경 위험에 맞는 lint, build 또는 기능 검증을 수행한다.
+5. 검증 결과와 남은 제약을 공유하고 기능 브랜치에서 Pull Request 검토를 진행한다.
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+## 거버넌스
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+이 헌법은 프로젝트의 최소 개발 원칙이며 모든 Spec Kit 명세·계획·작업 문서에 적용된다.
+`AGENTS.md`와 기능 명세는 세부 실행 규칙으로 함께 준수한다. 문서 간 충돌은 임의로 우선순위를
+정하지 않고 사용자에게 보고하여 해결한다.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+헌법 변경은 변경 이유와 영향받는 원칙 및 템플릿을 기록하고 사용자 승인을 받아야 한다. 버전은
+호환되지 않는 원칙 변경에 MAJOR, 원칙이나 필수 절차 추가에 MINOR, 의미를 바꾸지 않는 설명
+수정에 PATCH를 올린다. 모든 구현 계획과 Pull Request 검토에서는 명세, 구조, 작업 범위,
+한국어 문서화 준수 여부를 확인해야 한다.
+
+**버전**: 1.0.0 | **제정일**: 2026-08-04 | **최종 수정일**: 2026-08-04
