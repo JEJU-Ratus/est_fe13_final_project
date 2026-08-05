@@ -39,5 +39,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Spec Kit local runtime state
-.specify/feature.json
+
+# Local AI development tools
+.agents/
+.claude/
+.specify/
+.github/agents/
+.github/prompts/
+.vscode/settings.json

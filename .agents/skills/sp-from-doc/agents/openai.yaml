@@ -1,7 +1,0 @@
-interface:
-  display_name: "SP From Doc"
-  short_description: "기존 명세와 Figma를 Spec Kit 명세로 변환"
-  default_prompt: "Use $sp-from-doc with a docs/specs Markdown file to run the complete speckit-specify workflow."
-
-policy:
-  allow_implicit_invocation: false
