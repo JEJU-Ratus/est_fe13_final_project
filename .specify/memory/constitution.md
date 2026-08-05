@@ -1,50 +1,107 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+동기화 영향 보고서
+- 버전 변경: 1.2.0 → 2.0.0
+- 수정된 원칙:
+  - 명세 우선 및 추측 금지 → 명세 우선과 충돌 보고
+  - 기술 스택과 프로젝트 구조 준수 → 기술 스택 및 구조 보존
+  - 단순한 구현과 작업 범위 통제 → 단일 기능과 최소 변경
+  - 기존 컴포넌트 재사용과 Next.js 규칙 준수 → Next.js 및 컴포넌트 규칙 준수
+  - 기능 브랜치·승인·리뷰 중심의 작업 → 사전 승인과 기능 브랜치 협업
+- 추가된 섹션: 없음
+- 제거된 섹션: Spec Kit 문서 규칙
+- 후속 TODO: 없음
+-->
 
-## Core Principles
+# Front Digest AI 프로젝트 헌법
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+## 핵심 원칙
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### I. 명세 우선과 충돌 보고
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+모든 구현은 `AGENTS.md`, 관련 `docs/specs` 문서, 기존 코드를 근거로 해야 한다. 구현 전에 해당 기능 또는
+페이지의 명세를 반드시 확인하며, 명세에 없는 기능이나 디자인만으로 판단할 수 없는 동작을 임의로 결정하지
+않는다. 요구사항이 불명확하면 사용자에게 확인한다. 명세와 기존 코드가 충돌하면 즉시 수정하지 않고 충돌
+내용과 영향 범위를 사용자에게 알린다.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. 기술 스택 및 구조 보존
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+Next.js App Router, JavaScript, SCSS, `@/*` import alias를 사용한다. 전역 스타일은
+`src/app/globals.scss`, 공통 색상·변수·믹스인·타이포그래피는 `src/styles/abstracts`, CSS Reset은
+`src/styles/base/_reset.scss`에서 관리한다. 컴포넌트·페이지·레이아웃 전용 스타일에는 대상 파일명과
+대응하는 SCSS Module을 사용한다. 기존 폴더와 파일 위치 및 스타일 구조를 임의로 변경하지 않으며, 명세에
+없는 폴더가 필요하면 구현 전에 사용자에게 확인한다. 컴포넌트는 별도 하위 폴더로 묶지 않고
+`src/components`에 파일 단위로 작성한다. Supabase 인증, 데이터베이스, 서버 통신은 구체적인 명세가 있을
+때만 구현한다.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### III. 단일 기능과 최소 변경
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+한 번에 하나의 기능만 구현하며, 승인된 작업 범위에 필요한 최소한의 파일만 변경한다. 요청하지 않은
+리팩터링, 구조 변경, 최적화, 공통화, 추상화, 라이브러리 또는 패키지 설치를 수행하지 않는다. 작업 범위와
+관계없는 파일은 수정하지 않는다. 기존 코드 삭제가 필요하면 삭제 이유와 영향 범위를 먼저 설명한다.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### IV. Next.js 및 컴포넌트 규칙 준수
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+페이지는 App Router의 `app` 내부 `page.js`로, 공통 레이아웃은 필요한 경로의 `layout.js`로 작성한다.
+정적으로 목적지가 정해진 이동은 `next/link`의 `Link`를 우선 사용하고, 서버 응답이나 조건에 따른 이동에만
+`next/navigation`의 `useRouter`를 사용한다. React Router와 `useNavigate`는 사용하지 않는다. 상태,
+이벤트, 브라우저 API가 필요한 컴포넌트에만 `"use client"`를 선언한다.
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+기존 공통 컴포넌트를 우선 재사용하고 같은 역할의 컴포넌트를 중복 생성하지 않는다. 페이지에서만 사용하는
+간단한 요소를 무조건 공통 컴포넌트로 분리하지 않는다. 기존 컴포넌트의 props와 동작을 임의로 변경하지
+않으며, 공통 컴포넌트 수정이 다른 페이지에 영향을 줄 수 있으면 구현 전에 영향 범위를 알린다.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### V. 사전 승인과 기능 브랜치 협업
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+구현 전에 수정하거나 생성할 파일과 구현 계획을 사용자에게 제시하고 승인을 받아야 한다. 모든 기능 작업은
+기능 단위의 `feature/*` 브랜치에서 진행하며 `main` 브랜치에 직접 push하지 않는다. 하나의 브랜치에 관련
+없는 여러 기능을 포함하지 않는다. 작업 완료 후 Pull Request를 생성하고 팀원의 리뷰를 받은 뒤 `main`에
+병합한다. 병합 후에는 로컬 `main`을 최신 상태로 갱신한 다음 새 작업을 시작한다.
+
+## 코딩 및 네이밍 규칙
+
+- 컴포넌트 이름과 파일명은 PascalCase를 사용한다.
+- JavaScript 변수명과 함수명은 camelCase를 사용한다.
+- 이벤트 처리 함수에는 `handle` 접두사를 사용한다.
+- Boolean 값에는 가능한 경우 `is`, `has`, `can`, `should` 등의 접두사를 사용한다.
+- CSS 클래스 이름은 kebab-case를 사용한다.
+- SCSS Module의 kebab-case 클래스는 `styles["class-name"]`과 같이 대괄호 표기법으로 접근한다.
+- SCSS Module 파일명은 대상 파일명과 대응시킨다. 예를 들어 `Header.jsx`에는
+  `Header.module.scss`, `page.js`에는 `page.module.scss`를 사용한다.
+- 기존 공통 컴포넌트가 있으면 우선 재사용하며, 같은 역할의 컴포넌트를 중복 생성하지 않는다.
+
+## 금지 사항
+
+다음 작업은 사용자의 명시적인 요청 없이 수행하지 않는다.
+
+- TypeScript 전환
+- Tailwind CSS 도입
+- React Router 설치 또는 사용
+- 상태 관리 라이브러리 도입
+- 데이터 요청 라이브러리 도입
+- 폴더 구조 또는 파일명 변경
+- 공통 컴포넌트 구조 변경
+- 요청 범위 밖의 리팩터링
+- 명세에 없는 기능, 애니메이션 또는 UI 추가
+- Supabase 인증 및 통신 구조의 임의 결정
+
+## 개발 절차
+
+1. 구현 전에 `AGENTS.md`, 관련 `docs/specs`, 기존 코드를 확인한다.
+2. 수정하거나 생성할 파일, 구현 계획, 예상 영향 범위를 사용자에게 제시한다.
+3. 사용자 승인 후 한 가지 기능과 승인된 범위만 구현한다.
+4. 변경 위험에 맞는 lint, build 또는 기능 검증을 수행한다.
+5. 검증 결과와 변경 내용을 공유하고 기능 브랜치에서 Pull Request를 생성한다.
+
+## 거버넌스
+
+이 헌법은 프로젝트의 최소 개발 원칙이며 모든 Spec Kit 명세·계획·작업 문서와 구현 작업에 적용한다.
+`AGENTS.md`와 기능별 `docs/specs`는 이 헌법과 함께 준수한다. 문서 간 충돌이 발견되면 임의로 우선순위를
+정하거나 수정하지 않고 사용자에게 충돌 내용과 영향 범위를 보고하여 해결한다.
+
+헌법 개정 전에는 변경 이유, 영향을 받는 원칙과 문서, 새 버전을 제시하고 사용자의 승인을 받아야 한다.
+버전은 의미적 버전 규칙을 따른다. 기존 원칙을 제거하거나 호환되지 않게 재정의하면 MAJOR, 원칙 또는 필수
+절차를 추가하거나 실질적으로 확장하면 MINOR, 의미를 바꾸지 않는 설명·표현·오탈자 수정은 PATCH로 올린다.
+모든 구현 계획과 Pull Request 검토에서는 명세 준수, 기술 스택과 구조 보존, 작업 범위, 네이밍, 승인 및
+협업 절차 준수 여부를 확인한다.
+
+**버전**: 2.0.0 | **비준일**: 2026-08-04 | **최종 개정일**: 2026-08-05
