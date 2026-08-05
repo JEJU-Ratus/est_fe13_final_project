@@ -60,7 +60,6 @@ page.module.scss
 │   │   ├── favicon.ico
 │   │   ├── globals.scss
 │   │   ├── layout.js
-│   │   ├── loading.js
 │   │   ├── page.js
 │   │   │
 │   │   ├── login/
@@ -84,7 +83,7 @@ page.module.scss
 │   │   │               └── edit/
 │   │   │                   └── page.js
 │   │   │
-│   │   ├── all-notes/
+│   │   ├── allnote/
 │   │   │   └── page.js
 │   │   │
 │   │   └── mypage/
@@ -96,11 +95,8 @@ page.module.scss
 │   │
 │   ├── components/
 │   │   ├── Header.jsx
-│   │   ├── Button.jsx
-│   │   ├── LinkButton.jsx
 │   │   ├── Banner.jsx
-│   │   ├── PreparingModal.jsx
-│   │   ├── SuggestLoginModal.jsx
+│   │   ├── CommonModal.jsx
 │   │   ├── NotePasswordModal.jsx
 │   │   ├── QuizModal.jsx
 │   │   ├── NoteItem.jsx
@@ -119,6 +115,7 @@ page.module.scss
 │           └── _reset.scss
 │
 ├── AGENTS.md
+├── CLAUDE.md
 ├── README.md
 ├── eslint.config.mjs
 ├── jsconfig.json
