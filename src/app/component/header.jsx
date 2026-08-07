@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import styles from "./header.module.scss";
 
 const menuItems = ["요약 노트 생성", "전체 요약 노트", "퀴즈", "마이페이지"];
@@ -16,10 +17,7 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
     setIsHeaderCollapsed(false);
   }
 
-  const headerClassName = [
-    styles.header,
-    isHeaderCollapsed && styles["is-collapsed"],
-  ]
+  const headerClassName = [styles.header, isHeaderCollapsed && styles["is-collapsed"]]
     .filter(Boolean)
     .join(" ");
 
@@ -34,20 +32,23 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
             aria-expanded="false"
             onClick={handleExpand}
           >
-            <span className={styles["logo-slot"]} aria-hidden="true" />
+            <Image src="/images/logo-off.png" alt="프로필 이미지" width={42} height={42} />
           </button>
         ) : (
-          <div className={styles["logo-slot"]} aria-label="로고 이미지 영역" />
+          <button type="button" className={styles["logo-button"]} aria-label="홈으로 이동">
+            <Image src="/images/logo-on.png" alt="로고" width={59} height={25} />
+          </button>
         )}
+
         {!isHeaderCollapsed && (
           <button
             className={styles["panel-button"]}
             type="button"
             aria-label="헤더 접기"
-            aria-expanded="true"
+            aria-expanded={!isHeaderCollapsed}
             onClick={handleCollapse}
           >
-            <span className={styles["icon-slot"]} aria-hidden="true" />
+            <Image src="/images/left_panel_close.svg" alt="로고" width={59} height={25} />
           </button>
         )}
       </div>
@@ -56,7 +57,9 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
         <div className={styles["user-section"]}>
           {isLoggedIn ? (
             <div className={styles["logged-in-user"]}>
-              <div className={styles["profile-slot"]} aria-label="프로필 이미지 영역" />
+              <div className={styles["profile-slot"]}>
+                <Image src="/images/main_profile.webp" alt="프로필 이미지" width={48} height={48} />
+              </div>
               <div className={styles["profile-content"]}>
                 <p className={styles["user-name"]}>user name</p>
                 <div className={styles["account-buttons"]}>
@@ -83,7 +86,7 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
       )}
 
       <nav className={styles["menu-list"]} aria-label="주요 메뉴">
-        {menuItems.map((menuItem) => (
+        {menuItems.map(menuItem => (
           <button className={styles["menu-item"]} type="button" key={menuItem}>
             <span className={styles["menu-icon-slot"]} aria-label={`${menuItem} 아이콘 영역`} />
             {!isHeaderCollapsed && <span className={styles["menu-label"]}>{menuItem}</span>}
