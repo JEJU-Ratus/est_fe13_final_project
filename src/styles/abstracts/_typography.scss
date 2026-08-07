@@ -5,21 +5,21 @@
 
 // 48px
 @mixin text-48-bold {
-  @include mixin.font(var.$font-size-48, var.$font-weight-bold, var.$line-height-tight);
+  @include mixin.font(var.$font-size-48, var.$font-weight-bold);
 }
 
 // 36px
 @mixin text-36-bold {
-  @include mixin.font(var.$font-size-36, var.$font-weight-bold, var.$line-height-tight);
+  @include mixin.font(var.$font-size-36, var.$font-weight-bold);
 }
 
 // 24px
 @mixin text-24-semibold {
-  @include mixin.font(var.$font-size-24, var.$font-weight-semibold, var.$line-height-tight);
+  @include mixin.font(var.$font-size-24, var.$font-weight-semibold);
 }
 
 @mixin text-24-medium {
-  @include mixin.font(var.$font-size-24, var.$font-weight-medium, var.$line-height-tight);
+  @include mixin.font(var.$font-size-24, var.$font-weight-medium);
 }
 
 // 20px
