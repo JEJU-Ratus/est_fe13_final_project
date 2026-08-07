@@ -1,0 +1,60 @@
+@use "../styles/abstracts/colors" as color;
+@use "../styles/abstracts/typography" as typography;
+
+.summary-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 96px 0;
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 20px;
+}
+
+.summary-title {
+  @include typography.text-36-bold;
+
+  color: color.$black;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+
+  width: 292px;
+  height: 40px;
+  padding: 0 24px;
+
+  background: color.$white;
+  border-radius: 50px;
+
+  input {
+    flex: 1;
+
+    border: none;
+    outline: none;
+    background: transparent;
+  }
+
+  .search-icon {
+    color: color.$gray-medium-3;
+  }
+
+  &:focus-within {
+    box-shadow: 0 0 10px rgba(110, 110, 110, 0.6);
+  }
+}
+
+.summary-content {
+  display: grid;
+  grid-template-columns: repeat(4, 312px);
+  gap: 32px 24px;
+}
