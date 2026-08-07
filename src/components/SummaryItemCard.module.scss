@@ -1,0 +1,109 @@
+@use "../styles/abstracts/colors" as color;
+@use "../styles/abstracts/typography" as typography;
+
+.item-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  width: 312px;
+  height: 229px;
+  padding: 16px 20px;
+
+  background: color.$card-color;
+  border-radius: 15px;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 10px rgba(250, 129, 47, 0.7);
+    cursor: pointer;
+  }
+}
+
+.card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-header,
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nickname {
+  @include typography.text-18-semibold;
+  color: color.$black;
+}
+
+.bookmark-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+
+.bookmark-icon {
+  color: color.$gray-light-3;
+
+  &.is-active {
+    color: color.$fda-navy;
+  }
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-title {
+  @include typography.text-20-semibold;
+
+  width: 100%;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  color: color.$black;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.card-desc {
+  @include typography.text-14-regular;
+
+  display: -webkit-box;
+  overflow: hidden;
+
+  color: color.$gray-medium-3;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.created-date {
+  @include typography.text-14-regular;
+  color: color.$gray-medium-3;
+}
+
+.lock-icon {
+  color: color.$fda-navy;
+}
