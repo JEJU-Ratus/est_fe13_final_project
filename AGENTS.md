@@ -55,43 +55,56 @@ page.module.scss
 ├── docs/
 │   └── specs/
 │
+├── public/
+│   └── images/
+│
+├── specs/
+│
 ├── src/
 │   ├── app/
 │   │   ├── favicon.ico
 │   │   ├── globals.scss
 │   │   ├── layout.js
-│   │   ├── page.js
 │   │   │
-│   │   ├── login/
-│   │   │   └── page.js
-│   │   │
-│   │   ├── signup/
-│   │   │   ├── page.js
-│   │   │   └── complete/
+│   │   ├── (dev)/
+│   │   │   └── dev/
+│   │   │       ├── layout.js
 │   │   │       └── page.js
 │   │   │
-│   │   ├── summary/
-│   │   │   ├── page.js
-│   │   │   └── [summaryId]/
-│   │   │       ├── layout.js
-│   │   │       ├── page.js
-│   │   │       └── notes/
-│   │   │           ├── new/
-│   │   │           │   └── page.js
-│   │   │           └── [noteId]/
-│   │   │               ├── page.js
-│   │   │               └── edit/
-│   │   │                   └── page.js
-│   │   │
-│   │   ├── allnote/
-│   │   │   └── page.js
-│   │   │
-│   │   └── mypage/
+│   │   └── (site)/
+│   │       ├── layout.js
 │   │       ├── page.js
-│   │       ├── summaries/
+│   │       │
+│   │       ├── login/
 │   │       │   └── page.js
-│   │       └── bookmarks/
-│   │           └── page.js
+│   │       │
+│   │       ├── signup/
+│   │       │   ├── page.js
+│   │       │   └── complete/
+│   │       │       └── page.js
+│   │       │
+│   │       ├── summary/
+│   │       │   ├── page.js
+│   │       │   └── [summaryId]/
+│   │       │       ├── layout.js
+│   │       │       ├── page.js
+│   │       │       └── notes/
+│   │       │           ├── new/
+│   │       │           │   └── page.js
+│   │       │           └── [noteId]/
+│   │       │               ├── page.js
+│   │       │               └── edit/
+│   │       │                   └── page.js
+│   │       │
+│   │       ├── allnote/
+│   │       │   └── page.js
+│   │       │
+│   │       └── mypage/
+│   │           ├── page.js
+│   │           ├── summaries/
+│   │           │   └── page.js
+│   │           └── bookmarks/
+│   │               └── page.js
 │   │
 │   ├── components/
 │   │   ├── Header.jsx
