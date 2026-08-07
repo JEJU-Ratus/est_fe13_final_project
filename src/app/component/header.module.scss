@@ -10,11 +10,31 @@
   border-right: 1px solid color.$gray-light;
   background-color: color.$white;
   box-shadow: 0 10px 10px rgba(color.$gray, 0.6);
-}
 
-.is-collapsed {
-  width: 52px;
-  padding-bottom: 24px;
+  &.is-collapsed {
+    width: 52px;
+    padding-bottom: 24px;
+
+    .header-top {
+      justify-content: center;
+      height: auto;
+      padding: 24px 0 20px;
+    }
+
+    .menu-list {
+      flex: 1;
+      gap: 20px;
+      align-items: center;
+      padding-top: 0;
+    }
+
+    .menu-item {
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+    }
+  }
 }
 
 .header-top {
@@ -26,23 +46,6 @@
   padding: 0 20px;
 }
 
-.is-collapsed .header-top {
-  justify-content: center;
-  height: auto;
-  padding: 24px 0 20px;
-}
-
-.logo-slot {
-  width: 59px;
-  height: 25px;
-  flex-shrink: 0;
-}
-
-.is-collapsed .logo-slot {
-  width: 32px;
-  height: 33px;
-}
-
 .panel-button {
   display: grid;
   width: 24px;
@@ -51,6 +54,11 @@
   place-items: center;
   border: 0;
   background: transparent;
+}
+
+.logo-button {
+  all: unset;
+  cursor: pointer;
 }
 
 .collapsed-logo-button {
@@ -75,12 +83,35 @@
 .user-section {
   padding: 24px 20px;
   border-bottom: 1px solid color.$gray-light;
-}
 
-.guest-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  .guest-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .logged-in-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .profile-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .user-name {
+        margin: 0;
+        font-size: var.$font-size-14;
+        line-height: 1;
+      }
+
+      .account-buttons {
+        display: flex;
+        gap: 10px;
+      }
+    }
+  }
 }
 
 .login-button,
@@ -113,36 +144,6 @@
   background-color: color.$fda-orange;
 }
 
-.logged-in-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.profile-slot {
-  width: 63px;
-  height: 63px;
-  flex-shrink: 0;
-  border-radius: 50%;
-}
-
-.profile-content {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.user-name {
-  margin: 0;
-  font-size: var.$font-size-14;
-  line-height: 1;
-}
-
-.account-buttons {
-  display: flex;
-  gap: 10px;
-}
-
 .profile-button,
 .logout-button {
   width: 90px;
@@ -162,40 +163,26 @@
   flex-direction: column;
   width: 100%;
   padding-top: 0;
-}
 
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  height: 48px;
-  padding: 0 20px;
-  border: 0;
-  color: color.$black;
-  background: transparent;
-  font: inherit;
-  cursor: default;
-  text-align: left;
-}
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 48px;
+    padding: 0 20px;
+    border: 0;
+    color: color.$black;
+    background: transparent;
+    font: inherit;
+    cursor: default;
+    text-align: left;
 
-.menu-label {
-  font-size: var.$font-size-14;
-  line-height: 1;
-}
-
-.is-collapsed .menu-list {
-  flex: 1;
-  gap: 20px;
-  align-items: center;
-  padding-top: 0;
-}
-
-.is-collapsed .menu-item {
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
+    .menu-label {
+      font-size: var.$font-size-14;
+      line-height: 1;
+    }
+  }
 }
 
 .collapsed-user-slot {
@@ -219,8 +206,8 @@
   font-size: 12px;
   line-height: 1;
   white-space: nowrap;
-}
 
-.footer span:nth-child(even) {
-  font-size: 10px;
+  span:nth-child(even) {
+    font-size: 10px;
+  }
 }
