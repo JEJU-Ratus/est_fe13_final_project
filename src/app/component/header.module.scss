@@ -1,0 +1,213 @@
+@use "@/styles/abstracts/colors" as color;
+@use "@/styles/abstracts/variables" as var;
+
+.header {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  min-height: 100vh;
+  overflow: hidden;
+  border-right: 1px solid color.$gray-light;
+  background-color: color.$white;
+  box-shadow: 0 10px 10px rgba(color.$gray, 0.6);
+
+  &.is-collapsed {
+    width: 52px;
+    padding-bottom: 24px;
+
+    .header-top {
+      justify-content: center;
+      height: auto;
+      padding: 24px 0 20px;
+    }
+
+    .menu-list {
+      flex: 1;
+      gap: 20px;
+      align-items: center;
+      padding-top: 0;
+    }
+
+    .menu-item {
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+    }
+  }
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 48px;
+  padding: 0 20px;
+}
+
+.panel-button {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  background: transparent;
+}
+
+.logo-button {
+  all: unset;
+  cursor: pointer;
+}
+
+.collapsed-logo-button {
+  display: grid;
+  width: 32px;
+  height: 33px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.icon-slot,
+.menu-icon-slot {
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.user-section {
+  padding: 24px 20px;
+  border-bottom: 1px solid color.$gray-light;
+
+  .guest-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .logged-in-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .profile-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .user-name {
+        margin: 0;
+        font-size: var.$font-size-14;
+        line-height: 1;
+      }
+
+      .account-buttons {
+        display: flex;
+        gap: 10px;
+      }
+    }
+  }
+}
+
+.login-button,
+.signup-button,
+.profile-button,
+.logout-button {
+  border: 0;
+  font: inherit;
+  font-weight: var.$font-weight-medium;
+  cursor: default;
+}
+
+.login-button,
+.signup-button {
+  width: 100%;
+  padding: 11px 0;
+  border-radius: 50px;
+  font-size: var.$font-size-18;
+  line-height: 1;
+}
+
+.login-button,
+.profile-button {
+  color: color.$fda-navy;
+  background-color: color.$fda-yellow;
+}
+
+.signup-button {
+  color: color.$white;
+  background-color: color.$fda-orange;
+}
+
+.profile-button,
+.logout-button {
+  width: 90px;
+  height: 34px;
+  border-radius: 100px;
+  font-size: var.$font-size-14;
+}
+
+.logout-button {
+  color: color.$white;
+  background-color: color.$fda-navy;
+}
+
+.menu-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  padding-top: 0;
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 48px;
+    padding: 0 20px;
+    border: 0;
+    color: color.$black;
+    background: transparent;
+    font: inherit;
+    cursor: default;
+    text-align: left;
+
+    .menu-label {
+      font-size: var.$font-size-14;
+      line-height: 1;
+    }
+  }
+}
+
+.collapsed-user-slot {
+  width: 30px;
+  height: 30px;
+  margin-top: auto;
+  align-self: center;
+  border-radius: 50%;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 32px;
+  flex-shrink: 0;
+  color: color.$gray;
+  background-color: #efefef;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+
+  span:nth-child(even) {
+    font-size: 10px;
+  }
+}
