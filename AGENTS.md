@@ -97,7 +97,7 @@ page.module.scss
 │   │   ├── Header.jsx
 │   │   ├── Banner.jsx
 │   │   ├── CommonModal.jsx
-│   │   ├── NotePasswordModal.jsx
+│   │   ├── NotePwModal.jsx
 │   │   ├── QuizModal.jsx
 │   │   ├── NoteItem.jsx
 │   │   ├── SummaryItemCard.jsx
