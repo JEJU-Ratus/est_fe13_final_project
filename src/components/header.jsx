@@ -48,7 +48,7 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
             aria-expanded={!isHeaderCollapsed}
             onClick={handleCollapse}
           >
-            <Image src="/images/left_panel_close.svg" alt="로고" width={59} height={25} />
+            <span className={`material-symbols-outlined ${styles.icon}`}>left_panel_close</span>
           </button>
         )}
       </div>
