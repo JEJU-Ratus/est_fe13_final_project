@@ -1,5 +1,6 @@
 import { Noto_Sans_KR } from "next/font/google"; // 내장 폰트 시스템
-import "./globals.scss"; // 프로젝트 전역 css
+import "@/app/globals.scss"; // 프로젝트 전역 css
+import Header from "@/components/header";
 
 const notoSans = Noto_Sans_KR({
   // 폰트를 변수에 저장. 아래는 옵션
@@ -17,7 +18,10 @@ export default function RootLayout({ children }) {
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" />
       </head>
-      <body>{children}</body>
+      <body>
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }
