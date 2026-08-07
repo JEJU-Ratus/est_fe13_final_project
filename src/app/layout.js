@@ -15,7 +15,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko" className={`${notoSans.className}`}>
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap"
+        />
       </head>
       <body>{children}</body>
     </html>
