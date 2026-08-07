@@ -4,7 +4,24 @@ import { useState } from "react";
 import Image from "next/image";
 import styles from "./header.module.scss";
 
-const menuItems = ["요약 노트 생성", "전체 요약 노트", "퀴즈", "마이페이지"];
+const menuItems = [
+  {
+    label: "요약 노트 생성",
+    icon: "assignment_add",
+  },
+  {
+    label: "전체 요약 노트",
+    icon: "book_4",
+  },
+  {
+    label: "퀴즈",
+    icon: "quiz",
+  },
+  {
+    label: "마이페이지",
+    icon: "person",
+  },
+];
 
 export default function Header({ isLoggedIn = false, isCollapsed = false }) {
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(isCollapsed);
@@ -48,7 +65,7 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
             aria-expanded={!isHeaderCollapsed}
             onClick={handleCollapse}
           >
-            <span className={`material-symbols-outlined ${styles.icon}`}>left_panel_close</span>
+            <span className={`material-symbols-outlined left_panel_close ${styles.icon}`}>left_panel_close</span>
           </button>
         )}
       </div>
@@ -86,10 +103,16 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
       )}
 
       <nav className={styles["menu-list"]} aria-label="주요 메뉴">
-        {menuItems.map(menuItem => (
-          <button className={styles["menu-item"]} type="button" key={menuItem}>
-            <span className={styles["menu-icon-slot"]} aria-label={`${menuItem} 아이콘 영역`} />
-            {!isHeaderCollapsed && <span className={styles["menu-label"]}>{menuItem}</span>}
+        {menuItems.map(menu => (
+          <button className={styles["menu-item"]} type="button" key={menu.label}>
+            <span
+              className={`material-symbols-outlined ${styles["menu-icon-slot"]}`}
+              aria-hidden="true"
+            >
+              {menu.icon}
+            </span>
+
+            {!isHeaderCollapsed && <span className={styles["menu-label"]}>{menu.label}</span>}
           </button>
         ))}
       </nav>
