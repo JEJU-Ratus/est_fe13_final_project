@@ -9,13 +9,17 @@ const MODES = [
   "suggestLogin",
   "requireLogin",
   "alreadyLoggedIn",
+  "error",
 ];
+
+const ERROR_STATUSES = [401, 403, 404, 429, 500, 502, 503, 504, "network", 418, "undefined"];
 
 export default function CommonModalDevPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState("preparing");
   const [resultMessage, setResultMessage] = useState("대기 중");
   const [confirmCount, setConfirmCount] = useState(0);
+  const [status, setStatus] = useState(500);
 
   function handleModeChange(event) {
     setMode(event.target.value);
@@ -24,6 +28,17 @@ export default function CommonModalDevPage() {
   function handleModalOpen() {
     setResultMessage(`${mode} 모달 열림`);
     setIsOpen(true);
+  }
+
+  function handleStatusChange(event) {
+    const nextStatus = event.target.value;
+
+    if (nextStatus === "undefined") {
+      setStatus(undefined);
+      return;
+    }
+
+    setStatus(nextStatus === "network" ? nextStatus : Number(nextStatus));
   }
 
   function handleModalClose() {
@@ -50,6 +65,27 @@ export default function CommonModalDevPage() {
         ))}
       </select>
 
+      {mode === "error" && (
+        <>
+          <label htmlFor="common-modal-status">오류 상태</label>
+          <select
+            id="common-modal-status"
+            value={status ?? "undefined"}
+            onChange={handleStatusChange}
+          >
+            {ERROR_STATUSES.map((statusOption) => (
+              <option key={statusOption} value={statusOption}>
+                {statusOption === 418
+                  ? "418 (미지원 상태)"
+                  : statusOption === "undefined"
+                    ? "상태 없음"
+                    : statusOption}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
+
       <button type="button" onClick={handleModalOpen}>
         공통 모달 열기
       </button>
@@ -60,6 +96,7 @@ export default function CommonModalDevPage() {
       <CommonModal
         isOpen={isOpen}
         mode={mode}
+        status={status}
         onClose={handleModalClose}
         onConfirm={handleConfirm}
       />

@@ -33,7 +33,7 @@
 | `suggestLogin` | 로그인 → `/login`, 전체 요약 노트 → `/summary` | `onClose` | 없음 |
 | `requireLogin` | 없음 | 즉시 `/login` | 3초 후 `/login` |
 | `alreadyLoggedIn` | 없음 | 즉시 `/` | 3초 후 `/` |
-| `error` | 없음 | 즉시 `/` | 3초 후 `/` |
+| `error` | 없음 | 401은 즉시 `/login`, 나머지는 즉시 `/` | 401은 3초 후 `/login`, 나머지는 3초 후 `/` |
 
 ## 오류 계약
 

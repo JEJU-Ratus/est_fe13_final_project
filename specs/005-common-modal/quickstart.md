@@ -30,9 +30,9 @@ npm run dev
 2. `confirmDelete`에서 취소와 닫기가 승인 결과를 만들지 않는지, 삭제가 승인 결과를 한 번만 만드는지 확인한다.
 3. `suggestLogin`의 두 버튼 목적지가 각각 `/login`, `/summary`인지 확인하고 닫기는 현재 페이지를 유지하는지 확인한다.
 4. `requireLogin`이 3초 후 `/login`으로 한 번 이동하는지 확인한다.
-5. `alreadyLoggedIn`과 `error`가 3초 후 `/`로 한 번 이동하는지 확인한다.
+5. `alreadyLoggedIn`은 3초 후 `/`, `error`는 401이면 `/login`, 나머지 상태면 `/`로 한 번 이동하는지 확인한다.
 6. 자동 이동 전에 닫기를 눌러 즉시 같은 목적지로 이동하고 3초 뒤 중복 이동이 없는지 확인한다.
-7. 모든 오류 선택에서 [`contracts/CommonModal.md`](./contracts/CommonModal.md)의 고정 문구와 메인 이동 안내가 표시되는지 확인한다.
+7. 모든 오류 선택에서 [`contracts/CommonModal.md`](./contracts/CommonModal.md)의 고정 문구와 상태별 이동 안내가 표시되는지 확인한다.
 8. 배경막 클릭과 Escape 입력으로 모달이 닫히지 않고 뒤쪽 컨트롤도 작동하지 않는지 확인한다.
 9. 같은 개발 페이지에서 공통 모달이 두 개 이상 겹치지 않는지 확인한다.
 10. 프비 이미지, 닫기 아이콘, 흰색 둥근 컨테이너, 회색 배경막, 중앙 정렬과 버튼 구성이 제공 디자인과 일치하는지 확인한다.

@@ -65,7 +65,7 @@
 - 상태·이벤트·타이머·클라이언트 라우팅이 필요하므로 `CommonModal.jsx`와 개발 확인 페이지에만 `"use client"`를 선언한다.
 - `isOpen`이 거짓이면 렌더링하지 않으며 타이머도 존재하지 않는다.
 - `suggestLogin`의 정적으로 정해진 버튼 이동은 `Link`를 사용한다.
-- `requireLogin`, `alreadyLoggedIn`, `error`의 조건부·시간 기반 이동은 `useRouter`의 `replace`를 사용해 제한 또는 오류 화면으로 뒤로 돌아오는 흐름을 막는다.
+- `requireLogin`, `alreadyLoggedIn`, `error`의 조건부·시간 기반 이동은 `useRouter`의 `replace`를 사용해 제한 또는 오류 화면으로 뒤로 돌아오는 흐름을 막는다. `error`는 401이면 `/login`, 나머지 상태면 `/`를 목적지로 선택한다.
 - 자동 이동 모드는 `useEffect`에서 타이머 하나를 만들고 정리 함수에서 해제한다. 닫기 아이콘은 동일 목적지로 즉시 이동하며 기존 타이머는 정리되어야 한다.
 - `error` 상태는 `401`, `403`, `404`, `429`, `500`, `502/503/504`, `network`, 그 외의 순서로 고정 문구에 매핑한다.
 

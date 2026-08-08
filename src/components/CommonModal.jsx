@@ -19,12 +19,35 @@ const MODE_MESSAGES = {
   alreadyLoggedIn: "이미 로그인하셨습니다. 메인페이지로 이동합니다.",
 };
 
+const ERROR_MESSAGES = {
+  401: "로그인이 필요합니다.",
+  403: "접근 권한이 없습니다.",
+  404: "요청한 내용을 찾을 수 없습니다.",
+  429: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
+  500: "서버 오류가 발생했습니다.",
+  502: "현재 서비스 연결이 원활하지 않습니다.",
+  503: "현재 서비스 연결이 원활하지 않습니다.",
+  504: "현재 서비스 연결이 원활하지 않습니다.",
+  network: "네트워크 연결을 확인해 주세요.",
+};
+
+function getErrorMessage(status) {
+  return ERROR_MESSAGES[status] ?? "문제가 발생했습니다.";
+}
+
+function getErrorDestination(status) {
+  return Number(status) === 401 ? "/login" : "/";
+}
+
 export default function CommonModal(props) {
-  const { isOpen, mode, onClose, onConfirm } = props;
+  const { isOpen, mode, status, onClose, onConfirm } = props;
   const router = useRouter();
   const timerRef = useRef(null);
-  const autoDestination = AUTO_DESTINATIONS[mode];
-  const message = MODE_MESSAGES[mode] ?? "";
+  const autoDestination = mode === "error" ? getErrorDestination(status) : AUTO_DESTINATIONS[mode];
+  const message =
+    mode === "error"
+      ? `${getErrorMessage(status)}\n${Number(status) === 401 ? "로그인페이지로 이동합니다." : "메인페이지로 이동합니다."}`
+      : (MODE_MESSAGES[mode] ?? "");
 
   useEffect(() => {
     if (!isOpen || !autoDestination) {

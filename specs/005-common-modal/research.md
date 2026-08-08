@@ -10,7 +10,7 @@
 
 ## 결정 2: 정적 이동과 조건부 이동의 분리
 
-**결정**: `suggestLogin` 버튼의 `/login`, `/summary` 이동은 `Link`를 사용하고, 모드 및 시간에 따라 실행되는 `/login`, `/` 이동은 `useRouter().replace()`를 사용한다.
+**결정**: `suggestLogin` 버튼의 `/login`, `/summary` 이동은 `Link`를 사용하고, 모드 및 시간에 따라 실행되는 `/login`, `/` 이동은 `useRouter().replace()`를 사용한다. 오류 상태 401은 재인증을 위해 `/login`, 나머지 오류는 `/`로 이동한다.
 
 **근거**: AGENTS.md는 고정 목적지 이동에 `Link`, 조건에 따른 이동에 `useRouter`를 우선하도록 정한다. 자동 이동은 사용자가 제한·오류 화면으로 되돌아오지 않도록 현재 히스토리 항목을 교체한다.
 
