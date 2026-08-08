@@ -5,6 +5,7 @@ import CommonModal from "@/components/CommonModal";
 
 const MODES = [
   "preparing",
+  "confirmDelete",
   "suggestLogin",
   "requireLogin",
   "alreadyLoggedIn",
@@ -14,6 +15,7 @@ export default function CommonModalDevPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState("preparing");
   const [resultMessage, setResultMessage] = useState("대기 중");
+  const [confirmCount, setConfirmCount] = useState(0);
 
   function handleModeChange(event) {
     setMode(event.target.value);
@@ -26,6 +28,12 @@ export default function CommonModalDevPage() {
 
   function handleModalClose() {
     setResultMessage(`${mode} 모달 닫힘`);
+    setIsOpen(false);
+  }
+
+  function handleConfirm() {
+    setConfirmCount((currentCount) => currentCount + 1);
+    setResultMessage("삭제 승인 전달 확인(실제 삭제 없음)");
     setIsOpen(false);
   }
 
@@ -47,11 +55,13 @@ export default function CommonModalDevPage() {
       </button>
 
       <p aria-live="polite">확인 결과: {resultMessage}</p>
+      <p>삭제 승인 호출 횟수: {confirmCount}</p>
 
       <CommonModal
         isOpen={isOpen}
         mode={mode}
         onClose={handleModalClose}
+        onConfirm={handleConfirm}
       />
     </main>
   );

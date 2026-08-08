@@ -13,13 +13,14 @@ const AUTO_DESTINATIONS = {
 
 const MODE_MESSAGES = {
   preparing: "현재 준비 중입니다.",
+  confirmDelete: "정말 삭제하시겠습니까?",
   suggestLogin: "로그인이 필요합니다.",
   requireLogin: "로그인이 필요합니다.",
   alreadyLoggedIn: "이미 로그인하셨습니다. 메인페이지로 이동합니다.",
 };
 
 export default function CommonModal(props) {
-  const { isOpen, mode, onClose } = props;
+  const { isOpen, mode, onClose, onConfirm } = props;
   const router = useRouter();
   const timerRef = useRef(null);
   const autoDestination = AUTO_DESTINATIONS[mode];
@@ -55,6 +56,10 @@ export default function CommonModal(props) {
     }
 
     onClose?.();
+  }
+
+  function handleConfirm() {
+    onConfirm?.();
   }
 
   if (!isOpen) {
@@ -104,6 +109,25 @@ export default function CommonModal(props) {
             <Link className={styles["secondary-link"]} href="/summary">
               전체 요약 노트
             </Link>
+          </div>
+        )}
+
+        {mode === "confirmDelete" && (
+          <div className={styles["button-group"]}>
+            <button
+              className={styles["primary-button"]}
+              type="button"
+              onClick={handleConfirm}
+            >
+              삭제
+            </button>
+            <button
+              className={styles["secondary-button"]}
+              type="button"
+              onClick={handleClose}
+            >
+              취소
+            </button>
           </div>
         )}
       </section>

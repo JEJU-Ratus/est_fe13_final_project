@@ -79,10 +79,10 @@ description: "공통 모달 기능 구현을 위한 작업 목록"
 
 ### 사용자 스토리 2 구현
 
-- [ ] T015 [US2] `confirmDelete` 고정 문구, 삭제·취소 버튼과 닫기 아이콘의 `onConfirm`·`onClose` 분기를 `src/components/CommonModal.jsx`에 구현하고 실제 삭제 요청은 추가하지 않는다.
-- [ ] T016 [US2] 삭제 버튼과 취소 버튼의 색상·배치·포커스 상태를 제공 디자인과 기존 토큰에 맞춰 `src/components/CommonModal.module.scss`에 작성한다.
-- [ ] T017 [US2] `confirmDelete` 선택과 승인 호출 횟수를 로컬 결과 문구로 확인하도록 `src/app/(dev)/dev/commonmodal/page.js`를 확장하되 삭제 대상이나 모의 API를 추가하지 않는다.
-- [ ] T018 [US2] `specs/005-common-modal/quickstart.md`의 삭제 시나리오를 실행해 삭제 승인 1회, 취소·닫기 시 승인 0회와 현재 데이터 유지 조건을 검증한다.
+- [x] T015 [US2] `confirmDelete` 고정 문구, 삭제·취소 버튼과 닫기 아이콘의 `onConfirm`·`onClose` 분기를 `src/components/CommonModal.jsx`에 구현하고 실제 삭제 요청은 추가하지 않는다.
+- [x] T016 [US2] 삭제 버튼과 취소 버튼의 색상·배치·포커스 상태를 제공 디자인과 기존 토큰에 맞춰 `src/components/CommonModal.module.scss`에 작성한다.
+- [x] T017 [US2] `confirmDelete` 선택과 승인 호출 횟수를 로컬 결과 문구로 확인하도록 `src/app/(dev)/dev/commonmodal/page.js`를 확장하되 삭제 대상이나 모의 API를 추가하지 않는다.
+- [x] T018 [US2] `specs/005-common-modal/quickstart.md`의 삭제 시나리오를 실행해 삭제 승인 1회, 취소·닫기 시 승인 0회와 현재 데이터 유지 조건을 검증한다.
 
 **확인 지점**: 사용자 스토리 2를 실제 삭제 없이 독립 실행하고 콜백 결과로 검증할 수 있음
 
