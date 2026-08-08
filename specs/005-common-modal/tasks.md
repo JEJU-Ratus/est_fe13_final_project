@@ -114,12 +114,12 @@ description: "공통 모달 기능 구현을 위한 작업 목록"
 
 **목적**: 여섯 모드 전체의 디자인·상호작용·프로젝트 품질 확인
 
-- [ ] T024 `src/components/CommonModal.jsx`에서 허용하지 않은 mode 확장, Promise·Response·오류 원문·경로 입력 props, 실제 인증·삭제·API 로직이 없는지 `specs/005-common-modal/contracts/CommonModal.md`와 대조한다.
-- [ ] T025 제공 디자인을 기준으로 여섯 모드의 프비 이미지, 닫기 아이콘, 중앙 정렬, 배경막, 모드별 버튼 구성을 `src/components/CommonModal.jsx`와 `src/components/CommonModal.module.scss`에서 최종 확인한다.
-- [ ] T026 배경막 클릭과 Escape로 닫히지 않음, 뒤쪽 포인터 입력 0건, 한 번에 하나의 모달만 표시됨을 `src/app/(dev)/dev/commonmodal/page.js`에서 검증한다.
-- [ ] T027 `npm run lint`를 실행하고 이번 기능 파일인 `src/components/CommonModal.jsx`, `src/components/CommonModal.module.scss`, `src/app/(dev)/dev/commonmodal/page.js` 관련 오류를 해결한다.
-- [ ] T028 `npm run build`를 실행하고 `/dev/commonmodal`을 포함한 production build가 성공하는지 확인한다.
-- [ ] T029 `git diff --name-only`로 소스 변경이 `src/components/CommonModal.jsx`, `src/components/CommonModal.module.scss`, `src/app/(dev)/dev/commonmodal/page.js`에만 있고 `src/app/(dev)/dev/page.js`가 수정되지 않았는지 확인한다.
+- [x] T024 `src/components/CommonModal.jsx`에서 허용하지 않은 mode 확장, Promise·Response·오류 원문·경로 입력 props, 실제 인증·삭제·API 로직이 없는지 `specs/005-common-modal/contracts/CommonModal.md`와 대조한다.
+- [x] T025 제공 디자인을 기준으로 여섯 모드의 프비 이미지, 닫기 아이콘, 중앙 정렬, 배경막, 모드별 버튼 구성을 `src/components/CommonModal.jsx`와 `src/components/CommonModal.module.scss`에서 최종 확인한다.
+- [x] T026 배경막 클릭과 Escape로 닫히지 않음, 뒤쪽 포인터 입력 0건, 한 번에 하나의 모달만 표시됨을 `src/app/(dev)/dev/commonmodal/page.js`에서 검증한다.
+- [x] T027 `npm run lint`를 실행하고 이번 기능 파일인 `src/components/CommonModal.jsx`, `src/components/CommonModal.module.scss`, `src/app/(dev)/dev/commonmodal/page.js` 관련 오류를 해결한다.
+- [x] T028 `npm run build`를 실행하고 `/dev/commonmodal`을 포함한 production build가 성공하는지 확인한다.
+- [x] T029 `git diff --name-only`로 소스 변경이 `src/components/CommonModal.jsx`, `src/components/CommonModal.module.scss`, `src/app/(dev)/dev/commonmodal/page.js`에만 있고 `src/app/(dev)/dev/page.js`가 수정되지 않았는지 확인한다.
 
 **커밋 경계 제안**: 전체 디자인 및 검증 보완
 
