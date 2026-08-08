@@ -5,11 +5,9 @@ import CommonModal from "@/components/CommonModal";
 
 const MODES = [
   "preparing",
-  "confirmDelete",
   "suggestLogin",
   "requireLogin",
   "alreadyLoggedIn",
-  "error",
 ];
 
 export default function CommonModalDevPage() {
@@ -29,10 +27,6 @@ export default function CommonModalDevPage() {
   function handleModalClose() {
     setResultMessage(`${mode} 모달 닫힘`);
     setIsOpen(false);
-  }
-
-  function handleConfirm() {
-    setResultMessage("삭제 승인 전달 확인");
   }
 
   return (
@@ -57,9 +51,7 @@ export default function CommonModalDevPage() {
       <CommonModal
         isOpen={isOpen}
         mode={mode}
-        status={500}
         onClose={handleModalClose}
-        onConfirm={handleConfirm}
       />
     </main>
   );

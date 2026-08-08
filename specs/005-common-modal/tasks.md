@@ -57,13 +57,13 @@ description: "공통 모달 기능 구현을 위한 작업 목록"
 
 ### 사용자 스토리 1 구현
 
-- [ ] T008 [US1] `preparing`의 고정 문구와 `onClose` 기반 현재 페이지 유지 동작을 `src/components/CommonModal.jsx`에 구현한다.
-- [ ] T009 [US1] `suggestLogin`의 고정 문구, `/login` 및 `/summary` `Link`, `onClose` 동작을 `src/components/CommonModal.jsx`에 구현한다.
-- [ ] T010 [US1] 자동 이동 모드의 목적지 설정과 `useEffect` 3초 단일 타이머·정리 로직을 `src/components/CommonModal.jsx`에 구현한다.
-- [ ] T011 [US1] `requireLogin`의 3초 후 `/login` 이동과 닫기 시 즉시 `/login` 이동을 `src/components/CommonModal.jsx`에 구현한다.
-- [ ] T012 [US1] `alreadyLoggedIn`의 3초 후 `/` 이동과 닫기 시 즉시 `/` 이동을 `src/components/CommonModal.jsx`에 구현한다.
-- [ ] T013 [US1] 네 안내 모드를 선택·재공개하고 결과를 확인할 수 있도록 `src/app/(dev)/dev/commonmodal/page.js`의 개발 확인 제어를 완성한다.
-- [ ] T014 [US1] `specs/005-common-modal/quickstart.md`의 안내 모드 시나리오를 `/dev/commonmodal`에서 실행해 정적 링크, 즉시 이동, 3초 이동과 중복 이동 방지를 검증한다.
+- [x] T008 [US1] `preparing`의 고정 문구와 `onClose` 기반 현재 페이지 유지 동작을 `src/components/CommonModal.jsx`에 구현한다.
+- [x] T009 [US1] `suggestLogin`의 고정 문구, `/login` 및 `/summary` `Link`, `onClose` 동작을 `src/components/CommonModal.jsx`에 구현한다.
+- [x] T010 [US1] 자동 이동 모드의 목적지 설정과 `useEffect` 3초 단일 타이머·정리 로직을 `src/components/CommonModal.jsx`에 구현한다.
+- [x] T011 [US1] `requireLogin`의 3초 후 `/login` 이동과 닫기 시 즉시 `/login` 이동을 `src/components/CommonModal.jsx`에 구현한다.
+- [x] T012 [US1] `alreadyLoggedIn`의 3초 후 `/` 이동과 닫기 시 즉시 `/` 이동을 `src/components/CommonModal.jsx`에 구현한다.
+- [x] T013 [US1] 네 안내 모드를 선택·재공개하고 결과를 확인할 수 있도록 `src/app/(dev)/dev/commonmodal/page.js`의 개발 확인 제어를 완성한다.
+- [x] T014 [US1] `specs/005-common-modal/quickstart.md`의 안내 모드 시나리오를 `/dev/commonmodal`에서 실행해 정적 링크, 즉시 이동, 3초 이동과 중복 이동 방지를 검증한다.
 
 **확인 지점**: 사용자 스토리 1만으로 네 안내 모드를 독립 실행하고 검증할 수 있음
 

@@ -1,12 +1,59 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./CommonModal.module.scss";
+
+const AUTO_DESTINATIONS = {
+  requireLogin: "/login",
+  alreadyLoggedIn: "/",
+};
+
+const MODE_MESSAGES = {
+  preparing: "현재 준비 중입니다.",
+  suggestLogin: "로그인이 필요합니다.",
+  requireLogin: "로그인이 필요합니다.",
+  alreadyLoggedIn: "이미 로그인하셨습니다. 메인페이지로 이동합니다.",
+};
 
 export default function CommonModal(props) {
   const { isOpen, mode, onClose } = props;
+  const router = useRouter();
+  const timerRef = useRef(null);
+  const autoDestination = AUTO_DESTINATIONS[mode];
+  const message = MODE_MESSAGES[mode] ?? "";
+
+  useEffect(() => {
+    if (!isOpen || !autoDestination) {
+      return undefined;
+    }
+
+    timerRef.current = window.setTimeout(() => {
+      timerRef.current = null;
+      router.replace(autoDestination);
+    }, 3000);
+
+    return () => {
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [autoDestination, isOpen, router]);
 
   function handleClose() {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    if (autoDestination) {
+      router.replace(autoDestination);
+      return;
+    }
+
     onClose?.();
   }
 
@@ -45,8 +92,20 @@ export default function CommonModal(props) {
           />
         </div>
 
-        <p className={styles["modal-message"]} aria-live="polite" />
-        <div className={styles["button-group"]} />
+        <p className={styles["modal-message"]} aria-live="polite">
+          {message}
+        </p>
+
+        {mode === "suggestLogin" && (
+          <div className={styles["button-group"]}>
+            <Link className={styles["link-button"]} href="/login">
+              로그인 하러가기
+            </Link>
+            <Link className={styles["secondary-link"]} href="/summary">
+              전체 요약 노트
+            </Link>
+          </div>
+        )}
       </section>
     </div>
   );
