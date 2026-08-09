@@ -1,0 +1,18 @@
+@use "@/styles/abstracts/colors" as color;
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  // 기존 페이지와 공통 모달보다 앞에 표시합니다.
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(color.$gray-light-3, 0.9);
+  pointer-events: auto;
+}
+
+// 디자인 적용 전 첫 번째 구현 단계에서 사용하는 임시 로딩 문구입니다.
+.loading-message {
+  color: color.$fda-navy;
+}
