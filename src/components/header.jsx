@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./header.module.scss";
 
 const menuItems = [
@@ -12,6 +13,7 @@ const menuItems = [
   {
     label: "전체 요약 노트",
     icon: "book_4",
+    href: "/Summary",
   },
   {
     label: "퀴즈",
@@ -34,9 +36,7 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
     setIsHeaderCollapsed(false);
   }
 
-  const headerClassName = [styles.header, isHeaderCollapsed && styles["is-collapsed"]]
-    .filter(Boolean)
-    .join(" ");
+  const headerClassName = [styles.header, isHeaderCollapsed && styles["is-collapsed"]].filter(Boolean).join(" ");
 
   return (
     <aside className={headerClassName} aria-label="사이드 헤더">
@@ -105,10 +105,7 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
       <nav className={styles["menu-list"]} aria-label="주요 메뉴">
         {menuItems.map(menu => (
           <button className={styles["menu-item"]} type="button" key={menu.label}>
-            <span
-              className={`material-symbols-outlined ${styles["menu-icon-slot"]}`}
-              aria-hidden="true"
-            >
+            <span className={`material-symbols-outlined ${styles["menu-icon-slot"]}`} aria-hidden="true">
               {menu.icon}
             </span>
 
