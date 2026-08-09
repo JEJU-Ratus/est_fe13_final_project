@@ -2,6 +2,16 @@
   width: 100%;
 }
 
+.banner-link {
+  display: block;
+  width: 100%;
+
+  &:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+  }
+}
+
 .banner-image {
   display: block;
   width: 100%;

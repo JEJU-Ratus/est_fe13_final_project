@@ -56,12 +56,12 @@ description: "공통 광고 배너 구현을 위한 작업 목록"
 
 ### 사용자 스토리 1 구현
 
-- [ ] T007 [US1] `/`로 시작하고 `//`가 아닌 내부 목적지와 파싱 가능한 HTTP(S) 외부 목적지를 구분하는 판별 로직을 `src/components/Banner.jsx`에 작성한다.
-- [ ] T008 [US1] 내부 목적지일 때 이미지 전체를 `Link`로 감싸 현재 탭에서 이동하도록 `src/components/Banner.jsx`에 구현한다.
-- [ ] T009 [US1] 외부 HTTP(S) 목적지일 때 이미지 전체를 새 탭 `<a>`로 감싸고 원래 페이지와 실행 컨텍스트를 분리하도록 `src/components/Banner.jsx`에 구현한다.
-- [ ] T010 [US1] 링크 래퍼가 배너 전체 너비와 이미지 전체 클릭 영역을 차지하고 키보드 포커스를 구분하도록 `src/components/Banner.module.scss`에 작성한다.
-- [ ] T011 [US1] 내부 목적지와 외부 목적지 사례를 `src/app/(dev)/dev/banner/page.js`에 추가하고 배너 내부에는 별도 버튼·문구·아이콘·오버레이를 넣지 않는다.
-- [ ] T012 [US1] `specs/006-banner/quickstart.md`의 내부·외부 이동 시나리오를 `/dev/banner`에서 실행해 전체 이미지 클릭 영역, 현재 탭과 새 탭 동작을 검증한다.
+- [x] T007 [US1] `/`로 시작하고 `//`가 아닌 내부 목적지와 파싱 가능한 HTTP(S) 외부 목적지를 구분하는 판별 로직을 `src/components/Banner.jsx`에 작성한다.
+- [x] T008 [US1] 내부 목적지일 때 이미지 전체를 `Link`로 감싸 현재 탭에서 이동하도록 `src/components/Banner.jsx`에 구현한다.
+- [x] T009 [US1] 외부 HTTP(S) 목적지일 때 이미지 전체를 새 탭 `<a>`로 감싸고 원래 페이지와 실행 컨텍스트를 분리하도록 `src/components/Banner.jsx`에 구현한다.
+- [x] T010 [US1] 링크 래퍼가 배너 전체 너비와 이미지 전체 클릭 영역을 차지하고 키보드 포커스를 구분하도록 `src/components/Banner.module.scss`에 작성한다.
+- [x] T011 [US1] 내부 목적지와 외부 목적지 사례를 `src/app/(dev)/dev/banner/page.js`에 추가하고 배너 내부에는 별도 버튼·문구·아이콘·오버레이를 넣지 않는다.
+- [x] T012 [US1] `specs/006-banner/quickstart.md`의 내부·외부 이동 시나리오를 `/dev/banner`에서 실행해 전체 이미지 클릭 영역, 현재 탭과 새 탭 동작을 검증한다.
 
 **확인 지점**: 사용자 스토리 1만으로 내부·외부 이동 가능한 배너 MVP를 독립 실행하고 검증할 수 있음
 
