@@ -77,10 +77,10 @@ description: "공통 광고 배너 구현을 위한 작업 목록"
 
 ### 사용자 스토리 2 구현
 
-- [ ] T013 [US2] 최상위 배너, 링크 래퍼와 이미지에 `width: 100%`, 자동 높이, 블록 표시와 비율 유지 규칙을 `src/components/Banner.module.scss`에 완성한다.
-- [ ] T014 [US2] 좁은 영역, 넓은 영역과 임의의 세 번째 영역을 재현하는 부모 너비 클래스만 `src/app/(dev)/dev/banner/page.module.scss`에 작성한다.
-- [ ] T015 [US2] 같은 `Banner`를 세 부모 영역에 배치하고 `main`, `list`, `variant`, 고정 크기 prop을 전달하지 않도록 `src/app/(dev)/dev/banner/page.js`를 확장한다.
-- [ ] T016 [US2] `specs/006-banner/quickstart.md`의 크기 시나리오를 `/dev/banner`에서 실행해 잘림·왜곡 0건과 부모 너비만으로 크기가 달라지는지 검증한다.
+- [x] T013 [US2] 최상위 배너, 링크 래퍼와 이미지에 `width: 100%`, 자동 높이, 블록 표시와 비율 유지 규칙을 `src/components/Banner.module.scss`에 완성한다.
+- [x] T014 [US2] 좁은 영역, 넓은 영역과 임의의 세 번째 영역을 재현하는 부모 너비 클래스만 `src/app/(dev)/dev/banner/page.module.scss`에 작성한다.
+- [x] T015 [US2] 같은 `Banner`를 세 부모 영역에 배치하고 `main`, `list`, `variant`, 고정 크기 prop을 전달하지 않도록 `src/app/(dev)/dev/banner/page.js`를 확장한다.
+- [x] T016 [US2] `specs/006-banner/quickstart.md`의 크기 시나리오를 `/dev/banner`에서 실행해 잘림·왜곡 0건과 부모 너비만으로 크기가 달라지는지 검증한다.
 
 **확인 지점**: 사용자 스토리 2를 공통 배너 변경 없이 부모 컨테이너만으로 독립 검증할 수 있음
 
