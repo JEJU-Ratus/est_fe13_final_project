@@ -96,10 +96,10 @@ description: "공통 광고 배너 구현을 위한 작업 목록"
 
 ### 사용자 스토리 3 구현
 
-- [ ] T017 [US3] `imageSrc`가 명시적으로 없거나 빈 값이면 컨테이너 없이 `null`을 반환하도록 `src/components/Banner.jsx`에 구현한다.
-- [ ] T018 [US3] `href`가 없거나 빈 값, `//`, `javascript:` 및 미지원 스킴이면 링크 없이 같은 이미지만 렌더링하도록 `src/components/Banner.jsx`에 구현한다.
-- [ ] T019 [US3] 이미지 없음, 목적지 없음과 미지원 목적지 사례를 `src/app/(dev)/dev/banner/page.js`에 추가하고 사례 설명은 배너 바깥에만 표시한다.
-- [ ] T020 [US3] `specs/006-banner/quickstart.md`의 누락·잘못된 값 시나리오를 `/dev/banner`에서 실행해 깨진 이미지, 빈 영역, 의도하지 않은 이동과 새 탭 열기가 0건인지 검증한다.
+- [x] T017 [US3] `imageSrc`가 명시적으로 없거나 빈 값이면 컨테이너 없이 `null`을 반환하도록 `src/components/Banner.jsx`에 구현한다.
+- [x] T018 [US3] `href`가 없거나 빈 값, `//`, `javascript:` 및 미지원 스킴이면 링크 없이 같은 이미지만 렌더링하도록 `src/components/Banner.jsx`에 구현한다.
+- [x] T019 [US3] 이미지 없음, 목적지 없음과 미지원 목적지 사례를 `src/app/(dev)/dev/banner/page.js`에 추가하고 사례 설명은 배너 바깥에만 표시한다.
+- [x] T020 [US3] `specs/006-banner/quickstart.md`의 누락·잘못된 값 시나리오를 `/dev/banner`에서 실행해 깨진 이미지, 빈 영역, 의도하지 않은 이동과 새 탭 열기가 0건인지 검증한다.
 
 **확인 지점**: 사용자 스토리 3을 API나 오류 UI 없이 단순 입력값만으로 독립 검증할 수 있음
 

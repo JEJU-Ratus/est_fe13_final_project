@@ -49,6 +49,30 @@ export default function BannerDevPage() {
           </div>
         </div>
       </section>
+
+      <section>
+        <h2>목적지 없는 배너</h2>
+        <div className={styles["banner-preview"]}>
+          <Banner alt="이동하지 않는 프론트엔드 스킬업 이벤트" />
+        </div>
+      </section>
+
+      <section>
+        <h2>지원하지 않는 목적지 배너</h2>
+        <div className={styles["banner-preview"]}>
+          <Banner
+            href="javascript:alert('invalid')"
+            alt="지원하지 않는 목적지를 가진 프론트엔드 스킬업 이벤트"
+          />
+        </div>
+      </section>
+
+      <section>
+        <h2>이미지 없는 배너</h2>
+        <div className={styles["banner-preview"]}>
+          <Banner imageSrc="" alt="" href="/dev" />
+        </div>
+      </section>
     </main>
   );
 }

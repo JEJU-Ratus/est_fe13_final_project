@@ -25,12 +25,17 @@ function getDestinationType(href) {
 }
 
 export default function Banner({ imageSrc = DEFAULT_IMAGE_SRC, alt = DEFAULT_ALT, href = "" }) {
+  if (typeof imageSrc !== "string" || imageSrc.trim() === "") {
+    return null;
+  }
+
+  const normalizedImageSrc = imageSrc.trim();
   const destination = typeof href === "string" ? href.trim() : "";
   const destinationType = getDestinationType(destination);
   const image = (
     <Image
       className={styles["banner-image"]}
-      src={imageSrc}
+      src={normalizedImageSrc}
       alt={alt}
       width={1322}
       height={358}
