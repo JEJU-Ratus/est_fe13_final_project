@@ -48,8 +48,7 @@ npm run dev
 
 ```powershell
 npm run lint
-npm run build
 ```
 
-두 명령이 오류 없이 완료되어야 한다.
+Loading 관련 lint 오류 없이 완료되어야 한다. 전체 production build는 페이지 통합 또는 배포 전 검증에서 실행한다.
 
