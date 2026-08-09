@@ -111,11 +111,11 @@ description: "공통 광고 배너 구현을 위한 작업 목록"
 
 **목적**: 전체 계약, 디자인, 범위와 프로젝트 품질 확인
 
-- [ ] T021 `src/components/Banner.jsx`와 `src/components/Banner.module.scss`를 `specs/006-banner/contracts/Banner.md`와 대조해 별도 CTA·문구·아이콘·오버레이, 페이지별 크기 유형, Client Component 전환이 없는지 확인한다.
-- [ ] T022 `src/app/(dev)/dev/banner/page.js`와 `src/app/(dev)/dev/banner/page.module.scss`에서 내부·외부·비대화형·미표시와 세 부모 너비 시나리오를 모두 최종 검증한다.
-- [ ] T023 `npm run lint`를 실행해 `src/components/Banner.jsx`, `src/components/Banner.module.scss`, `src/app/(dev)/dev/banner/page.js`, `src/app/(dev)/dev/banner/page.module.scss` 관련 오류가 없는지 확인한다.
-- [ ] T024 `npm run build`를 실행해 `/dev/banner`가 포함된 production build가 성공하는지 확인한다.
-- [ ] T025 `git diff --name-only`로 소스 변경이 `src/components/Banner.jsx`, `src/components/Banner.module.scss`, `src/app/(dev)/dev/banner/page.js`, `src/app/(dev)/dev/banner/page.module.scss`에만 있고 `src/app/(dev)/dev/page.js`와 제품 페이지가 수정되지 않았는지 확인한다.
+- [x] T021 `src/components/Banner.jsx`와 `src/components/Banner.module.scss`를 `specs/006-banner/contracts/Banner.md`와 대조해 별도 CTA·문구·아이콘·오버레이, 페이지별 크기 유형, Client Component 전환이 없는지 확인한다.
+- [x] T022 `src/app/(dev)/dev/banner/page.js`와 `src/app/(dev)/dev/banner/page.module.scss`에서 내부·외부·비대화형·미표시와 세 부모 너비 시나리오를 모두 최종 검증한다.
+- [x] T023 `npm run lint`를 실행해 `src/components/Banner.jsx`, `src/components/Banner.module.scss`, `src/app/(dev)/dev/banner/page.js`, `src/app/(dev)/dev/banner/page.module.scss` 관련 오류가 없는지 확인한다.
+- [x] T024 `npm run build`를 실행해 `/dev/banner`가 포함된 production build가 성공하는지 확인한다.
+- [x] T025 `git diff --name-only`로 소스 변경이 `src/components/Banner.jsx`, `src/components/Banner.module.scss`, `src/app/(dev)/dev/banner/page.js`, `src/app/(dev)/dev/banner/page.module.scss`에만 있고 `src/app/(dev)/dev/page.js`와 제품 페이지가 수정되지 않았는지 확인한다.
 
 **커밋 경계 제안**: 전체 계약 및 검증 완료
 
