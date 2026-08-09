@@ -54,15 +54,15 @@
 
 ## 4단계: 사용자 스토리 2 - 일관된 로딩 디자인 확인 (우선순위: P2)
 
-**목표**: 첨부 디자인의 프로필 이미지, 막대형 회전 스피너와 고정 두 줄 문구를 공통 Loading에 완성한다.
+**목표**: 첨부 디자인의 프로필 이미지, 순차적으로 투명도가 바뀌는 막대형 스피너와 고정 두 줄 문구를 공통 Loading에 완성한다.
 
-**독립 검증**: Loading을 단독 표시하고 첨부 디자인과 중앙 이미지, 막대 수·배치·회전, 두 줄 문구, 배경 색상과 간격을 비교한다.
+**독립 검증**: Loading을 단독 표시하고 첨부 디자인과 중앙 이미지, 막대 수·배치·순차 투명도 변화, 두 줄 문구, 배경 색상과 간격을 비교한다.
 
 ### 사용자 스토리 2 구현
 
-- [ ] T007 [US2] `next/image`로 `/images/프로필.webp` 장식 이미지를 표시하고, 원형 배치를 위한 흰색 막대 12개와 `잠시만 기다려주세요.`, `로딩중입니다` 두 줄을 `src/components/Loading.jsx`에 추가한다.
-- [ ] T008 [US2] 중앙 이미지 크기, 12개 막대의 원형 배치, 흰색 색상, 반복 회전 keyframes, 두 줄 문구의 색상·타이포그래피·간격을 첨부 디자인에 맞춰 `src/components/Loading.module.scss`에 작성한다.
-- [ ] T009 [US2] `prefers-reduced-motion: reduce`에서 회전 속도를 현저히 낮추면서 이미지와 문구로 상태를 유지하는 스타일을 `src/components/Loading.module.scss`에 추가하고 기본·모션 감소 양쪽을 `/dev/loading`에서 검증한다.
+- [x] T007 [US2] `next/image`로 `/images/프로필.webp` 장식 이미지를 표시하고, 원형 배치를 위한 흰색 막대 12개와 `잠시만 기다려주세요.`, `로딩중입니다` 두 줄을 `src/components/Loading.jsx`에 추가한다.
+- [x] T008 [US2] 중앙 이미지 크기, 12개 막대의 원형 배치, 순차 투명도 keyframes, 두 줄 문구의 색상·타이포그래피·간격을 첨부 디자인에 맞춰 `src/components/Loading.module.scss`에 작성한다.
+- [x] T009 [US2] `prefers-reduced-motion: reduce`에서 투명도 변화 주기를 현저히 늘리면서 이미지와 문구로 상태를 유지하는 스타일을 `src/components/Loading.module.scss`에 추가하고 기본·모션 감소 양쪽을 `/dev/loading`에서 검증한다.
 
 **확인 지점**: 사용자 스토리 1의 차단 동작을 유지하면서 첨부 디자인의 주요 요소가 모두 표시됨
 
@@ -78,9 +78,9 @@
 
 ### 사용자 스토리 3 구현 및 검증
 
-- [ ] T010 [US3] `src/app/(dev)/dev/loading/page.js`가 `isLoading && <Loading />` 단일 조건으로 표시를 소유하고 같은 작업에 Suspense fallback을 중복 연결하지 않도록 정리한다.
-- [ ] T011 [US3] `src/components/Loading.jsx`가 API, Promise 판정, 인증, 데이터 요청, 오류 처리, 이동, 로딩 상태와 전역 중복 조정을 포함하지 않고 `specs/007-loading/contracts/Loading.md`의 props 없는 UI 계약만 수행하는지 검증한다.
-- [ ] T012 [US3] 저장소에서 새 `loading.js` 파일과 승인 범위 밖 페이지 연결이 생성되지 않았으며 `/summary`, `/mypage/summaries`, `/mypage/bookmarks`, 로그인·회원가입 파일이 수정되지 않았는지 `git diff`와 파일 목록으로 검증한다.
+- [x] T010 [US3] `src/app/(dev)/dev/loading/page.js`가 `isLoading && <Loading />` 단일 조건으로 표시를 소유하고 같은 작업에 Suspense fallback을 중복 연결하지 않도록 정리한다.
+- [x] T011 [US3] `src/components/Loading.jsx`가 API, Promise 판정, 인증, 데이터 요청, 오류 처리, 이동, 로딩 상태와 전역 중복 조정을 포함하지 않고 `specs/007-loading/contracts/Loading.md`의 props 없는 UI 계약만 수행하는지 검증한다.
+- [x] T012 [US3] 저장소에서 새 `loading.js` 파일과 승인 범위 밖 페이지 연결이 생성되지 않았으며 `/summary`, `/mypage/summaries`, `/mypage/bookmarks`, 로그인·회원가입 파일이 수정되지 않았는지 `git diff`와 파일 목록으로 검증한다.
 
 **확인 지점**: 이벤트 작업은 `isLoading`, 실제 렌더 대기는 후속 호출부의 단일 Suspense fallback이라는 계약을 유지하며 이번 범위에는 실제 페이지 연결이 없음
 
