@@ -16,7 +16,7 @@ const menuItems = [
   {
     label: "전체 요약 노트",
     icon: "book_4",
-    href: "/Summary",
+    href: "/summary",
   },
   {
     label: "퀴즈",
