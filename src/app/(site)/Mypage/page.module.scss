@@ -102,8 +102,12 @@
           width: 100%;
           padding: 10px 16px;
           border: 1px solid color.$gray-light;
-          border-radius: 8px;
-          outline-color: color.$fda-orange;
+          border-radius: 50px;
+
+          &:focus {
+            outline: 1px solid color.$fda-orange;
+            outline-offset: -1px;
+          }
         }
       }
     }
@@ -149,14 +153,31 @@
   background-color: color.$white;
 
   .table-header {
-    display: grid;
-    grid-template-columns: 100px 140px minmax(180px, 1fr) minmax(200px, 1fr) 130px;
+    display: flex;
+    position: relative;
+    align-items: center;
     padding: 16px 24px;
     border-bottom: 1px solid color.$gray-light;
     color: color.$gray-medium-3;
     font-size: var.$font-size-14;
     font-weight: var.$font-weight-medium;
-    text-align: center;
+
+    .table-leading {
+      display: flex;
+      gap: 48px;
+    }
+
+    .table-topic {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    > span:last-child {
+      margin-left: auto;
+      width: 153px;
+      text-align: left;
+    }
   }
 
   .empty-message {
