@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import styles from "./header.module.scss";
+import styles from "./Header.module.scss";
 
 const menuItems = [
   {
@@ -49,11 +49,11 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
             aria-expanded="false"
             onClick={handleExpand}
           >
-            <Image src="/images/logo-off.png" alt="프로필 이미지" width={42} height={42} />
+            <Image src="/images/프! 로고.png" alt="프로필 이미지" width={42} height={42} />
           </button>
         ) : (
           <button type="button" className={styles["logo-button"]} aria-label="홈으로 이동">
-            <Image src="/images/logo-on.png" alt="로고" width={59} height={25} />
+            <Image src="/images/프다로고.png" alt="로고" width={59} height={25} />
           </button>
         )}
 
