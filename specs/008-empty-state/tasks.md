@@ -33,8 +33,8 @@
 
 **⚠️ 중요**: 이 단계를 완료하기 전에는 사용자 스토리 적용 작업을 시작하지 않는다.
 
-- [ ] T004 [P] `src/components/EmptyState.jsx`에 필수 `message` prop, `/images/empty-note.png` 장식 이미지, 안내 문구, `role="status"`와 정중한 live 안내를 구현하고 접근성 속성의 목적을 주석으로 설명한다.
-- [ ] T005 [P] `src/components/EmptyState.module.scss`에 `src/app/(site)/summary/[summaryId]/page.module.scss`의 기존 중앙 정렬·이미지 크롭·문구 스타일을 옮기고 일반 부모 너비와 Grid 전체 열을 모두 차지하도록 구현한다.
+- [X] T004 [P] `src/components/EmptyState.jsx`에 필수 `message` prop, `/images/empty-note.png` 장식 이미지, 안내 문구, `role="status"`와 정중한 live 안내를 구현하고 접근성 속성의 목적을 주석으로 설명한다.
+- [X] T005 [P] `src/components/EmptyState.module.scss`에 `src/app/(site)/summary/[summaryId]/page.module.scss`의 기존 중앙 정렬·이미지 크롭·문구 스타일을 옮기고 일반 부모 너비와 Grid 전체 열을 모두 차지하도록 구현한다.
 
 **확인 지점**: `EmptyState({ message })`가 내부 상태·이벤트·버튼·링크 없이 공통 표시 구조를 제공하고 각 호출 영역에서 import할 준비가 완료됨
 
