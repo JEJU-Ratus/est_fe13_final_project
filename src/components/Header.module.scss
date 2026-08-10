@@ -180,6 +180,11 @@
     cursor: default;
     text-align: left;
 
+    &[href] {
+      cursor: pointer;
+      text-decoration: none;
+    }
+
     .menu-label {
       font-size: var.$font-size-14;
       line-height: 1;
