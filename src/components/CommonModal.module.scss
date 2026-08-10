@@ -1,5 +1,5 @@
-@use "../styles/abstracts/colors" as color;
-@use "../styles/abstracts/typography" as typography;
+@use "styles/abstracts/colors" as color;
+@use "styles/abstracts/typography" as typography;
 
 .modal-backdrop {
   position: fixed;
@@ -19,11 +19,11 @@
 
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
 
-  width: min(500px, 100%);
-  min-height: 330px;
-  padding: 48px 44px 38px;
+  width: min(896px, 100%);
+  min-height: 600px;
 
   background: color.$white;
   border-radius: 6px;
@@ -61,8 +61,8 @@
 .mascot-wrapper {
   position: relative;
 
-  width: 220px;
-  height: 190px;
+  width: 348px;
+  height: 329px;
 }
 
 .mascot-image {
@@ -70,7 +70,7 @@
 }
 
 .modal-message {
-  @include typography.text-16-semibold;
+  @include typography.text-20-semibold;
 
   margin: 10px 0 0;
   color: color.$black;
