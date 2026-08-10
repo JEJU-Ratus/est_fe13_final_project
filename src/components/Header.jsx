@@ -26,7 +26,7 @@ const menuItems = [
   {
     label: "마이페이지",
     icon: "person",
-    href: "/Mypage",
+    href: "/mypage",
     requiresLogin: true,
   },
 ];
