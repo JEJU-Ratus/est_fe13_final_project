@@ -11,12 +11,12 @@ const menuItems = [
   {
     label: "요약 노트 생성",
     icon: "assignment_add",
-    href: "#",
+    href: "/",
   },
   {
     label: "전체 요약 노트",
     icon: "book_4",
-    href: "#",
+    href: "/summary",
   },
   {
     label: "퀴즈",
