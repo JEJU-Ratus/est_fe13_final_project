@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import CommonModal from "@/components/CommonModal";
 import Loading from "@/components/Loading";
 import styles from "./page.module.scss";
 
@@ -41,13 +40,6 @@ export default function LoginPage() {
   const [isLoading] = useState(false);
   // 자격 정보 실패 문구는 실제 인증 결과가 연결된 뒤 이 상태로 관리합니다.
   const [formError] = useState("");
-  // 실제 로그인 사용자 판정이나 시스템 오류가 연결되기 전에는 모달을 열지 않습니다.
-  const [loginModal] = useState({
-    isOpen: false,
-    mode: "alreadyLoggedIn",
-    status: undefined,
-  });
-
   const emailError = validateEmail(email);
   const passwordError = validatePassword(password);
   const shouldShowValidation = isEmailTouched || isPasswordTouched;
@@ -225,11 +217,6 @@ export default function LoginPage() {
       </div>
 
       {isLoading && <Loading />}
-      <CommonModal
-        isOpen={loginModal.isOpen}
-        mode={loginModal.mode}
-        status={loginModal.status}
-      />
     </main>
   );
 }

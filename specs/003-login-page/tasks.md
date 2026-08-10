@@ -11,7 +11,7 @@ description: "로그인 페이지 UI 구현을 위한 작업 목록"
 
 **참고 문서**: `research.md`, `data-model.md`, `contracts/LoginPage.md`, `quickstart.md`
 
-**구현 범위**: 로그인 UI, 입력 검증, 로그인 상태 유지 Boolean, 공통 Loading·CommonModal 배치, 반응형 스타일
+**구현 범위**: 로그인 UI, 입력 검증, 로그인 상태 유지 Boolean, 공통 Loading 배치, 반응형 스타일
 
 **제외 범위**: 실제 Supabase 인증, OAuth, API, 세션 저장·복구, 가짜 인증 성공, `loading.js`, Suspense fallback, production build
 
@@ -101,14 +101,14 @@ description: "로그인 페이지 UI 구현을 위한 작업 목록"
 
 ## 5단계: 사용자 스토리 3 - 접근 안내와 회원가입 경로 (우선순위: P3)
 
-**목표**: 비로그인 사용자의 회원가입 이동과 추후 로그인 사용자·시스템 오류 안내를 위한 공통 모달 경계를 제공한다.
+**목표**: 비로그인 사용자의 회원가입 이동을 제공하고 CommonModal 연결은 실제 인증 연동 단계로 분리한다.
 
 **독립 검증**: 회원가입 링크가 `/signup`으로 이동하고 로그인 페이지가 Header를 중복 렌더링하지 않으며, CommonModal 계약을 변경하지 않았는지 확인한다.
 
 ### 사용자 스토리 3 구현
 
 - [x] T017 [US3] `src/app/(site)/login/page.js`에 `/signup`을 가리키는 `Link`와 회원가입 안내 문구를 추가한다.
-- [x] T018 [US3] `src/app/(site)/login/page.js`에 기존 `CommonModal`의 `alreadyLoggedIn`·`error` 모드를 사용할 수 있는 표시 경계를 계약대로 배치하되 로그인 판정, 오류 응답과 가짜 트리거는 구현하지 않는다.
+- [x] T018 [US3] `src/app/(site)/login/page.js`에 실제 로그인 판정과 오류 응답이 없는 동안 `CommonModal`용 임시 상태나 항상 닫힌 표시 경계를 만들지 않고 인증 연동 단계로 이관한다.
 - [x] T019 [US3] `src/app/(site)/login/page.module.scss`에 회원가입 안내와 링크 상태 스타일을 반영하고 페이지가 `Header`용 공간이나 Header UI를 중복 생성하지 않도록 확인한다.
 
 **확인 지점**: 회원가입 이동은 동작하고 Header·CommonModal의 기존 책임과 로그인 페이지 책임이 분리되어 있다.
@@ -117,7 +117,7 @@ description: "로그인 페이지 UI 구현을 위한 작업 목록"
 
 - 변경 파일: `src/app/(site)/login/page.js`, `src/app/(site)/login/page.module.scss`
 - 검증: `/signup` 이동, Header 미렌더링, CommonModal 계약 보존, 실제 사용자·오류 판정 미구현 확인
-- 권장 커밋: `git commit -m "feat: 로그인 보조 경로와 공통 모달 경계 추가"`
+- 권장 커밋: `git commit -m "feat: 로그인 회원가입 경로 추가"`
 
 ---
 
@@ -170,7 +170,7 @@ description: "로그인 페이지 UI 구현을 위한 작업 목록"
 ### 점진적 제공
 
 1. MVP 이후 T014~T016으로 소셜 로그인 진입 UI를 추가한다.
-2. T017~T019로 회원가입 경로와 CommonModal 사용 경계를 추가한다.
+2. T017~T019로 회원가입 경로를 추가하고 CommonModal 연결을 인증 연동 단계로 분리한다.
 3. T020~T023으로 수동 검증과 lint를 완료한다.
 
 ## 참고
