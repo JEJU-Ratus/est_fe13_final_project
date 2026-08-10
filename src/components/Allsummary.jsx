@@ -1,8 +1,26 @@
 import styles from "./AllSummary.module.scss";
 import SummaryItemCard from "./SummaryItemCard";
+import summaries from "@/mocks/summaries.json";
+import users from "@/mocks/users.json";
+import bookmarks from "@/mocks/bookmarks.json";
+
+const currentUserId = "user-001";
 
 export default function AllSummary({ title }) {
-  const demoCards = Array.from({ length: 12 });
+  const summaryCards = summaries.map((summary) => {
+    const author = users.find((user) => user.userId === summary.authorId);
+    const isBookmarked = bookmarks.some(
+      (bookmark) =>
+        bookmark.userId === currentUserId && bookmark.summaryId === summary.summaryId,
+    );
+
+    return {
+      ...summary,
+      nickname: author?.nickname ?? "알 수 없는 사용자",
+      profileImageUrl: author?.profileImageUrl ?? "/images/main_profile.webp",
+      isBookmarked,
+    };
+  });
 
   return (
     <main className={styles["summary-page"]}>
@@ -20,8 +38,18 @@ export default function AllSummary({ title }) {
         </div>
 
         <div className={styles["summary-content"]}>
-          {demoCards.map((_, index) => (
-            <SummaryItemCard key={index} />
+          {summaryCards.map((summary) => (
+            <SummaryItemCard
+              key={summary.summaryId}
+              summaryId={summary.summaryId}
+              nickname={summary.nickname}
+              profileImageUrl={summary.profileImageUrl}
+              title={summary.title}
+              excerpt={summary.excerpt}
+              createdAt={summary.createdAt}
+              isPrivate={summary.isPrivate}
+              initialIsBookmarked={summary.isBookmarked}
+            />
           ))}
         </div>
       </section>
