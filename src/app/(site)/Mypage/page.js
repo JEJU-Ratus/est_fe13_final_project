@@ -69,7 +69,7 @@ export default function Mypage() {
 
         <section className={styles["learning-note-section"]} aria-labelledby="learning-note-title">
           <div className={styles["section-heading"]}>
-            <h2 id="learning-note-title">학습 노트</h2>
+            <h2 id="learning-note-title">내 학습노트 리스트</h2>
             <div className={styles["more-link"]}>
               <span>더보기</span>
               <span className={`material-symbols-outlined ${styles["more-icon"]}`} aria-hidden="true">
@@ -80,10 +80,11 @@ export default function Mypage() {
 
           <div className={styles["learning-note-table"]}>
             <div className={styles["table-header"]}>
-              <span>상태</span>
-              <span>작성자</span>
-              <span>학습 노트 제목</span>
-              <span>연관 요약 노트 주제</span>
+              <div className={styles["table-leading"]}>
+                <span>상태</span>
+                <span>작성자</span>
+              </div>
+              <span className={styles["table-topic"]}>주제</span>
               <span>작성일</span>
             </div>
             <p className={styles["empty-message"]}>현재 리스트가 없습니다.</p>
