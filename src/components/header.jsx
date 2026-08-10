@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./Header.module.scss";
@@ -25,8 +26,18 @@ const menuItems = [
   },
 ];
 
-export default function Header({ isLoggedIn = false, isCollapsed = false }) {
-  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(isCollapsed);
+//헤더가 접힌 페이지
+const COLLAPSED_PATHS = ["/login", "/signup", "/signup/complete"];
+
+
+export default function Header({ isLoggedIn = false }) {
+   // 최초 헤더 렌더링 시 현재 경로를 기준으로 접힘/펼침 상태 결정
+   // useState의 초기값, 페이지 이동 시 사용자가 선택된 상태 유지
+  const pathname = usePathname();
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(() =>
+    COLLAPSED_PATHS.includes(pathname)
+  );
+
 
   function handleCollapse() {
     setIsHeaderCollapsed(true);
@@ -49,7 +60,7 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
             aria-expanded="false"
             onClick={handleExpand}
           >
-            <Image src="/images/프! 로고.png" alt="로고" width={40} height={40} />
+            <Image src="/images/프! 로고.png" alt="로고" width={40} height={36} />
           </button>
         ) : (
           <button type="button" className={styles["logo-button"]} aria-label="홈으로 이동">
