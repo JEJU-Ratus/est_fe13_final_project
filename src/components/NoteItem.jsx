@@ -26,7 +26,7 @@ export default function NoteItem({
   return (
     <Link
       className={styles["note-item"]}
-      href={`/Summary/${summaryId}/notes/${noteId}`}
+      href={`/summary/${summaryId}/notes/${noteId}`}
     >
       <span className={styles["status-cell"]}>
         <span className={styles["status-image"]}>
