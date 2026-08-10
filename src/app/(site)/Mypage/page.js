@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import SummaryItemCard from "@/components/SummaryItemCard";
 import styles from "./page.module.scss";
 
@@ -70,12 +71,12 @@ export default function Mypage() {
         <section className={styles["learning-note-section"]} aria-labelledby="learning-note-title">
           <div className={styles["section-heading"]}>
             <h2 id="learning-note-title">내 학습노트 리스트</h2>
-            <div className={styles["more-link"]}>
+            <Link href="#" className={styles["more-link"]}>
               <span>더보기</span>
               <span className={`material-symbols-outlined ${styles["more-icon"]}`} aria-hidden="true">
                 arrow_forward_ios
               </span>
-            </div>
+            </Link>
           </div>
 
           <div className={styles["learning-note-table"]}>
@@ -94,12 +95,12 @@ export default function Mypage() {
         <section className={styles["summary-section"]} aria-labelledby="my-summary-title">
           <div className={styles["section-heading"]}>
             <h2 id="my-summary-title">내 요약 노트</h2>
-            <div className={styles["more-link"]}>
+            <Link href="#" className={styles["more-link"]}>
               <span>더보기</span>
               <span className={`material-symbols-outlined ${styles["more-icon"]}`} aria-hidden="true">
                 arrow_forward_ios
               </span>
-            </div>
+            </Link>
           </div>
 
           <div className={styles["summary-list"]}>
@@ -112,12 +113,12 @@ export default function Mypage() {
         <section className={styles["summary-section"]} aria-labelledby="bookmark-title">
           <div className={styles["section-heading"]}>
             <h2 id="bookmark-title">북마크</h2>
-            <div className={styles["more-link"]}>
+            <Link href="#" className={styles["more-link"]}>
               <span>더보기</span>
               <span className={`material-symbols-outlined ${styles["more-icon"]}`} aria-hidden="true">
                 arrow_forward_ios
               </span>
-            </div>
+            </Link>
           </div>
 
           <div className={styles["summary-list"]}>

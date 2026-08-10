@@ -136,6 +136,8 @@
     align-items: center;
     color: color.$gray-medium-3;
     font-size: var.$font-size-14;
+    cursor: pointer;
+    text-decoration: none;
 
     .more-icon {
       width: 14px;
