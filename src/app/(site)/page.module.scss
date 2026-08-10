@@ -142,8 +142,56 @@
           font-size: var.$font-size-18;
           font-weight: var.$font-weight-medium;
 
+          .password-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+          }
+
+          .checkbox-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            clip-path: inset(50%);
+            white-space: nowrap;
+
+            &:focus-visible + .checkbox-icon {
+              border-radius: 2px;
+              outline: 2px solid color.$fda-orange;
+              outline-offset: 2px;
+            }
+          }
+
+          .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            clip-path: inset(50%);
+            white-space: nowrap;
+          }
+
           .checkbox-icon {
             font-size: 24px;
+          }
+
+          .password-input {
+            width: 140px;
+            padding: 8px 0;
+            border: 0;
+            border-bottom: 1px solid color.$gray-medium;
+            color: color.$black;
+            background-color: transparent;
+            font: inherit;
+
+            &:focus {
+              border-bottom-color: color.$fda-orange;
+              outline: 0;
+            }
           }
         }
       }
