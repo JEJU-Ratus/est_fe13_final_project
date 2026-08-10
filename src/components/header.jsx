@@ -49,7 +49,7 @@ export default function Header({ isLoggedIn = false, isCollapsed = false }) {
             aria-expanded="false"
             onClick={handleExpand}
           >
-            <Image src="/images/프! 로고.png" alt="프로필 이미지" width={42} height={42} />
+            <Image src="/images/프! 로고.png" alt="로고" width={40} height={40} />
           </button>
         ) : (
           <button type="button" className={styles["logo-button"]} aria-label="홈으로 이동">
