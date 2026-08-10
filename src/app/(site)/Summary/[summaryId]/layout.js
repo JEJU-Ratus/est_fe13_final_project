@@ -1,32 +1,48 @@
-import styles from "./layout.module.scss";
+"use client";
 
-export default async function SummaryDetailLayout({ children, params }) {
-  const { summaryId } = await params;
+import Link from "next/link";
+import styles from "./SummaryId.module.scss";
+import { useState } from "react";
+
+export default function AiSummary() {
+  const [isBookmarked, setBookmarked] = useState(false);
 
   return (
-    <main className={styles["summary-detail"]} data-summary-id={summaryId}>
-      <div className={styles["summary-container"]}>
-        <section className={styles["summary-section"]}>
-          <header className={styles["topic-header"]}>
-            <h1>생성 주제</h1>
-            {/* 서비스 연결 전에는 권한과 저장 상태를 판단할 수 없어 북마크를 표시 전용으로 둡니다. */}
-            <button className={styles["bookmark-button"]} type="button" disabled>
-              {/* 숨김 텍스트가 버튼 이름을 제공하므로 아이콘의 중복 낭독을 막습니다. */}
-              <span className="material-symbols-outlined" aria-hidden="true">
+    <>
+      <main className={styles["Ai-page"]}>
+        <section className={styles["Ai-container"]}>
+          <div className={styles["Ai-header"]}>
+            <Link href="/" className={styles["title-link"]}>
+              <h2 className={styles["Ai-title"]}>생성 주제</h2>
+            </Link>
+            <button
+              className={styles["bookmark-btn"]}
+              type="button"
+              aria-label={isBookmarked ? "북마크 삭제" : "북마크 추가"}
+              aria-pressed={isBookmarked}
+              onClick={() => setBookmarked(!isBookmarked)}
+            >
+              <span
+                className={`material-symbols-outlined ${styles["bookmark-icon"]} ${isBookmarked ? styles["is-active"] : ""}`}
+                aria-hidden="true"
+              >
                 bookmark_add
               </span>
-              <span className={styles["screen-reader-only"]}>북마크</span>
             </button>
-          </header>
-
-          <article className={styles["summary-content"]}>
-            {/* 실제 요약 데이터가 연결되면 이 표시 영역의 내용만 교체합니다. */}
-            <p className={styles["summary-placeholder"]}>AI 요약본</p>
-          </article>
+          </div>
+          <div className={styles["Ai-content"]}>
+            <h3>제목</h3>
+            <h4>1. 한 줄 요약</h4>
+            <h4>2. 개념 설명</h4>
+            <h4>3. 기본 문법</h4>
+            <h4>4. 실무 예제</h4>
+            <h4>5. 핵심포인트</h4>
+            <p>- 꼭 기억할 내용</p>
+            <h4>6. 자주 하는 실수</h4>
+            <h4>7. 관련 개념</h4>
+          </div>
         </section>
-
-        {children}
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
