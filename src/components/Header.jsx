@@ -174,7 +174,7 @@ export default function Header({ isLoggedIn = false }) {
       )}
       <CommonModal
         isOpen={isLoginModalOpen}
-        mode="requireLogin"
+        mode="suggestLogin"
         onClose={() => setIsLoginModalOpen(false)}
       />
       <CommonModal
