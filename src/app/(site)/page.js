@@ -5,6 +5,7 @@ import Image from "next/image";
 import Banner from "@/components/Banner";
 import CommonModal from "@/components/CommonModal";
 import styles from "./page.module.scss";
+import Link from "next/link";
 
 export default function Home() {
   const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
@@ -39,11 +40,11 @@ export default function Home() {
                   aria-label="요약할 내용"
                   placeholder="궁금한 내용을 입력하면 프비가 핵심만 요약해 드려요."
                 />
-                <button className={styles["submit-button"]} type="button" aria-label="요약 요청">
+                <Link href="#" className={styles["submit-button"]} type="button" aria-label="요약 요청">
                   <span className={`material-symbols-outlined ${styles["submit-icon"]}`} aria-hidden="true">
                     arrow_upward
                   </span>
-                </button>
+                </Link>
               </div>
 
               <div className={styles["form-bottom"]}>
@@ -68,12 +69,12 @@ export default function Home() {
           <Banner />
 
           <div className={styles["quick-menu"]}>
-            <div className={styles["quick-menu-card"]}>
+            <Link href="#" className={styles["quick-menu-card"]}>
               <span className="material-symbols-outlined" aria-hidden="true">
                 assignment_add
               </span>
               <span>전체 요약 노트</span>
-            </div>
+            </Link>
             <button
               className={styles["quick-menu-card"]}
               type="button"
