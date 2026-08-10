@@ -1,0 +1,192 @@
+[
+  {
+    "noteId": "note-001",
+    "summaryId": "summary-001",
+    "authorId": "user-001",
+    "title": "Promise 상태 복습",
+    "content": "Promise는 pending 상태에서 fulfilled 또는 rejected 상태로 전환된다.",
+    "isQuizCompleted": true,
+    "createdAt": "2026-08-07T10:30:00+09:00",
+    "updatedAt": "2026-08-07T10:30:00+09:00"
+  },
+  {
+    "noteId": "note-002",
+    "summaryId": "summary-001",
+    "authorId": "user-002",
+    "title": "async 함수 메모",
+    "content": "async 함수는 항상 Promise를 반환하며 await는 Promise의 결과를 기다린다.",
+    "isQuizCompleted": false,
+    "createdAt": "2026-08-07T13:00:00+09:00",
+    "updatedAt": "2026-08-08T09:10:00+09:00"
+  },
+  {
+    "noteId": "note-003",
+    "summaryId": "summary-001",
+    "authorId": "user-003",
+    "title": "비동기 오류 처리",
+    "content": "await를 사용하는 코드에서는 try/catch로 요청 실패를 처리한다.",
+    "isQuizCompleted": true,
+    "createdAt": "2026-08-08T15:20:00+09:00",
+    "updatedAt": "2026-08-08T15:20:00+09:00"
+  },
+  {
+    "noteId": "note-004",
+    "summaryId": "summary-002",
+    "authorId": "user-002",
+    "title": "함수형 상태 업데이트",
+    "content": "이전 상태로 다음 상태를 계산할 때는 setState에 업데이트 함수를 전달한다.",
+    "isQuizCompleted": false,
+    "createdAt": "2026-08-06T09:40:00+09:00",
+    "updatedAt": "2026-08-06T09:40:00+09:00"
+  },
+  {
+    "noteId": "note-005",
+    "summaryId": "summary-003",
+    "authorId": "user-001",
+    "title": "App Router 파일 역할",
+    "content": "page는 경로별 UI를 정의하고 layout은 하위 페이지가 공유하는 UI를 정의한다.",
+    "isQuizCompleted": true,
+    "createdAt": "2026-08-05T11:10:00+09:00",
+    "updatedAt": "2026-08-05T11:10:00+09:00"
+  },
+  {
+    "noteId": "note-006",
+    "summaryId": "summary-003",
+    "authorId": "user-004",
+    "title": "동적 라우트 정리",
+    "content": "대괄호 폴더 이름으로 동적 세그먼트를 정의하고 params에서 값을 확인한다.",
+    "isQuizCompleted": false,
+    "createdAt": "2026-08-05T17:35:00+09:00",
+    "updatedAt": "2026-08-06T08:20:00+09:00"
+  },
+  {
+    "noteId": "note-007",
+    "summaryId": "summary-003",
+    "authorId": "user-005",
+    "title": "레이아웃 확인 사항",
+    "content": "공통 레이아웃은 children을 렌더링해야 하위 페이지 화면이 함께 표시된다.",
+    "isQuizCompleted": true,
+    "createdAt": "2026-08-06T12:45:00+09:00",
+    "updatedAt": "2026-08-06T12:45:00+09:00"
+  },
+  {
+    "noteId": "note-008",
+    "summaryId": "summary-003",
+    "authorId": "user-006",
+    "title": "서버와 클라이언트 컴포넌트",
+    "content": "상태와 브라우저 API가 필요한 컴포넌트에만 use client를 선언한다.",
+    "isQuizCompleted": false,
+    "createdAt": "2026-08-07T08:15:00+09:00",
+    "updatedAt": "2026-08-07T08:15:00+09:00"
+  },
+  {
+    "noteId": "note-009",
+    "summaryId": "summary-004",
+    "authorId": "user-001",
+    "title": "Flexbox 축 정리",
+    "content": "justify-content는 주축, align-items는 교차축의 정렬을 제어한다.",
+    "isQuizCompleted": true,
+    "createdAt": "2026-08-04T10:05:00+09:00",
+    "updatedAt": "2026-08-04T10:05:00+09:00"
+  },
+  {
+    "noteId": "note-010",
+    "summaryId": "summary-005",
+    "authorId": "user-004",
+    "title": "마이크로태스크 우선순위",
+    "content": "현재 태스크가 끝나면 다음 태스크보다 먼저 마이크로태스크 큐를 비운다.",
+    "isQuizCompleted": false,
+    "createdAt": "2026-08-03T14:30:00+09:00",
+    "updatedAt": "2026-08-03T14:30:00+09:00"
+  },
+  {
+    "noteId": "note-011",
+    "summaryId": "summary-005",
+    "authorId": "user-002",
+    "title": "타이머 실행 시점",
+    "content": "setTimeout의 지연 시간은 최소 대기 시간이며 정확한 실행 시간을 의미하지 않는다.",
+    "isQuizCompleted": true,
+    "createdAt": "2026-08-04T16:20:00+09:00",
+    "updatedAt": "2026-08-04T16:20:00+09:00"
+  },
+  {
+    "noteId": "note-012",
+    "summaryId": "summary-006",
+    "authorId": "user-005",
+    "title": "반응형 Grid 공식",
+    "content": "repeat(auto-fit, minmax(240px, 1fr))로 카드의 최소 너비를 유지한다.",
+    "isQuizCompleted": true,
+    "createdAt": "2026-08-02T12:10:00+09:00",
+    "updatedAt": "2026-08-02T12:10:00+09:00"
+  },
+  {
+    "noteId": "note-013",
+    "summaryId": "summary-007",
+    "authorId": "user-002",
+    "title": "Effect cleanup",
+    "content": "타이머나 이벤트 리스너는 cleanup 함수에서 해제해 중복 실행을 막는다.",
+    "isQuizCompleted": false,
+    "createdAt": "2026-08-01T09:55:00+09:00",
+    "updatedAt": "2026-08-01T09:55:00+09:00"
+  },
+  {
+    "noteId": "note-014",
+    "summaryId": "summary-007",
+    "authorId": "user-003",
+    "title": "Effect 의존성",
+    "content": "Effect 내부에서 읽는 반응형 값은 의존성 배열에 포함해야 한다.",
+    "isQuizCompleted": true,
+    "createdAt": "2026-08-02T11:40:00+09:00",
+    "updatedAt": "2026-08-03T09:00:00+09:00"
+  },
+  {
+    "noteId": "note-015",
+    "summaryId": "summary-008",
+    "authorId": "user-006",
+    "title": "HTTP 메서드 구분",
+    "content": "조회, 생성, 수정, 삭제의 목적에 맞는 HTTP 메서드를 선택한다.",
+    "isQuizCompleted": true,
+    "createdAt": "2026-07-31T14:25:00+09:00",
+    "updatedAt": "2026-07-31T14:25:00+09:00"
+  },
+  {
+    "noteId": "note-016",
+    "summaryId": "summary-009",
+    "authorId": "user-003",
+    "title": "토글 버튼 접근성",
+    "content": "토글 버튼은 현재 상태를 aria-pressed로 보조 기술에 전달한다.",
+    "isQuizCompleted": false,
+    "createdAt": "2026-07-30T18:10:00+09:00",
+    "updatedAt": "2026-07-30T18:10:00+09:00"
+  },
+  {
+    "noteId": "note-017",
+    "summaryId": "summary-009",
+    "authorId": "user-001",
+    "title": "모달 포커스 메모",
+    "content": "모달이 열리면 포커스 이동과 키보드 닫기 동작을 함께 고려한다.",
+    "isQuizCompleted": false,
+    "createdAt": "2026-07-31T10:00:00+09:00",
+    "updatedAt": "2026-07-31T10:00:00+09:00"
+  },
+  {
+    "noteId": "note-018",
+    "summaryId": "summary-010",
+    "authorId": "user-001",
+    "title": "기능 브랜치 체크리스트",
+    "content": "관련 기능만 커밋하고 테스트 결과와 변경 범위를 Pull Request에 기록한다.",
+    "isQuizCompleted": true,
+    "createdAt": "2026-07-29T13:30:00+09:00",
+    "updatedAt": "2026-07-29T13:30:00+09:00"
+  },
+  {
+    "noteId": "note-019",
+    "summaryId": "summary-012",
+    "authorId": "user-004",
+    "title": "북마크 관계 모델",
+    "content": "사용자 ID와 요약 노트 ID를 연결 테이블에 저장해 사용자별 북마크를 표현한다.",
+    "isQuizCompleted": false,
+    "createdAt": "2026-07-28T11:15:00+09:00",
+    "updatedAt": "2026-07-28T11:15:00+09:00"
+  }
+]
