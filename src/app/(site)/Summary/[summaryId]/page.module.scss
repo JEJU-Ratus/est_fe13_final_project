@@ -1,0 +1,82 @@
+@use "@/styles/abstracts/colors" as color;
+@use "@/styles/abstracts/typography" as typography;
+
+.notes-section {
+  margin-top: 24px;
+  border-top: 1px solid color.$gray-light;
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0;
+}
+
+.create-button,
+.delete-button {
+  @include typography.text-20-semibold;
+
+  width: 150px;
+  height: 50px;
+  border: 0;
+  border-radius: 100px;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.create-button {
+  color: color.$fda-navy;
+  background: color.$fda-yellow;
+}
+
+.delete-button {
+  color: color.$white;
+  background: color.$fda-navy;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  height: 70px;
+  padding: 0 20px;
+
+  h2 {
+    @include typography.text-36-bold;
+
+    margin: 0;
+    line-height: 1;
+  }
+}
+
+.empty-state {
+  display: flex;
+  min-height: 280px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  p {
+    @include typography.text-24-semibold;
+
+    margin: 0;
+    color: color.$gray-medium-3;
+  }
+}
+
+.empty-image {
+  position: relative;
+  width: 171px;
+  height: 184px;
+  overflow: hidden;
+
+  img {
+    width: 205.21% !important;
+    height: 285.5% !important;
+    max-width: none !important;
+    inset: -81.23% auto auto -52.91% !important;
+  }
+}

@@ -29,10 +29,10 @@ npm run dev
 
 ## 시나리오 1: 공개 요약본과 목록
 
-1. 학습노트가 있는 `/summary/{summaryId}`에 접근한다.
+1. 학습노트가 있는 `/Summary/{summaryId}`에 접근한다.
 2. 생성 주제와 AI 요약, 최신 작성순 목록을 확인한다.
 3. 각 행에 퀴즈 상태, 작성자, 주제, 작성일이 있고 백분율은 없는지 확인한다.
-4. 행을 한 번 선택해 `/summary/{summaryId}/notes/{noteId}`에 도달한다.
+4. 행을 한 번 선택해 `/Summary/{summaryId}/notes/{noteId}`에 도달한다.
 5. `더보기`가 `/allnote`로 이동하는지 확인한다.
 
 **예상 결과**: 주요 내용이 3초 이내 표시되고 정렬·표시·이동이 계약과 일치한다.
@@ -49,10 +49,10 @@ npm run dev
 다음 네 경로를 인증 전 각각 직접 연다.
 
 ```text
-/summary/{summaryId}
-/summary/{summaryId}/notes/new
-/summary/{summaryId}/notes/{noteId}
-/summary/{summaryId}/notes/{noteId}/edit
+/Summary/{summaryId}
+/Summary/{summaryId}/notes/new
+/Summary/{summaryId}/notes/{noteId}
+/Summary/{summaryId}/notes/{noteId}/edit
 ```
 
 1. 모든 경로에서 보호 콘텐츠보다 먼저 비밀번호 모달이 표시되는지 확인한다.
@@ -66,7 +66,7 @@ npm run dev
 
 ## 시나리오 4: 생성과 수정
 
-1. 로그인 사용자로 `/summary/{summaryId}/notes/new`를 연다.
+1. 로그인 사용자로 `/Summary/{summaryId}/notes/new`를 연다.
 2. 공백 제목과 51자 제목, 1,001자 본문을 각각 blur·제출해 오류와 요청 차단을 확인한다.
 3. 유효한 제목과 선택 본문으로 제출한다.
 4. 전체 화면 Loading, 입력·제출 비활성화, 중복 요청 차단을 확인한다.
@@ -124,4 +124,3 @@ npm run build
 - SCSS Module 클래스는 kebab-case이고 JSX에서 대괄호 표기법으로 접근한다.
 - 동적 경로의 정적 이동은 `Link`, 결과 기반 이동은 `next/navigation`을 사용한다.
 - `"use client"`는 상호작용이 필요한 파일에만 존재한다.
-

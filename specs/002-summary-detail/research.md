@@ -2,7 +2,7 @@
 
 ## 결정 1: 동적 경로와 공통 레이아웃
 
-**결정**: `src/app/summary/[summaryId]/layout.js`에서 생성 주제와 AI 요약을 공통으로 구성하고, 요약 상세·작성·학습노트 상세·수정 페이지는 명세에 정의된 하위 `page.js`에 둔다. Next.js 16의 동적 `params`는 비동기 값으로 해석한다.
+**결정**: 실제 저장소 경로인 `src/app/(site)/Summary/[summaryId]/layout.js`에서 생성 주제와 AI 요약을 공통으로 구성하고, 요약 상세·작성·학습노트 상세·수정 페이지는 명세에 정의된 하위 `page.js`에 둔다. Next.js 16의 동적 `params`는 비동기 값으로 해석한다.
 
 **근거**: 기능 명세와 `AGENTS.md`가 네 경로와 공통 레이아웃 위치를 직접 지정한다. 최신 App Router 문서의 동적 페이지 예시는 `params`를 Promise로 받고 `await`한 뒤 식별자를 사용한다.
 
@@ -97,4 +97,3 @@
 - [프로젝트 NotePwModal 계약](../004-note-password-modal/contracts/NotePwModal.md)
 - [프로젝트 CommonModal 계약](../005-common-modal/contracts/CommonModal.md)
 - [프로젝트 Loading 계약](../007-loading/contracts/Loading.md)
-

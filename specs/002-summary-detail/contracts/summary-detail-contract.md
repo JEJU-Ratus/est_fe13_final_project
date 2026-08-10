@@ -8,10 +8,10 @@
 
 | 경로 | 주요 결과 | 접근 규칙 |
 |---|---|---|
-| `/summary/[summaryId]` | 요약 공통 영역, 학습노트 목록·빈 상태, 생성·삭제·북마크 | 방문자 조회 가능, 잠김이면 세션 인증 선행 |
-| `/summary/[summaryId]/notes/new` | 학습노트 작성 양식 | 로그인 필수, 잠김이면 세션 인증 선행 |
-| `/summary/[summaryId]/notes/[noteId]` | 학습노트 상세, 퀴즈·수정·삭제 | 방문자 조회 가능, 잠김이면 세션 인증 선행 |
-| `/summary/[summaryId]/notes/[noteId]/edit` | 기존 값이 채워진 수정 양식 | 로그인 및 학습노트 작성자, 잠김이면 세션 인증 선행 |
+| `/Summary/[summaryId]` | 요약 공통 영역, 학습노트 목록·빈 상태, 생성·삭제·북마크 | 방문자 조회 가능, 잠김이면 세션 인증 선행 |
+| `/Summary/[summaryId]/notes/new` | 학습노트 작성 양식 | 로그인 필수, 잠김이면 세션 인증 선행 |
+| `/Summary/[summaryId]/notes/[noteId]` | 학습노트 상세, 퀴즈·수정·삭제 | 방문자 조회 가능, 잠김이면 세션 인증 선행 |
+| `/Summary/[summaryId]/notes/[noteId]/edit` | 기존 값이 채워진 수정 양식 | 로그인 및 학습노트 작성자, 잠김이면 세션 인증 선행 |
 
 ### 공통 경로 규칙
 
@@ -72,7 +72,7 @@ references: trim 후 0~1,000자
 
 **성공 결과**: 생성된 `summaryId`, `noteId`
 
-**성공 이동**: `/summary/{summaryId}/notes/{noteId}`
+**성공 이동**: `/Summary/{summaryId}/notes/{noteId}`
 
 ### `updateStudyNote(summaryId, noteId, input)`
 
@@ -80,7 +80,7 @@ references: trim 후 0~1,000자
 
 **성공 결과**: 수정된 `summaryId`, `noteId`
 
-**성공 이동**: `/summary/{summaryId}/notes/{noteId}`
+**성공 이동**: `/Summary/{summaryId}/notes/{noteId}`
 
 ### `deleteSummary(summaryId)`
 
@@ -147,7 +147,7 @@ src/components/NoteItem.module.scss
 
 **행동**
 
-- 전체 항목은 `/summary/{summaryId}/notes/{noteId}`로 이동하는 정적 링크다.
+- 전체 항목은 `/Summary/{summaryId}/notes/{noteId}`로 이동하는 정적 링크다.
 - 퀴즈 백분율은 표시하지 않는다.
 - 긴 작성자명과 주제는 목록 배치를 깨뜨리지 않아야 한다.
 
@@ -191,3 +191,46 @@ src/components/QuizModal.module.scss
 - 로그인 상태, 현재 사용자, 작성자 판정과 Summary 세션 인증 상태가 제공되어야 한다.
 - 전제조건이 없으면 임시 Supabase 구조, 임의 URL 또는 제품 경로 하드코딩 데모 데이터로 대체하지 않는다.
 
+## 1단계 실제 연결 점검 결과 (2026-08-10)
+
+### 인증·데이터 서비스
+
+- 확인 범위: `src/`, `package.json`, `package-lock.json`
+- Supabase 패키지 또는 클라이언트 초기화 코드가 없다.
+- 인증 상태, 현재 사용자, 요약본·학습노트 조회 및 CRUD, 북마크, 퀴즈, 비밀번호 검증을 제공하는 서비스 모듈이 없다.
+- `fetch`, Server Action 또는 Route Handler로 위 연산을 연결한 코드가 없다.
+- 따라서 이 계약의 실제 서비스 위치와 호출 형태는 **미제공** 상태다.
+
+### 기존 공통 UI 연결
+
+- `src/components/NotePwModal.jsx`는 기존 계약의 입력·제출·오류·닫기 props로 재사용할 수 있다.
+- `src/components/Loading.jsx`는 호출 측 Boolean 상태로 조건부 렌더링하는 기존 계약을 그대로 사용할 수 있다.
+- `src/components/CommonModal.jsx`의 `confirmDelete`, `suggestLogin` 모드는 기존 계약대로 재사용할 수 있다.
+- 현재 `CommonModal`의 `error` 모드는 3초 후 또는 닫기 시 메인 화면으로 이동하므로, 이 기능의 “현재 입력 또는 페이지 상태 보존” 요구와 충돌한다. 공개 props 변경 또는 요구사항 변경 승인 전에는 오류 상태 연결을 구현할 수 없다.
+- 실제 Header 파일은 `src/components/header.jsx`지만 현재 호출부 일부는 `@/components/Header`로 import한다. 대소문자 구분 빌드 환경에서의 경로 정합성은 별도 승인 없이 이름을 바꾸지 않고 기준 build 결과로 확인한다.
+
+### 구현 관문
+
+- T003 점검은 완료됐지만 서비스 전제조건이 충족되지 않았으므로 조회·인증·CRUD 등 서비스 연결 작업은 차단된다. 사용자가 별도로 승인한 정적 UI와 비활성 상태는 선행할 수 있다.
+- 다음 단계로 진행하려면 팀이 실제 서비스 모듈 위치와 각 연산의 호출·오류 형태를 제공하고, `CommonModal error` 충돌의 처리 방향을 확정해야 한다.
+- 그 전에는 임시 Supabase 구조, 임의 API URL, 제품 경로용 하드코딩 데이터 또는 새 데이터 폴더를 생성하지 않는다. 정적 UI는 실제 데이터를 대신하는 샘플 값을 포함하지 않는다.
+
+### 기준 정적 검증
+
+- `package-lock.json`에 고정된 기존 의존성을 `npm ci`로 복원했으며 새 의존성이나 버전을 추가하지 않았다.
+- 설치 감사에서 high severity 취약점 5건이 보고됐으나 의존성 변경 승인이 없어 `npm audit fix`는 실행하지 않았다.
+- `npm run lint`: exit 0. `src/app/layout.js`의 외부 폰트 링크에 대한 `@next/next/no-page-custom-font` 경고 1건이 있으며 오류는 없다.
+- `npm run build`: exit 1. `src/app/(dev)/dev/header/page.js`와 `src/app/(site)/layout.js`가 `@/components/Header`를 import하지만 실제 파일은 `src/components/header.jsx`여서 module not found 오류 2건이 발생한다.
+- 위 lint 경고와 build 오류는 요약 상세 제품 코드 생성 전 기준 상태이며 이번 1단계에서 관련 파일을 수정하지 않았다.
+
+## 정적 UI 선행 구현 결과 (2026-08-10)
+
+- 사용자 결정에 따라 실제 저장소 경로 `src/app/(site)/Summary`와 `src/components/header.jsx`를 유지했다.
+- 공통 `src/app/(site)/layout.js`의 Header·페이지 가로 정렬은 영향 범위에서 제외했다.
+- Figma의 목록 있음 `169:2177`, 빈 목록 `222:2221`, 작성·수정 `169:2309`, 상세 `221:2172`, 퀴즈 모달 `230:2996` 컨텍스트와 스크린샷을 정적 UI 기준으로 사용했다.
+- `src/app/(site)/Summary/[summaryId]` 아래 공통 레이아웃, 목록 빈 상태, 작성·상세·수정 화면과 `NoteItem`, `QuizModal`을 구현했다.
+- 실제 조회·인증·CRUD·북마크·퀴즈 조회 서비스는 추가하지 않았고, 권한 또는 변경 요청이 필요한 제품 경로 버튼은 서비스 연결 전 비활성 상태로 두었다.
+- `npm run lint`는 exit 0이며 기존 `src/app/layout.js` 폰트 경고 1건만 남는다.
+- 원본 저장소 `npm run build`는 기존 `@/components/Header` 대소문자 오류 2건으로 새 코드 컴파일 전에 중단된다.
+- 임시 복사본에서 기존 Header import 대소문자만 테스트용으로 보정했을 때 새 UI는 production compile을 통과했고, 이후 기존 `/Mypage/Bookmarks`의 `Maximum call stack size exceeded` prerender 오류로 전체 build가 중단됐다.
+- 같은 임시 복사본의 네 정적 UI 경로는 개발 서버에서 모두 HTTP 200 응답을 반환했다. 연결된 브라우저가 없어 자동 스크린샷 비교는 수행하지 못했다.

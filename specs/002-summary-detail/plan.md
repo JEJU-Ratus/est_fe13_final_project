@@ -65,24 +65,25 @@ specs/002-summary-detail/
 ```text
 src/
 ├── app/
-│   └── summary/
-│       └── [summaryId]/
-│           ├── layout.js
-│           ├── layout.module.scss
-│           ├── page.js
-│           ├── page.module.scss
-│           └── notes/
-│               ├── new/
-│               │   ├── page.js
-│               │   └── page.module.scss
-│               └── [noteId]/
-│                   ├── page.js
-│                   ├── page.module.scss
-│                   └── edit/
+│   └── (site)/
+│       └── Summary/
+│           └── [summaryId]/
+│               ├── layout.js
+│               ├── layout.module.scss
+│               ├── page.js
+│               ├── page.module.scss
+│               └── notes/
+│                   ├── new/
+│                   │   ├── page.js
+│                   │   └── page.module.scss
+│                   └── [noteId]/
 │                       ├── page.js
-│                       └── page.module.scss
+│                       ├── page.module.scss
+│                       └── edit/
+│                           ├── page.js
+│                           └── page.module.scss
 └── components/
-    ├── Header.jsx                    # 기존 구현 재사용, 이름 변경은 범위 제외
+    ├── header.jsx                    # 실제 구현 재사용, 이름 변경은 범위 제외
     ├── CommonModal.jsx               # 기존 구현 재사용
     ├── NotePwModal.jsx               # 기존 구현 재사용
     ├── Loading.jsx                   # 기존 구현 재사용
@@ -92,7 +93,7 @@ src/
     └── QuizModal.module.scss
 ```
 
-**구조 결정**: `AGENTS.md`에 명시된 소문자 `/summary` 동적 경로와 평면 `src/components` 구조를 그대로 사용한다. `layout.js`는 모든 하위 페이지의 생성 주제와 AI 요약 영역을 공유한다. 빈 목록은 요약 상세 페이지 내부의 단순 상태로 표현해 별도 공통 컴포넌트를 추가하지 않는다. 찾을 수 없는 식별자는 `notFound()`로 기존 404 처리에 위임하고 새 `not-found.js`는 만들지 않는다. 현재 저장소의 대문자 `(site)/Summary` 임시 목록 경로와 `header.jsx` 파일명 불일치는 이번 기능에서 이동·이름 변경하지 않는다.
+**구조 결정**: 사용자의 실제 경로 우선 결정에 따라 `src/app/(site)/Summary`와 `src/components/header.jsx`를 그대로 사용하고 이름을 변경하지 않는다. `layout.js`는 모든 하위 페이지의 생성 주제·AI 요약 영역을 공유한다. 빈 목록은 요약 상세 페이지 내부의 단순 상태로 표현해 별도 공통 컴포넌트를 추가하지 않는다. 찾을 수 없는 식별자는 서비스 연결 후 `notFound()`로 기존 404 처리에 위임하고 새 `not-found.js`는 만들지 않는다. 공통 `(site)/layout.js` 정렬 수정은 사용자 결정에 따라 이번 정적 UI 범위에서 제외한다.
 
 ## 구현 설계
 
@@ -110,7 +111,7 @@ src/
 - 레이아웃은 `Header`와 생성 주제·AI 요약을 한 번만 표시하고 각 하위 페이지가 이를 중복 렌더링하지 않게 한다.
 - 요약 상세 페이지는 최신 작성순 학습노트와 빈 목록 상태, 로그인 사용자의 생성 버튼, 작성자의 삭제 버튼, 로그인 사용자의 북마크 상태를 구성한다.
 - `NoteItem`은 퀴즈 학습 상태, 작성자, 주제, 작성일과 학습노트 상세 목적지를 props로 받고 표시·정적 이동만 담당한다.
-- `더보기`와 작성 버튼은 각각 `/allnote`, `/summary/[summaryId]/notes/new`로 연결한다.
+- `더보기`와 작성 버튼은 각각 `/allnote`, `/Summary/[summaryId]/notes/new`로 연결한다.
 
 ### 작성·수정 양식
 
@@ -156,4 +157,3 @@ src/
 ## 복잡성 기록
 
 헌법을 위반하는 예외가 없다.
-
