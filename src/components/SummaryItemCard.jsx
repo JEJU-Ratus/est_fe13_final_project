@@ -5,7 +5,7 @@ import styles from "./SummaryItemCard.module.scss";
 import { useState } from "react";
 import Link from "next/link";
 
-export default function SummaryItemCard() {
+export default function SummaryItemCard({}) {
   const [isBookmarked, setBookmarked] = useState(false);
 
   return (
@@ -21,7 +21,7 @@ export default function SummaryItemCard() {
               height={32}
             />
 
-            <p className={styles["nickname"]}>NickName</p>
+            <p className={styles["nickname"]}>{nickname}</p>
           </div>
 
           <button
