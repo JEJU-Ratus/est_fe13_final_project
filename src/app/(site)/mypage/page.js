@@ -131,7 +131,7 @@ export default function Mypage() {
         <section className={styles["summary-section"]} aria-labelledby="my-summary-title">
           <div className={styles["section-heading"]}>
             <h2 id="my-summary-title">내 요약 노트</h2>
-            <Link href="#" className={styles["more-link"]}>
+            <Link href="/mypage/mysummaries" className={styles["more-link"]}>
               <span>더보기</span>
               <span className={`material-symbols-outlined ${styles["more-icon"]}`} aria-hidden="true">
                 arrow_forward_ios
@@ -149,7 +149,7 @@ export default function Mypage() {
         <section className={styles["summary-section"]} aria-labelledby="bookmark-title">
           <div className={styles["section-heading"]}>
             <h2 id="bookmark-title">북마크</h2>
-            <Link href="#" className={styles["more-link"]}>
+            <Link href="/mypage/bookmarks" className={styles["more-link"]}>
               <span>더보기</span>
               <span className={`material-symbols-outlined ${styles["more-icon"]}`} aria-hidden="true">
                 arrow_forward_ios
