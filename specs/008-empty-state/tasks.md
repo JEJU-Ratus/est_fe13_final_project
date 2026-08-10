@@ -21,9 +21,9 @@
 
 **목적**: 구현 전 명세, 실제 경로와 기존 중복 구현을 확인한다.
 
-- [ ] T001 `AGENTS.md`, `docs/specs/AllSummary.md`, `docs/specs/Summary.md`, `docs/specs/Mypage.md`, `specs/008-empty-state/spec.md`, `specs/008-empty-state/plan.md`, `specs/008-empty-state/contracts/EmptyState.md`를 읽고 문구·책임·금지 범위를 재확인한다.
-- [ ] T002 `src/components/Allsummary.jsx`, `src/app/(site)/summary/[summaryId]/page.js`, `src/app/(site)/summary/[summaryId]/page.module.scss`, `src/app/(site)/mypage/page.js`의 현재 내용과 Git 상태를 확인해 팀 변경을 덮어쓰지 않을 구현 기준을 기록한다.
-- [ ] T003 `public/images/empty-note.png`의 존재 여부와 `src/app/(site)/summary/[summaryId]/page.module.scss`의 기존 `.empty-state`, `.empty-image` 스타일을 확인해 재사용할 이미지·스타일 범위를 확정한다.
+- [X] T001 `AGENTS.md`, `docs/specs/AllSummary.md`, `docs/specs/Summary.md`, `docs/specs/Mypage.md`, `specs/008-empty-state/spec.md`, `specs/008-empty-state/plan.md`, `specs/008-empty-state/contracts/EmptyState.md`를 읽고 문구·책임·금지 범위를 재확인한다.
+- [X] T002 `src/components/Allsummary.jsx`, `src/app/(site)/summary/[summaryId]/page.js`, `src/app/(site)/summary/[summaryId]/page.module.scss`, `src/app/(site)/mypage/page.js`의 현재 내용과 Git 상태를 확인해 팀 변경을 덮어쓰지 않을 구현 기준을 기록한다.
+- [X] T003 `public/images/empty-note.png`의 존재 여부와 `src/app/(site)/summary/[summaryId]/page.module.scss`의 기존 `.empty-state`, `.empty-image` 스타일을 확인해 재사용할 이미지·스타일 범위를 확정한다.
 
 ---
 
