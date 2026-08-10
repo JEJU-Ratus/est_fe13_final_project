@@ -47,6 +47,7 @@ export default function SummaryItemCard({
             <p className={styles["nickname"]}>{nickname}</p>
           </div>
 
+          {/* 북마크의 현재 선택 상태와 토글 목적을 보조 기술 사용자에게 전달합니다. */}
           <button
             className={styles["bookmark-btn"]}
             type="button"
@@ -75,6 +76,7 @@ export default function SummaryItemCard({
           {formattedCreatedAt}
         </time>
 
+        {/* 잠금 아이콘이 비공개 요약 노트의 접근 제한 상태임을 전달합니다. */}
         {isPrivate && (
           <span className={`material-symbols-outlined ${styles["lock-icon"]}`} aria-label="비공개 게시물">
             lock

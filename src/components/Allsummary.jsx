@@ -4,10 +4,29 @@ import summaries from "@/mocks/summaries.json";
 import users from "@/mocks/users.json";
 import bookmarks from "@/mocks/bookmarks.json";
 
-const currentUserId = "user-001";
+function getSummariesByView(view, currentUserId) {
+  if (view === "mine") {
+    return summaries
+      .filter((summary) => summary.authorId === currentUserId)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
 
-export default function AllSummary({ title }) {
-  const summaryCards = summaries.map((summary) => {
+  if (view === "bookmarks") {
+    return bookmarks
+      .filter((bookmark) => bookmark.userId === currentUserId)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map((bookmark) =>
+        summaries.find((summary) => summary.summaryId === bookmark.summaryId),
+      )
+      .filter(Boolean);
+  }
+
+  return summaries;
+}
+
+export default function AllSummary({ title, view = "all", currentUserId }) {
+  const filteredSummaries = getSummariesByView(view, currentUserId);
+  const summaryCards = filteredSummaries.map((summary) => {
     const author = users.find((user) => user.userId === summary.authorId);
     const isBookmarked = bookmarks.some(
       (bookmark) =>
