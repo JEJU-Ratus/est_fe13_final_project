@@ -1,0 +1,65 @@
+@use "../../../../../styles/abstracts/colors" as color;
+@use "../../../../../styles/abstracts/typography" as typography;
+
+.Ai-page {
+  background: color.$white-2;
+}
+
+.Ai-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 96px 0;
+}
+
+.Ai-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 1px solid color.$fda-orange;
+
+  .title-link {
+    text-decoration: none;
+  }
+
+  .Ai-title {
+    color: color.$black;
+    @include typography.text-36-bold;
+  }
+}
+
+.bookmark-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+
+.bookmark-icon {
+  color: color.$gray-light-3;
+  font-size: 30px !important;
+
+  &.is-active {
+    color: color.$fda-navy;
+  }
+}
+
+.Ai-content {
+  min-height: 500px;
+  border: 2px solid color.$gray-light-2;
+  border-radius: 15px;
+  padding: 24px;
+
+  h3 {
+    @include typography.text-24-semibold;
+  }
+
+  h4 {
+    @include typography.text-20-medium;
+  }
+}
