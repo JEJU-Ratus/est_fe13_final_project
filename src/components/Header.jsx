@@ -11,11 +11,12 @@ const menuItems = [
   {
     label: "요약 노트 생성",
     icon: "assignment_add",
+    href: "#",
   },
   {
     label: "전체 요약 노트",
     icon: "book_4",
-    href: "/Summary",
+    href: "#",
   },
   {
     label: "퀴즈",
@@ -26,6 +27,7 @@ const menuItems = [
     label: "마이페이지",
     icon: "person",
     href: "/Mypage",
+    requiresLogin: true,
   },
 ];
 
@@ -117,12 +119,12 @@ export default function Header({ isLoggedIn = false }) {
             </div>
           ) : (
             <div className={styles["guest-buttons"]}>
-              <button className={styles["login-button"]} type="button">
+              <Link href="#" className={styles["login-button"]} type="button">
                 로그인
-              </button>
-              <button className={styles["signup-button"]} type="button">
+              </Link>
+              <Link href="#" className={styles["signup-button"]} type="button">
                 가입하기
-              </button>
+              </Link>
             </div>
           )}
         </div>
@@ -140,7 +142,7 @@ export default function Header({ isLoggedIn = false }) {
             </>
           );
 
-          if (menu.href && isLoggedIn) {
+          if (menu.href && (!menu.requiresLogin || isLoggedIn)) {
             return (
               <Link className={styles["menu-item"]} href={menu.href} key={menu.label}>
                 {menuContent}
@@ -153,7 +155,7 @@ export default function Header({ isLoggedIn = false }) {
               className={styles["menu-item"]}
               type="button"
               key={menu.label}
-              onClick={menu.href ? handleMypageClick : menu.modalMode ? handleQuizClick : undefined}
+              onClick={menu.requiresLogin ? handleMypageClick : menu.modalMode ? handleQuizClick : undefined}
             >
               {menuContent}
             </button>
