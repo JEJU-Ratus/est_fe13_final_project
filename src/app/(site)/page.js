@@ -1,8 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Banner from "@/components/Banner";
+import CommonModal from "@/components/CommonModal";
 import styles from "./page.module.scss";
 
 export default function Home() {
+  const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
+  const [isSuggestLoginModalOpen, setIsSuggestLoginModalOpen] = useState(false);
+
   return (
     <main className={styles["main-page"]}>
       <div className={styles.container}>
@@ -22,15 +29,21 @@ export default function Home() {
               <p className={styles.description}>궁금한 건 프비에게 물어보세요!</p>
             </div>
 
-            <div className={styles["summary-form"]}>
+            <form className={styles["summary-form"]}>
               <div className={styles["topic-input"]}>
                 <span className="material-symbols-outlined" aria-hidden="true">
                   add
                 </span>
-                <span>궁금한 내용을 입력하면 프비가 핵심만 요약해 드려요.</span>
-                <span className={`material-symbols-outlined ${styles["submit-icon"]}`} aria-hidden="true">
-                  arrow_upward
-                </span>
+                <input
+                  type="text"
+                  aria-label="요약할 내용"
+                  placeholder="궁금한 내용을 입력하면 프비가 핵심만 요약해 드려요."
+                />
+                <button className={styles["submit-button"]} type="button" aria-label="요약 요청">
+                  <span className={`material-symbols-outlined ${styles["submit-icon"]}`} aria-hidden="true">
+                    arrow_upward
+                  </span>
+                </button>
               </div>
 
               <div className={styles["form-bottom"]}>
@@ -47,7 +60,7 @@ export default function Home() {
                   <span>비밀번호 입력</span>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
         </section>
 
@@ -61,21 +74,39 @@ export default function Home() {
               </span>
               <span>전체 요약 노트</span>
             </div>
-            <div className={styles["quick-menu-card"]}>
+            <button
+              className={styles["quick-menu-card"]}
+              type="button"
+              onClick={() => setIsPreparingModalOpen(true)}
+            >
               <span className="material-symbols-outlined" aria-hidden="true">
                 quiz
               </span>
               <span>퀴즈</span>
-            </div>
-            <div className={styles["quick-menu-card"]}>
+            </button>
+            <button
+              className={styles["quick-menu-card"]}
+              type="button"
+              onClick={() => setIsSuggestLoginModalOpen(true)}
+            >
               <span className="material-symbols-outlined" aria-hidden="true">
                 person
               </span>
               <span>마이페이지</span>
-            </div>
+            </button>
           </div>
         </section>
       </div>
+      <CommonModal
+        isOpen={isPreparingModalOpen}
+        mode="preparing"
+        onClose={() => setIsPreparingModalOpen(false)}
+      />
+      <CommonModal
+        isOpen={isSuggestLoginModalOpen}
+        mode="suggestLogin"
+        onClose={() => setIsSuggestLoginModalOpen(false)}
+      />
     </main>
   );
 }

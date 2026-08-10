@@ -84,8 +84,33 @@
         font-size: var.$font-size-18;
         font-weight: var.$font-weight-regular;
 
-        .submit-icon {
+        input {
+          min-width: 0;
+          flex: 1;
+          border: 0;
+          outline: 0;
+          color: color.$black;
+          background-color: transparent;
+          font: inherit;
+
+          &::placeholder {
+            color: color.$gray;
+            opacity: 1;
+          }
+        }
+
+        .submit-button {
+          display: flex;
           margin-left: auto;
+          padding: 0;
+          border: 0;
+          color: inherit;
+          background-color: transparent;
+          cursor: pointer;
+        }
+
+        .submit-icon {
+          display: block;
         }
 
         :global(.material-symbols-outlined) {
@@ -153,8 +178,15 @@
       border: 1px solid color.$fda-orange;
       border-radius: 15px;
       color: color.$fda-navy;
+      background-color: transparent;
+      font-family: inherit;
       font-size: var.$font-size-24;
       font-weight: var.$font-weight-semibold;
+      text-align: left;
+
+      &[type="button"] {
+        cursor: pointer;
+      }
 
       :global(.material-symbols-outlined) {
         width: 48px;
