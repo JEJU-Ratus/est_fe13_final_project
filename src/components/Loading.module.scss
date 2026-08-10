@@ -1,5 +1,5 @@
-@use "../styles/abstracts/colors" as color;
-@use "../styles/abstracts/typography" as typo;
+@use "styles/abstracts/colors" as color;
+@use "styles/abstracts/typography" as typo;
 
 .loading-overlay {
   position: fixed;
