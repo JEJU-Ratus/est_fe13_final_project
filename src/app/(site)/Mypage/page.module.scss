@@ -102,8 +102,12 @@
           width: 100%;
           padding: 10px 16px;
           border: 1px solid color.$gray-light;
-          border-radius: 8px;
-          outline-color: color.$fda-orange;
+          border-radius: 50px;
+
+          &:focus {
+            outline: 1px solid color.$fda-orange;
+            outline-offset: -1px;
+          }
         }
       }
     }

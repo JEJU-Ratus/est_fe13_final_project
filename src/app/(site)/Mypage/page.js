@@ -43,11 +43,9 @@ export default function Mypage() {
               {isEditingProfile ? (
                 <div className={styles["profile-form"]}>
                   <label>
-                    <span>닉네임</span>
                     <input value={draftNickname} onChange={event => setDraftNickname(event.target.value)} />
                   </label>
                   <label>
-                    <span>한 줄 소개</span>
                     <input value={draftIntroduction} onChange={event => setDraftIntroduction(event.target.value)} />
                   </label>
                 </div>
