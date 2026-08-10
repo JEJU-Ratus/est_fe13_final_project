@@ -181,6 +181,33 @@ export default function LoginPage() {
             />
             <span>로그인 상태 유지</span>
           </label>
+
+          <div className={styles["social-divider"]}>
+            <span aria-hidden="true" />
+            <p>간편 로그인</p>
+            <span aria-hidden="true" />
+          </div>
+
+          <div className={styles["social-buttons"]}>
+            <button
+              className={styles["social-button"]}
+              type="button"
+              disabled={isLoading}
+              aria-label="카카오로 로그인"
+            >
+              {/* 접근 가능한 이름은 버튼이 제공하므로 아이콘의 중복 낭독을 막습니다. */}
+              <Image src="/images/kakao-icon.svg" alt="" width={56} height={56} />
+            </button>
+            <button
+              className={styles["social-button"]}
+              type="button"
+              disabled={isLoading}
+              aria-label="구글로 로그인"
+            >
+              {/* 접근 가능한 이름은 버튼이 제공하므로 아이콘의 중복 낭독을 막습니다. */}
+              <Image src="/images/google-icon.svg" alt="" width={56} height={56} />
+            </button>
+          </div>
         </form>
       </div>
 

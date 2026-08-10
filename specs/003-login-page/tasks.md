@@ -85,9 +85,9 @@ description: "로그인 페이지 UI 구현을 위한 작업 목록"
 
 ### 사용자 스토리 2 구현
 
-- [ ] T014 [US2] `src/app/(site)/login/page.js`에 `/images/kakao-icon.svg`와 `/images/google-icon.svg`를 각각 사용하는 간편 로그인 버튼과 제공자별 접근 가능한 이름을 추가한다.
-- [ ] T015 [US2] `src/app/(site)/login/page.js`에서 간편 로그인 버튼이 `isLoading` 중 비활성화되도록 연결하고 실제 OAuth 이동, 성공 응답 또는 세션 저장은 구현하지 않는다.
-- [ ] T016 [US2] `src/app/(site)/login/page.module.scss`에 간편 로그인 구분선, 버튼 배치와 데스크톱 `56px`, 태블릿·모바일 `48px` 크기를 반영한다.
+- [x] T014 [US2] `src/app/(site)/login/page.js`에 `/images/kakao-icon.svg`와 `/images/google-icon.svg`를 각각 사용하는 간편 로그인 버튼과 제공자별 접근 가능한 이름을 추가한다.
+- [x] T015 [US2] `src/app/(site)/login/page.js`에서 간편 로그인 버튼이 `isLoading` 중 비활성화되도록 연결하고 실제 OAuth 이동, 성공 응답 또는 세션 저장은 구현하지 않는다.
+- [x] T016 [US2] `src/app/(site)/login/page.module.scss`에 간편 로그인 구분선, 버튼 배치와 데스크톱 `56px`, 태블릿·모바일 `48px` 크기를 반영한다.
 
 **확인 지점**: 두 간편 로그인 버튼의 시각 요소와 상태는 독립적으로 확인할 수 있고 외부 인증은 실행되지 않는다.
 
