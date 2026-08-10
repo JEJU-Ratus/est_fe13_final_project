@@ -1,0 +1,13 @@
+.site-layout {
+  display: flex;
+  min-height: 100vh;
+
+  > :first-child {
+    flex-shrink: 0;
+  }
+
+  .site-content {
+    min-width: 0;
+    flex: 1;
+  }
+}
