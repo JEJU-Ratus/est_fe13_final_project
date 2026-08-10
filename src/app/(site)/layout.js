@@ -1,9 +1,9 @@
-import Header from "@/components/header";
+import Header from "@/components/Header";
 
 export default function RootLayout({ children }) {
   return (
     <>
-      <header />
+      <Header />
       {children}
     </>
   );
