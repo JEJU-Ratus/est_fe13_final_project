@@ -3,19 +3,42 @@
 import Image from "next/image";
 import styles from "./SummaryItemCard.module.scss";
 import { useState } from "react";
-import Link from "next/link";
 
-export default function SummaryItemCard({}) {
-  const [isBookmarked, setBookmarked] = useState(false);
+function formatCreatedAt(createdAt) {
+  if (!createdAt) {
+    return "";
+  }
+
+  const [year, month, day] = createdAt.slice(0, 10).split("-");
+
+  if (!year || !month || !day) {
+    return createdAt;
+  }
+
+  return `${year}년 ${month}월 ${day}일`;
+}
+
+export default function SummaryItemCard({
+  summaryId,
+  nickname = "",
+  profileImageUrl = "/images/main_profile.webp",
+  title = "",
+  excerpt = "",
+  createdAt = "",
+  isPrivate = false,
+  initialIsBookmarked = false,
+}) {
+  const [isBookmarked, setBookmarked] = useState(initialIsBookmarked);
+  const formattedCreatedAt = formatCreatedAt(createdAt);
 
   return (
-    <article className={styles["item-card"]}>
+    <article className={styles["item-card"]} data-summary-id={summaryId}>
       <div className={styles["card-main"]}>
         <div className={styles["card-header"]}>
           <div className={styles["user-info"]}>
             <Image
               className={styles["profile-img"]}
-              src="/images/main_profile.webp"
+              src={profileImageUrl}
               alt="사용자 프로필"
               width={32}
               height={32}
@@ -41,23 +64,22 @@ export default function SummaryItemCard({}) {
         </div>
 
         <div className={styles["card-content"]}>
-          <h4 className={styles["card-title"]}>Lorem ipsum dolor sit amet</h4>
+          <h4 className={styles["card-title"]}>{title}</h4>
 
-          <p className={styles["card-desc"]}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt Lorem ipsum dolor
-            sit amet, consectetur.
-          </p>
+          <p className={styles["card-desc"]}>{excerpt}</p>
         </div>
       </div>
 
       <div className={styles["card-footer"]}>
-        <time className={styles["created-date"]} dateTime="2026-08-06">
-          2026년 08월 06일
+        <time className={styles["created-date"]} dateTime={createdAt}>
+          {formattedCreatedAt}
         </time>
 
-        <span className={`material-symbols-outlined ${styles["lock-icon"]}`} aria-label="비공개 게시물">
-          lock
-        </span>
+        {isPrivate && (
+          <span className={`material-symbols-outlined ${styles["lock-icon"]}`} aria-label="비공개 게시물">
+            lock
+          </span>
+        )}
       </div>
     </article>
   );
