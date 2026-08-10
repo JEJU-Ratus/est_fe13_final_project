@@ -125,10 +125,10 @@ description: "로그인 페이지 UI 구현을 위한 작업 목록"
 
 **목적**: 승인된 UI 범위와 정적 품질을 확인
 
-- [ ] T020 `src/app/(site)/login/page.js`와 `src/app/(site)/login/page.module.scss`를 `/login`에서 실행해 `specs/003-login-page/quickstart.md`의 초기 화면·입력 검증·공통 SCSS 시나리오를 수동 검증한다.
-- [ ] T021 `src/app/(site)/login/page.js`와 `src/app/(site)/login/page.module.scss`를 1320px·1024px·480px에서 확인해 지정 너비·간격·로고·버튼 크기와 통일 스타일을 검증한다.
-- [ ] T022 `src/app/(site)/login/page.js`에서 Header 중복, 새 공통 React Input·Button, Suspense fallback, `loading.js`, 실제 Supabase·OAuth·세션·가짜 성공 처리가 추가되지 않았는지 범위를 검증한다.
-- [ ] T023 `src/app/(site)/login/page.js`, `src/app/(site)/login/page.module.scss`, `src/styles/abstracts/_mixins.scss`를 대상으로 `npm run lint`를 실행하고 로그인 작업 관련 오류를 해결한다.
+- [x] T020 `src/app/(site)/login/page.js`와 `src/app/(site)/login/page.module.scss`를 `/login`에서 실행해 `specs/003-login-page/quickstart.md`의 초기 화면·입력 검증·공통 SCSS 시나리오를 수동 검증한다.
+- [x] T021 `src/app/(site)/login/page.js`와 `src/app/(site)/login/page.module.scss`를 1320px·1024px·480px에서 확인해 지정 너비·간격·로고·버튼 크기와 통일 스타일을 검증한다.
+- [x] T022 `src/app/(site)/login/page.js`에서 Header 중복, 새 공통 React Input·Button, Suspense fallback, `loading.js`, 실제 Supabase·OAuth·세션·가짜 성공 처리가 추가되지 않았는지 범위를 검증한다.
+- [x] T023 `src/app/(site)/login/page.js`, `src/app/(site)/login/page.module.scss`, `src/styles/abstracts/_mixins.scss`를 대상으로 `npm run lint`를 실행하고 로그인 작업 관련 오류를 해결한다.
 
 ### 커밋 경계 5
 
