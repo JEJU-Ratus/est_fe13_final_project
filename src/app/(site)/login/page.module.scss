@@ -191,6 +191,22 @@
   }
 }
 
+.signup-guide {
+  @include type.text-14-regular;
+
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 24px;
+  color: color.$gray-medium-3;
+
+  a {
+    color: color.$fda-orange;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -282,6 +298,10 @@
 
   .social-buttons {
     order: 6;
+  }
+
+  .signup-guide {
+    order: 7;
   }
 
   .social-button {

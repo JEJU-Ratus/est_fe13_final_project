@@ -107,9 +107,9 @@ description: "로그인 페이지 UI 구현을 위한 작업 목록"
 
 ### 사용자 스토리 3 구현
 
-- [ ] T017 [US3] `src/app/(site)/login/page.js`에 `/signup`을 가리키는 `Link`와 회원가입 안내 문구를 추가한다.
-- [ ] T018 [US3] `src/app/(site)/login/page.js`에 기존 `CommonModal`의 `alreadyLoggedIn`·`error` 모드를 사용할 수 있는 표시 경계를 계약대로 배치하되 로그인 판정, 오류 응답과 가짜 트리거는 구현하지 않는다.
-- [ ] T019 [US3] `src/app/(site)/login/page.module.scss`에 회원가입 안내와 링크 상태 스타일을 반영하고 페이지가 `Header`용 공간이나 Header UI를 중복 생성하지 않도록 확인한다.
+- [x] T017 [US3] `src/app/(site)/login/page.js`에 `/signup`을 가리키는 `Link`와 회원가입 안내 문구를 추가한다.
+- [x] T018 [US3] `src/app/(site)/login/page.js`에 기존 `CommonModal`의 `alreadyLoggedIn`·`error` 모드를 사용할 수 있는 표시 경계를 계약대로 배치하되 로그인 판정, 오류 응답과 가짜 트리거는 구현하지 않는다.
+- [x] T019 [US3] `src/app/(site)/login/page.module.scss`에 회원가입 안내와 링크 상태 스타일을 반영하고 페이지가 `Header`용 공간이나 Header UI를 중복 생성하지 않도록 확인한다.
 
 **확인 지점**: 회원가입 이동은 동작하고 Header·CommonModal의 기존 책임과 로그인 페이지 책임이 분리되어 있다.
 
