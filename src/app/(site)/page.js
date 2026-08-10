@@ -69,7 +69,7 @@ export default function Home() {
           <Banner />
 
           <div className={styles["quick-menu"]}>
-            <Link href="/Summary" className={styles["quick-menu-card"]}>
+            <Link href="/summary" className={styles["quick-menu-card"]}>
               <span className="material-symbols-outlined" aria-hidden="true">
                 assignment_add
               </span>
