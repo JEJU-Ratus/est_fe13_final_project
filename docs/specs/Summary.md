@@ -21,10 +21,10 @@ AI가 생성한 요약본을 확인하고, 학습 노트를 생성·조회·수�
 
 ## URL
 
-- `/summary/[summaryId]`
-- `/summary/[summaryId]/notes/new`
-- `/summary/[summaryId]/notes/[noteId]`
-- `/summary/[summaryId]/notes/[noteId]/edit`
+- `/Summary/[summaryId]`
+- `/Summary/[summaryId]/notes/new`
+- `/Summary/[summaryId]/notes/[noteId]`
+- `/Summary/[summaryId]/notes/[noteId]/edit`
 
 ---
 
@@ -55,7 +55,7 @@ AI가 생성한 요약본을 확인하고, 학습 노트를 생성·조회·수�
 
 ## URL
 
-`/summary/[summaryId]`
+`/Summary/[summaryId]`
 
 ## 화면 구성
 
@@ -80,7 +80,7 @@ AI가 생성한 요약본을 확인하고, 학습 노트를 생성·조회·수�
 ### 학습노트 생성
 
 - 로그인한 사용자에게만 버튼을 표시한다.
-- 버튼 클릭 → `/summary/[summaryId]/notes/new`
+- 버튼 클릭 → `/Summary/[summaryId]/notes/new`
 
 ### 삭제
 
@@ -94,7 +94,7 @@ AI가 생성한 요약본을 확인하고, 학습 노트를 생성·조회·수�
 
 ## URL
 
-`/summary/[summaryId]/notes/new`
+`/Summary/[summaryId]/notes/new`
 
 ## 화면 구성
 
@@ -121,7 +121,7 @@ AI가 생성한 요약본을 확인하고, 학습 노트를 생성·조회·수�
 
 ## URL
 
-`/summary/[summaryId]/notes/[noteId]`
+`/Summary/[summaryId]/notes/[noteId]`
 
 ## 화면 구성
 
@@ -146,7 +146,7 @@ AI가 생성한 요약본을 확인하고, 학습 노트를 생성·조회·수�
 ### 수정
 
 - 작성자에게만 버튼을 표시한다.
-- 버튼 클릭 → `/summary/[summaryId]/notes/[noteId]/edit`
+- 버튼 클릭 → `/Summary/[summaryId]/notes/[noteId]/edit`
 
 ### 삭제
 
@@ -160,7 +160,7 @@ AI가 생성한 요약본을 확인하고, 학습 노트를 생성·조회·수�
 
 ## URL
 
-`/summary/[summaryId]/notes/[noteId]/edit`
+`/Summary/[summaryId]/notes/[noteId]/edit`
 
 ## 화면 구성
 

@@ -4,25 +4,30 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import CommonModal from "./CommonModal";
 import styles from "./Header.module.scss";
 
 const menuItems = [
   {
     label: "요약 노트 생성",
     icon: "assignment_add",
+    href: "#",
   },
   {
     label: "전체 요약 노트",
     icon: "book_4",
-    href: "/Summary",
+    href: "#",
   },
   {
     label: "퀴즈",
     icon: "quiz",
+    modalMode: "preparing",
   },
   {
     label: "마이페이지",
     icon: "person",
+    href: "/Mypage",
+    requiresLogin: true,
   },
 ];
 
@@ -37,6 +42,8 @@ export default function Header({ isLoggedIn = false }) {
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(() =>
     COLLAPSED_PATHS.includes(pathname)
   );
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
 
 
   function handleCollapse() {
@@ -45,6 +52,16 @@ export default function Header({ isLoggedIn = false }) {
 
   function handleExpand() {
     setIsHeaderCollapsed(false);
+  }
+
+  function handleMypageClick() {
+    if (!isLoggedIn) {
+      setIsLoginModalOpen(true);
+    }
+  }
+
+  function handleQuizClick() {
+    setIsPreparingModalOpen(true);
   }
 
   const headerClassName = [styles.header, isHeaderCollapsed && styles["is-collapsed"]].filter(Boolean).join(" ");
@@ -63,9 +80,9 @@ export default function Header({ isLoggedIn = false }) {
             <Image src="/images/프! 로고.png" alt="로고" width={40} height={36} />
           </button>
         ) : (
-          <button type="button" className={styles["logo-button"]} aria-label="홈으로 이동">
+          <Link href="/" className={styles["logo-button"]} aria-label="홈으로 이동">
             <Image src="/images/프다로고.png" alt="로고" width={59} height={25} />
-          </button>
+          </Link>
         )}
 
         {!isHeaderCollapsed && (
@@ -102,27 +119,48 @@ export default function Header({ isLoggedIn = false }) {
             </div>
           ) : (
             <div className={styles["guest-buttons"]}>
-              <button className={styles["login-button"]} type="button">
+              <Link href="#" className={styles["login-button"]} type="button">
                 로그인
-              </button>
-              <button className={styles["signup-button"]} type="button">
+              </Link>
+              <Link href="#" className={styles["signup-button"]} type="button">
                 가입하기
-              </button>
+              </Link>
             </div>
           )}
         </div>
       )}
 
       <nav className={styles["menu-list"]} aria-label="주요 메뉴">
-        {menuItems.map(menu => (
-          <button className={styles["menu-item"]} type="button" key={menu.label}>
-            <span className={`material-symbols-outlined ${styles["menu-icon-slot"]}`} aria-hidden="true">
-              {menu.icon}
-            </span>
+        {menuItems.map((menu) => {
+          const menuContent = (
+            <>
+              <span className={`material-symbols-outlined ${styles["menu-icon-slot"]}`} aria-hidden="true">
+                {menu.icon}
+              </span>
 
-            {!isHeaderCollapsed && <span className={styles["menu-label"]}>{menu.label}</span>}
-          </button>
-        ))}
+              {!isHeaderCollapsed && <span className={styles["menu-label"]}>{menu.label}</span>}
+            </>
+          );
+
+          if (menu.href && (!menu.requiresLogin || isLoggedIn)) {
+            return (
+              <Link className={styles["menu-item"]} href={menu.href} key={menu.label}>
+                {menuContent}
+              </Link>
+            );
+          }
+
+          return (
+            <button
+              className={styles["menu-item"]}
+              type="button"
+              key={menu.label}
+              onClick={menu.requiresLogin ? handleMypageClick : menu.modalMode ? handleQuizClick : undefined}
+            >
+              {menuContent}
+            </button>
+          );
+        })}
       </nav>
 
       {isHeaderCollapsed ? (
@@ -136,6 +174,16 @@ export default function Header({ isLoggedIn = false }) {
           <span>고객센터</span>
         </footer>
       )}
+      <CommonModal
+        isOpen={isLoginModalOpen}
+        mode="suggestLogin"
+        onClose={() => setIsLoginModalOpen(false)}
+      />
+      <CommonModal
+        isOpen={isPreparingModalOpen}
+        mode="preparing"
+        onClose={() => setIsPreparingModalOpen(false)}
+      />
     </aside>
   );
 }

@@ -128,11 +128,16 @@
 
 .login-button,
 .signup-button {
+  display: flex;
   width: 100%;
+  align-items: center;
+  justify-content: center;
   padding: 11px 0;
   border-radius: 50px;
   font-size: var.$font-size-18;
   line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
 }
 
 .login-button,
@@ -179,6 +184,11 @@
     font: inherit;
     cursor: default;
     text-align: left;
+
+    &[href] {
+      cursor: pointer;
+      text-decoration: none;
+    }
 
     .menu-label {
       font-size: var.$font-size-14;
