@@ -69,10 +69,10 @@
 
 ### 사용자 스토리 2 구현
 
-- [ ] T009 [US2] `src/app/(site)/signup/complete/page.module.scss`에 1024px 태블릿 기준의 제목 36px, 중앙 마스코트·그라디언트, 안내 20px와 화면 가용 너비 안의 로그인 이동 영역을 작성한다.
-- [ ] T010 [US2] `src/app/(site)/signup/complete/page.module.scss`에 480px 모바일 기준의 좌우 20px 여백, 제목 24px, 안내 16px, 축소된 마스코트·그라디언트와 최대 440px 로그인 이동 영역을 작성한다.
-- [ ] T011 [US2] `src/app/(site)/signup/complete/page.module.scss`에서 유연한 너비, `max-width`, 자동 높이와 최소 여백을 조정해 기준 사이 화면에서도 가로 넘침·이미지 왜곡·요소 겹침이 없게 한다.
-- [ ] T012 [US2] `src/app/(site)/signup/complete/page.js`와 `src/app/(site)/signup/complete/page.module.scss`를 1320px, 1024px, 480px 및 중간 너비에서 실행해 Figma 배치, 두 줄 문구, 이미지 비율과 가로 스크롤 부재를 수동 검증한다.
+- [x] T009 [US2] `src/app/(site)/signup/complete/page.module.scss`에 1024px 태블릿 기준의 제목 36px, 중앙 마스코트·그라디언트, 안내 20px와 화면 가용 너비 안의 로그인 이동 영역을 작성한다.
+- [x] T010 [US2] `src/app/(site)/signup/complete/page.module.scss`에 480px 모바일 기준의 좌우 20px 여백, 제목 24px, 안내 16px, 축소된 마스코트·그라디언트와 최대 440px 로그인 이동 영역을 작성한다.
+- [x] T011 [US2] `src/app/(site)/signup/complete/page.module.scss`에서 유연한 너비, `max-width`, 자동 높이와 최소 여백을 조정해 기준 사이 화면에서도 가로 넘침·이미지 왜곡·요소 겹침이 없게 한다.
+- [x] T012 [US2] `src/app/(site)/signup/complete/page.js`와 `src/app/(site)/signup/complete/page.module.scss`를 1320px, 1024px, 480px 및 중간 너비에서 실행해 Figma 배치, 두 줄 문구, 이미지 비율과 가로 스크롤 부재를 수동 검증한다.
 
 **확인 지점**: 사용자 스토리 1과 2가 결합되어 모든 기준 화면에서 동일한 완료 흐름을 제공한다.
 
