@@ -123,26 +123,20 @@
   }
 }
 
-.persistence-option {
+.session-guide {
   @include type.text-14-regular;
 
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 4px;
   margin-top: 8px;
-  color: color.$black;
-  cursor: pointer;
+  color: color.$gray-medium-3;
 
-  input {
-    width: 14px;
-    height: 14px;
-    margin: 0;
-    accent-color: color.$fda-orange;
-  }
-
-  &:has(input:disabled) {
-    cursor: not-allowed;
-    opacity: 0.5;
+  :global(.material-symbols-outlined) {
+    display: block;
+    font-size: 16px;
+    line-height: 1;
+    transform: translateY(1px);
   }
 }
 
@@ -282,7 +276,7 @@
     order: 1;
   }
 
-  .persistence-option {
+  .session-guide {
     order: 2;
   }
 

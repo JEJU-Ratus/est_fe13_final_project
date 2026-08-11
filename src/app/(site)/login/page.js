@@ -43,9 +43,6 @@ export default function LoginPage() {
   const [isEmailTouched, setIsEmailTouched] = useState(false);
   // 비밀번호 입력란을 한 번이라도 벗어났는지 기록해 오류 문구의 공개 시점을 결정합니다.
   const [isPasswordTouched, setIsPasswordTouched] = useState(false);
-  // 로그인 상태 유지 체크박스의 선택 여부만 관리하며 세션 저장은 아직 수행하지 않습니다.
-  const [isLoginPersistent, setIsLoginPersistent] = useState(false);
-
   // 로그인 요청 상태를 관리해 중복 제출을 막고 공통 Loading을 제어합니다.
   const [isLoading, setIsLoading] = useState(false);
   // 입력 형식은 정상이지만 Supabase 인증에 실패했을 때 표시할 문구를 관리합니다.
@@ -81,9 +78,6 @@ export default function LoginPage() {
     setIsPasswordTouched(true);
   }
 
-  function handlePersistenceChange(e) {
-    setIsLoginPersistent(e.target.checked);
-  }
   // 폼 제출
   async function handleSubmit(e) {
     e.preventDefault();
@@ -221,15 +215,13 @@ export default function LoginPage() {
             {visibleErrorMessage}
           </p>
 
-          <label className={styles["persistence-option"]}>
-            <input
-              type="checkbox"
-              checked={isLoginPersistent}
-              disabled={isLoading}
-              onChange={handlePersistenceChange}
-            />
-            <span>로그인 상태 유지</span>
-          </label>
+          <p className={styles["session-guide"]}>
+            {/* 안내 문구가 동일한 의미를 제공하므로 장식 아이콘의 중복 낭독을 막습니다. */}
+            <span className="material-symbols-outlined" aria-hidden="true">
+              info
+            </span>
+            로그아웃 전까지 로그인 상태가 유지됩니다.
+          </p>
 
           <div className={styles["social-divider"]}>
             <span aria-hidden="true" />
