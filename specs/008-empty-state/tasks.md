@@ -90,10 +90,10 @@
 
 **목적**: 다섯 적용 대상의 시각적 일관성, 접근성, 상태 상호 배제와 빌드 품질을 확인한다.
 
-- [ ] T013 `specs/008-empty-state/quickstart.md`의 전체 수동 시나리오를 실행해 `src/components/EmptyState.jsx`가 다섯 적용 대상에서 동일한 구조·이미지·간격·타이포그래피를 사용하고 정확한 세 문구만 표시하는지 확인한다.
-- [ ] T014 `src/components/EmptyState.jsx`, `src/components/Allsummary.jsx`, `src/app/(site)/summary/[summaryId]/page.js`, `src/app/(site)/mypage/page.js`를 대상으로 `npm run lint`를 실행하고 오류를 해결한다.
-- [ ] T015 `src/components/EmptyState.module.scss`, `src/app/(site)/summary/[summaryId]/page.module.scss`를 포함한 제품 경로에 대해 `npm run build`를 실행해 SCSS import와 production build가 성공하는지 확인한다.
-- [ ] T016 `specs/008-empty-state/quickstart.md`의 범위 확인 항목에 따라 `git diff --check`와 최종 diff를 검토해 새 패키지·앱 경로·자산·데이터 통신·인증·검색·경로 대소문자 변경이 포함되지 않았는지 확인한다.
+- [X] T013 `specs/008-empty-state/quickstart.md`의 전체 수동 시나리오를 실행해 `src/components/EmptyState.jsx`가 다섯 적용 대상에서 동일한 구조·이미지·간격·타이포그래피를 사용하고 정확한 세 문구만 표시하는지 확인한다.
+- [X] T014 `src/components/EmptyState.jsx`, `src/components/Allsummary.jsx`, `src/app/(site)/summary/[summaryId]/page.js`, `src/app/(site)/mypage/page.js`를 대상으로 `npm run lint`를 실행하고 오류를 해결한다.
+- [X] T015 `src/components/EmptyState.module.scss`, `src/app/(site)/summary/[summaryId]/page.module.scss`를 포함한 제품 경로에 대해 `npm run build`를 실행해 SCSS import와 production build가 성공하는지 확인한다.
+- [X] T016 `specs/008-empty-state/quickstart.md`의 범위 확인 항목에 따라 `git diff --check`와 최종 diff를 검토해 새 패키지·앱 경로·자산·데이터 통신·인증·검색·경로 대소문자 변경이 포함되지 않았는지 확인한다.
 
 ---
 
