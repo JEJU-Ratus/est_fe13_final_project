@@ -117,10 +117,10 @@
 
 **목적**: 승인된 UI 범위와 코드 품질을 최종 확인한다.
 
-- [ ] T024 `src/app/(site)/signup/page.js`와 `src/app/(site)/signup/page.module.scss`에서 Header·Loading·CommonModal·Suspense·`loading.js`, 실제 또는 가짜 인증·중복 확인과 새 공통 컴포넌트가 추가되지 않았는지 검토한다.
-- [ ] T025 키보드 Tab 순서, checkbox와 비밀번호 표시 버튼 조작, label 연결 및 오류 접근성 관계를 `specs/002-signup/quickstart.md`의 6번 기준으로 `/signup`에서 수동 검증한다.
-- [ ] T026 `npm run lint`를 실행해 `src/app/(site)/signup/page.js`와 관련 프로젝트 lint 오류가 없는지 확인하고 범위 내 오류만 수정한다.
-- [ ] T027 T010, T017, T023, T025의 결과와 미구현 후속 인증 범위를 `specs/002-signup/tasks.md` 체크박스에 반영한다.
+- [x] T024 `src/app/(site)/signup/page.js`와 `src/app/(site)/signup/page.module.scss`에서 Header·Loading·CommonModal·Suspense·`loading.js`, 실제 또는 가짜 인증·중복 확인과 새 공통 컴포넌트가 추가되지 않았는지 검토한다.
+- [x] T025 키보드 Tab 순서, checkbox와 비밀번호 표시 버튼 조작, label 연결 및 오류 접근성 관계를 `specs/002-signup/quickstart.md`의 6번 기준으로 `/signup`에서 수동 검증한다.
+- [x] T026 `npm run lint`를 실행해 `src/app/(site)/signup/page.js`와 관련 프로젝트 lint 오류가 없는지 확인하고 범위 내 오류만 수정한다.
+- [x] T027 T010, T017, T023, T025의 결과와 미구현 후속 인증 범위를 `specs/002-signup/tasks.md` 체크박스에 반영한다.
 
 **확인 지점**: 수동 검증과 lint가 통과했으며 production build는 실행하지 않았다.
 
