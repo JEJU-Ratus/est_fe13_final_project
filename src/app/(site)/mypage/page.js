@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import EmptyState from "@/components/EmptyState";
 import NoteItem from "@/components/NoteItem";
 import SummaryItemCard from "@/components/SummaryItemCard";
 import styles from "./page.module.scss";
 
-const summaryCards = [
+const mySummaryCards = [
   {
     summaryId: "summary-1",
     nickname: "프다",
@@ -39,6 +40,8 @@ const summaryCards = [
 ];
 
 const learningNotes = [];
+// 실제 북마크 데이터가 연결되기 전까지 북마크 섹션의 빈 상태만 표현합니다.
+const bookmarkCards = [];
 
 export default function Mypage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -140,7 +143,7 @@ export default function Mypage() {
           </div>
 
           <div className={styles["summary-list"]}>
-            {summaryCards.map((summary) => (
+            {mySummaryCards.map((summary) => (
               <SummaryItemCard key={summary.summaryId} {...summary} />
             ))}
           </div>
@@ -158,9 +161,13 @@ export default function Mypage() {
           </div>
 
           <div className={styles["summary-list"]}>
-            {summaryCards.map((summary) => (
-              <SummaryItemCard key={`bookmark-${summary.summaryId}`} {...summary} initialIsBookmarked />
-            ))}
+            {bookmarkCards.length === 0 ? (
+              <EmptyState message="북마크한 요약 노트가 없습니다." />
+            ) : (
+              bookmarkCards.map((summary) => (
+                <SummaryItemCard key={`bookmark-${summary.summaryId}`} {...summary} initialIsBookmarked />
+              ))
+            )}
           </div>
         </section>
       </div>

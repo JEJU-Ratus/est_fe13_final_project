@@ -79,8 +79,8 @@
 
 ### 사용자 스토리 3 구현
 
-- [ ] T011 [US3] `src/app/(site)/mypage/page.js`에서 내 요약 노트와 북마크가 공유하는 정적 placeholder 컬렉션을 분리하고, 실제 데이터 연결 전 범위를 설명하는 임시 주석과 함께 빈 북마크 컬렉션에는 `EmptyState` 및 `북마크한 요약 노트가 없습니다.`를 표시한다.
-- [ ] T012 [US3] `specs/008-empty-state/quickstart.md`의 마이페이지 북마크 빈 상태·항목 존재 시나리오를 `src/app/(site)/mypage/page.js`에서 실행해 프로필·학습노트·내 요약 노트 섹션에 회귀 변경이 없는지 확인한다.
+- [X] T011 [US3] `src/app/(site)/mypage/page.js`에서 내 요약 노트와 북마크가 공유하는 정적 placeholder 컬렉션을 분리하고, 실제 데이터 연결 전 범위를 설명하는 임시 주석과 함께 빈 북마크 컬렉션에는 `EmptyState` 및 `북마크한 요약 노트가 없습니다.`를 표시한다.
+- [X] T012 [US3] `specs/008-empty-state/quickstart.md`의 마이페이지 북마크 빈 상태·항목 존재 시나리오를 `src/app/(site)/mypage/page.js`에서 실행해 프로필·학습노트·내 요약 노트 섹션에 회귀 변경이 없는지 확인한다.
 
 **확인 지점**: 사용자 스토리 3을 다른 목록 페이지와 독립적으로 실행하고 검증할 수 있음
 
