@@ -72,6 +72,38 @@
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   background: transparent;
   cursor: pointer;
+
+  .collapsed-logo-image,
+  .collapsed-panel-icon {
+    grid-area: 1 / 1;
+  }
+
+  .collapsed-logo-image {
+    display: block;
+  }
+
+  .collapsed-panel-icon {
+    display: none;
+    color: color.$gray-medium-3;
+    font-size: 24px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    .collapsed-logo-image {
+      display: none;
+    }
+
+    .collapsed-panel-icon {
+      display: block;
+    }
+  }
+
+  &:focus-visible {
+    border-radius: 4px;
+    outline: 2px solid color.$fda-orange;
+    outline-offset: 3px;
+  }
 }
 
 .icon-slot,
