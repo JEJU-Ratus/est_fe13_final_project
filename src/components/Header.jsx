@@ -135,12 +135,12 @@ export default function Header({ isLoggedIn = false }) {
               <div className={styles["profile-content"]}>
                 <p className={styles["user-name"]}>user name</p>
                 <div className={styles["account-buttons"]}>
-                  <button className={styles["profile-button"]} type="button">
+                  <Link href="#" className={styles["profile-button"]} type="button">
                     프로필 수정
-                  </button>
-                  <button className={styles["logout-button"]} type="button">
+                  </Link>
+                  <Link href="#" className={styles["logout-button"]} type="button">
                     로그아웃
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
