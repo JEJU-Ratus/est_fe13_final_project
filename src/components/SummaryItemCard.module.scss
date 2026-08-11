@@ -29,7 +29,12 @@
   position: absolute;
   z-index: 1;
   inset: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
   border-radius: inherit;
+  appearance: none;
+  cursor: pointer;
 }
 
 .card-main {
