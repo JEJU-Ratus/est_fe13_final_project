@@ -63,9 +63,9 @@
 
 ### 사용자 스토리 2 구현
 
-- [ ] T008 [P] [US2] `src/app/(site)/summary/[summaryId]/page.js`에서 직접 작성된 `next/image` 빈 상태 마크업을 `EmptyState`와 `현재 리스트가 없습니다.` 메시지로 교체하고 불필요해진 `next/image` import만 제거한다.
-- [ ] T009 [P] [US2] `src/app/(site)/summary/[summaryId]/page.module.scss`에서 `EmptyState.module.scss`로 이동된 `.empty-state`, `.empty-image` 규칙만 제거하고 버튼·제목·목록 외 레이아웃 스타일과 상대 SCSS import는 유지한다.
-- [ ] T010 [US2] `specs/008-empty-state/quickstart.md`의 요약 상세 빈 학습노트 시나리오를 실행해 `src/app/(site)/summary/[summaryId]/page.js`의 문구, 장식 이미지, 접근성 상태와 기존 화면 영역 보존을 확인한다.
+- [X] T008 [P] [US2] `src/app/(site)/summary/[summaryId]/page.js`에서 직접 작성된 `next/image` 빈 상태 마크업을 `EmptyState`와 `현재 리스트가 없습니다.` 메시지로 교체하고 불필요해진 `next/image` import만 제거한다.
+- [X] T009 [P] [US2] `src/app/(site)/summary/[summaryId]/page.module.scss`에서 `EmptyState.module.scss`로 이동된 `.empty-state`, `.empty-image` 규칙만 제거하고 버튼·제목·목록 외 레이아웃 스타일과 상대 SCSS import는 유지한다.
+- [X] T010 [US2] `specs/008-empty-state/quickstart.md`의 요약 상세 빈 학습노트 시나리오를 실행해 `src/app/(site)/summary/[summaryId]/page.js`의 문구, 장식 이미지, 접근성 상태와 기존 화면 영역 보존을 확인한다.
 
 **확인 지점**: 사용자 스토리 2를 사용자 스토리 1·3의 페이지 데이터와 독립적으로 실행하고 검증할 수 있음
 

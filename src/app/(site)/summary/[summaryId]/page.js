@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import EmptyState from '@/components/EmptyState';
 import styles from './page.module.scss';
 
 export default function SummaryDetailPage() {
@@ -18,12 +18,7 @@ export default function SummaryDetailPage() {
         <h2>학습노트 리스트</h2>
       </div>
 
-      <div className={styles['empty-state']}>
-        <span className={styles['empty-image']}>
-          <Image src='/images/empty-note.png' alt='' fill sizes='171px' />
-        </span>
-        <p>현재 리스트가 없습니다.</p>
-      </div>
+      <EmptyState message='현재 리스트가 없습니다.' />
     </section>
   );
 }
