@@ -83,6 +83,14 @@
         color: color.$gray;
         font-size: var.$font-size-18;
         font-weight: var.$font-weight-regular;
+        transition: box-shadow 0.25s ease;
+
+        // 마우스와 키보드 사용자 모두 입력 위치를 명확히 확인할 수 있도록 래퍼에 포커스를 표시합니다.
+        &:focus-within {
+          box-shadow:
+            0 0 8px rgba(color.$fda-navy, 0.3),
+            0 0 18px rgba(color.$fda-navy, 0.24);
+        }
 
         input {
           min-width: 0;
@@ -142,8 +150,56 @@
           font-size: var.$font-size-18;
           font-weight: var.$font-weight-medium;
 
+          .password-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+          }
+
+          .checkbox-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            clip-path: inset(50%);
+            white-space: nowrap;
+
+            &:focus-visible + .checkbox-icon {
+              border-radius: 2px;
+              outline: 2px solid color.$fda-orange;
+              outline-offset: 2px;
+            }
+          }
+
+          .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            clip-path: inset(50%);
+            white-space: nowrap;
+          }
+
           .checkbox-icon {
             font-size: 24px;
+          }
+
+          .password-input {
+            width: 140px;
+            padding: 4px 0;
+            border: 0;
+            border-bottom: 1px solid color.$gray-medium;
+            color: color.$black;
+            background-color: transparent;
+            font: inherit;
+
+            &:focus {
+              border-bottom-color: color.$fda-orange;
+              outline: 0;
+            }
           }
         }
       }
@@ -185,6 +241,20 @@
       font-weight: var.$font-weight-semibold;
       text-align: left;
       text-decoration: none;
+      transition: box-shadow 0.25s ease;
+
+      &:hover,
+      &:focus-visible {
+        background-color: color.$white;
+        box-shadow:
+          0 0 8px rgba(color.$fda-orange, 0.3),
+          0 0 18px rgba(color.$fda-orange, 0.24);
+      }
+
+      &:focus-visible {
+        outline: 2px solid color.$fda-orange;
+        outline-offset: 3px;
+      }
 
       &[type="button"] {
         cursor: pointer;
@@ -218,14 +288,19 @@
   }
 }
 
-@media (max-width: 1120px) {
+@media (max-width: 1024px) {
   .main-page {
-    padding: 64px 24px;
+    padding: 64px 32px;
   }
 
   .intro-section {
     flex-direction: column;
     gap: 40px;
+    align-items: center;
+
+    .mascot-image {
+      width: min(100%, 280px);
+    }
 
     .intro-content {
       width: min(100%, 760px);
@@ -237,8 +312,49 @@
   }
 
   .content-section {
+    :global(.banner) {
+      width: 100%;
+    }
+
     .quick-menu {
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(212px, 1fr));
+      gap: 24px;
+      overflow-x: auto;
+
+      .quick-menu-card {
+        width: 100%;
+        height: 96px;
+        min-width: 0;
+        padding: 16px;
+        font-size: var.$font-size-20;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .main-page {
+    padding: 48px 20px;
+  }
+
+  .intro-section {
+    .mascot-image {
+      width: min(100%, 220px);
+    }
+
+    .intro-content {
+      .intro-copy {
+        h1 {
+          font-size: var.$font-size-36;
+          line-height: 1.3;
+        }
+      }
+
+      .summary-form .form-bottom {
+        flex-direction: column;
+      }
     }
   }
 }
