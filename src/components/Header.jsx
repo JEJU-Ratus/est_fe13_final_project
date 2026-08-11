@@ -135,21 +135,21 @@ export default function Header({ isLoggedIn = false }) {
               <div className={styles["profile-content"]}>
                 <p className={styles["user-name"]}>user name</p>
                 <div className={styles["account-buttons"]}>
-                  <button className={styles["profile-button"]} type="button">
+                  <Link href="#" className={styles["profile-button"]} type="button">
                     프로필 수정
-                  </button>
-                  <button className={styles["logout-button"]} type="button">
+                  </Link>
+                  <Link href="#" className={styles["logout-button"]} type="button">
                     로그아웃
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
           ) : (
             <div className={styles["guest-buttons"]}>
-              <Link href="#" className={styles["login-button"]} type="button">
+              <Link href="/login" className={styles["login-button"]} type="button">
                 로그인
               </Link>
-              <Link href="#" className={styles["signup-button"]} type="button">
+              <Link href="/signup" className={styles["signup-button"]} type="button">
                 가입하기
               </Link>
             </div>
