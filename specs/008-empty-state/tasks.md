@@ -48,8 +48,8 @@
 
 ### 사용자 스토리 1 구현
 
-- [ ] T006 [US1] `src/components/Allsummary.jsx`에서 기존 필터·정렬·카드 props를 유지한 채 `summaryCards.length`로 항목 목록과 `EmptyState`를 상호 배타적으로 렌더링하고 `view`별 정확한 문구를 전달한다.
-- [ ] T007 [US1] `specs/008-empty-state/quickstart.md`의 전체·나의·북마크 빈 컬렉션 및 항목 존재 시나리오를 `src/components/Allsummary.jsx`에 대해 실행하고 검증용 임시 데이터 변경이 최종 diff에 남지 않았는지 확인한다.
+- [X] T006 [US1] `src/components/Allsummary.jsx`에서 기존 필터·정렬·카드 props를 유지한 채 `summaryCards.length`로 항목 목록과 `EmptyState`를 상호 배타적으로 렌더링하고 `view`별 정확한 문구를 전달한다.
+- [X] T007 [US1] `specs/008-empty-state/quickstart.md`의 전체·나의·북마크 빈 컬렉션 및 항목 존재 시나리오를 `src/components/Allsummary.jsx`에 대해 실행하고 검증용 임시 데이터 변경이 최종 diff에 남지 않았는지 확인한다.
 
 **확인 지점**: 사용자 스토리 1만으로 세 요약본 목록의 빈 상태와 기존 카드 목록을 독립적으로 검증할 수 있음
 

@@ -1,4 +1,5 @@
 import styles from "./AllSummary.module.scss";
+import EmptyState from "./EmptyState";
 import SummaryItemCard from "./SummaryItemCard";
 import summaries from "@/mocks/summaries.json";
 import users from "@/mocks/users.json";
@@ -40,6 +41,10 @@ export default function AllSummary({ title, view = "all", currentUserId }) {
       isBookmarked,
     };
   });
+  const emptyStateMessage =
+    view === "bookmarks"
+      ? "북마크한 요약 노트가 없습니다."
+      : "요약 노트가 아직 생성되지 않았습니다.";
 
   return (
     <main className={styles["summary-page"]}>
@@ -57,19 +62,23 @@ export default function AllSummary({ title, view = "all", currentUserId }) {
         </div>
 
         <div className={styles["summary-content"]}>
-          {summaryCards.map((summary) => (
-            <SummaryItemCard
-              key={summary.summaryId}
-              summaryId={summary.summaryId}
-              nickname={summary.nickname}
-              profileImageUrl={summary.profileImageUrl}
-              title={summary.title}
-              excerpt={summary.excerpt}
-              createdAt={summary.createdAt}
-              isPrivate={summary.isPrivate}
-              initialIsBookmarked={summary.isBookmarked}
-            />
-          ))}
+          {summaryCards.length === 0 ? (
+            <EmptyState message={emptyStateMessage} />
+          ) : (
+            summaryCards.map((summary) => (
+              <SummaryItemCard
+                key={summary.summaryId}
+                summaryId={summary.summaryId}
+                nickname={summary.nickname}
+                profileImageUrl={summary.profileImageUrl}
+                title={summary.title}
+                excerpt={summary.excerpt}
+                createdAt={summary.createdAt}
+                isPrivate={summary.isPrivate}
+                initialIsBookmarked={summary.isBookmarked}
+              />
+            ))
+          )}
         </div>
       </section>
     </main>
