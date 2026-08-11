@@ -11,7 +11,7 @@ description: "로그인 페이지 UI 구현을 위한 작업 목록"
 
 **참고 문서**: `research.md`, `data-model.md`, `contracts/LoginPage.md`, `quickstart.md`
 
-**구현 범위**: 로그인 UI, 입력 검증, 로그인 상태 유지 Boolean, 공통 Loading 배치, 반응형 스타일
+**구현 범위**: 로그인 UI, 입력 검증, 기본 세션 유지 안내, 공통 Loading 배치, 반응형 스타일
 
 **제외 범위**: 실제 Supabase 인증, OAuth, API, 세션 저장·복구, 가짜 인증 성공, `loading.js`, Suspense fallback, production build
 
@@ -53,16 +53,16 @@ description: "로그인 페이지 UI 구현을 위한 작업 목록"
 
 ## 3단계: 사용자 스토리 1 - 이메일과 비밀번호 로그인 UI (우선순위: P1) 🎯 MVP
 
-**목표**: 이메일·비밀번호 입력, 입력 검증, 로그인 상태 유지 선택과 요청 상태 표시 경계를 제공한다.
+**목표**: 이메일·비밀번호 입력, 입력 검증, 기본 세션 유지 안내와 요청 상태 표시 경계를 제공한다.
 
-**독립 검증**: `/login`에서 초기 상태, 입력란 이탈 오류, 유효값 수정 시 오류 해제, 로그인 버튼 활성화와 로그인 상태 유지 체크 전환을 실제 인증 없이 확인한다.
+**독립 검증**: `/login`에서 초기 상태, 입력란 이탈 오류, 유효값 수정 시 오류 해제, 로그인 버튼 활성화와 기본 세션 유지 안내를 확인한다.
 
 ### 사용자 스토리 1 구현
 
-- [x] T007 [US1] `src/app/(site)/login/page.js`를 Client Component로 생성하고 이메일, 비밀번호, 입력란 이탈 여부, 폼 오류, `isLoginPersistent`, `isLoading` 상태와 파생 폼 유효성을 구성한다.
+- [x] T007 [US1] `src/app/(site)/login/page.js`를 Client Component로 생성하고 이메일, 비밀번호, 입력란 이탈 여부, 폼 오류, `isLoading` 상태와 파생 폼 유효성을 구성한다.
 - [x] T008 [US1] `src/app/(site)/login/page.js`에 이메일 필수·형식 및 비밀번호 필수 검증을 구현하고 이탈 후 고정된 단일 오류 공간에 우선순위별 한 문구 표시, 유효값 수정 시 즉시 갱신·해제, 비밀번호 상시 마스킹을 적용한다.
-- [x] T009 [US1] `src/app/(site)/login/page.js`에 로고·소개 문구, Material Symbols `person`·`lock`, 이메일·비밀번호 입력, `로그인 상태 유지` 체크박스와 유효성 기반 로그인 버튼을 구성한다.
-- [x] T010 [US1] `src/app/(site)/login/page.js`에서 `isLoading`일 때 기존 `Loading`을 한 번만 렌더링하고 모든 입력·체크박스·인증 버튼을 비활성화하되 실제 요청, 가짜 성공과 세션 처리는 추가하지 않는다.
+- [x] T009 [US1] `src/app/(site)/login/page.js`에 로고·소개 문구, Material Symbols `person`·`lock`, 이메일·비밀번호 입력, `info` 아이콘과 기본 세션 유지 안내 및 유효성 기반 로그인 버튼을 구성한다.
+- [x] T010 [US1] `src/app/(site)/login/page.js`에서 `isLoading`일 때 기존 `Loading`을 한 번만 렌더링하고 모든 입력·인증 버튼을 비활성화하되 가짜 성공과 별도 세션 선택 처리는 추가하지 않는다.
 - [x] T011 [US1] `src/app/(site)/login/page.js`의 label, 오류 연결, 비활성화와 Material Symbols 관련 접근성 속성에 목적을 설명하는 주석을 적용한다.
 - [x] T012 [US1] `src/app/(site)/login/page.module.scss`를 생성하고 `@use "styles/abstracts/mixins" as mixin;`으로 공통 mixin을 적용해 데스크톱 `1320px` 로그인 UI와 배경·Input·placeholder·버튼 상태 스타일을 구현한다.
 - [x] T013 [US1] `src/app/(site)/login/page.module.scss`에 태블릿 `1024px`과 모바일 `480px` 레이아웃, 지정 영역·로고·로그인 버튼 크기와 gutter·margin 차이를 반영하되 배경·Input 그림자·placeholder 스타일은 데스크톱 기준으로 유지한다.
@@ -72,7 +72,7 @@ description: "로그인 페이지 UI 구현을 위한 작업 목록"
 ### 커밋 경계 2
 
 - 변경 파일: `src/app/(site)/login/page.js`, `src/app/(site)/login/page.module.scss`
-- 검증: 초기 상태, blur 검증, 오류 해제, 버튼 활성화, 체크박스 Boolean, 1320px·1024px·480px 표시 확인
+- 검증: 초기 상태, blur 검증, 오류 해제, 버튼 활성화, 기본 세션 유지 안내, 1320px·1024px·480px 표시 확인
 - 권장 커밋: `git commit -m "feat: 로그인 폼 UI와 반응형 검증 구현"`
 
 ---
