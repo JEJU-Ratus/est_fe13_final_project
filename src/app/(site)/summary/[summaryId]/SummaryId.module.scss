@@ -164,7 +164,14 @@
 }
 
 @media (max-width: 480px) {
+  .Ai-container {
+    padding: 20px 0;
+  }
+  .ai-summary {
+    gap: 16px;
+  }
   .Ai-header {
+    border: none;
     .Ai-title {
       @include typography.text-24-semibold;
     }
@@ -181,6 +188,20 @@
 
     p {
       @include typography.text-14-regular;
+    }
+  }
+
+  .quiz-action {
+    button {
+      @include typography.text-14-medium;
+
+      width: 100px;
+      height: 33px;
+      color: color.$white;
+      background: color.$fda-orange;
+      border: 0;
+      border-radius: 100px;
+      cursor: pointer;
     }
   }
 }
