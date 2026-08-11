@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import NoteItem from "@/components/NoteItem";
@@ -46,6 +46,12 @@ export default function Mypage() {
   const [introduction, setIntroduction] = useState("프론트엔드 학습을 기록하고 있어요.");
   const [draftNickname, setDraftNickname] = useState(nickname);
   const [draftIntroduction, setDraftIntroduction] = useState(introduction);
+  const summaryListDragRef = useRef({
+    element: null,
+    startX: 0,
+    startScrollLeft: 0,
+    isDragging: false,
+  });
 
   function handleStartProfileEdit() {
     setDraftNickname(nickname);
@@ -57,6 +63,68 @@ export default function Mypage() {
     setNickname(draftNickname);
     setIntroduction(draftIntroduction);
     setIsEditingProfile(false);
+  }
+
+  function handleSummaryListPointerDown(event) {
+    if (event.pointerType !== "mouse" || event.button !== 0) {
+      return;
+    }
+
+    summaryListDragRef.current = {
+      element: event.currentTarget,
+      startX: event.clientX,
+      startScrollLeft: event.currentTarget.scrollLeft,
+      isDragging: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function handleSummaryListPointerMove(event) {
+    const dragState = summaryListDragRef.current;
+
+    if (dragState.element !== event.currentTarget) {
+      return;
+    }
+
+    const dragDistance = event.clientX - dragState.startX;
+
+    if (Math.abs(dragDistance) > 5) {
+      dragState.isDragging = true;
+    }
+
+    if (dragState.isDragging) {
+      event.preventDefault();
+      event.currentTarget.scrollLeft = dragState.startScrollLeft - dragDistance;
+    }
+  }
+
+  function handleSummaryListPointerEnd(event) {
+    const dragState = summaryListDragRef.current;
+
+    if (dragState.element !== event.currentTarget) {
+      return;
+    }
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    dragState.element = null;
+  }
+
+  function handleSummaryListPointerCancel(event) {
+    handleSummaryListPointerEnd(event);
+    summaryListDragRef.current.isDragging = false;
+  }
+
+  function handleSummaryListClickCapture(event) {
+    if (!summaryListDragRef.current.isDragging) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    summaryListDragRef.current.isDragging = false;
   }
 
   return (
@@ -139,7 +207,17 @@ export default function Mypage() {
             </Link>
           </div>
 
-          <div className={styles["summary-list"]}>
+          {/* 가로 카드 목록을 키보드 사용자도 직접 탐색할 수 있도록 스크롤 영역에 포커스를 허용합니다. */}
+          <div
+            className={styles["summary-list"]}
+            aria-label="내 요약 노트 목록"
+            tabIndex={0}
+            onPointerDown={handleSummaryListPointerDown}
+            onPointerMove={handleSummaryListPointerMove}
+            onPointerUp={handleSummaryListPointerEnd}
+            onPointerCancel={handleSummaryListPointerCancel}
+            onClickCapture={handleSummaryListClickCapture}
+          >
             {summaryCards.map((summary) => (
               <SummaryItemCard key={summary.summaryId} {...summary} />
             ))}
@@ -157,7 +235,17 @@ export default function Mypage() {
             </Link>
           </div>
 
-          <div className={styles["summary-list"]}>
+          {/* 가로 카드 목록을 키보드 사용자도 직접 탐색할 수 있도록 스크롤 영역에 포커스를 허용합니다. */}
+          <div
+            className={styles["summary-list"]}
+            aria-label="북마크 목록"
+            tabIndex={0}
+            onPointerDown={handleSummaryListPointerDown}
+            onPointerMove={handleSummaryListPointerMove}
+            onPointerUp={handleSummaryListPointerEnd}
+            onPointerCancel={handleSummaryListPointerCancel}
+            onClickCapture={handleSummaryListClickCapture}
+          >
             {summaryCards.map((summary) => (
               <SummaryItemCard key={`bookmark-${summary.summaryId}`} {...summary} initialIsBookmarked />
             ))}

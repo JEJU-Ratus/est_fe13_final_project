@@ -191,12 +191,34 @@
 }
 
 .summary-list {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
   gap: 24px;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
 
   > * {
-    width: 100%;
+    width: 312px;
+    flex: 0 0 312px;
+  }
+
+  // 키보드 사용자가 현재 가로 스크롤 영역을 확인할 수 있도록 포커스 위치를 표시합니다.
+  &:focus-visible {
+    border-radius: 4px;
+    outline: 2px solid color.$fda-orange;
+    outline-offset: 4px;
   }
 }
 
@@ -204,10 +226,50 @@
   .mypage {
     padding: 72px 32px;
   }
+}
 
-  .summary-list {
-    grid-template-columns: repeat(2, minmax(0, 312px));
-    justify-content: center;
+@media (min-width: 769px) and (max-width: 1024px) {
+  .mypage {
+    padding: 96px 32px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 838px;
+    gap: 96px;
+  }
+
+  .profile-content {
+    gap: 24px;
+    padding: 0;
+  }
+
+  .learning-note-section {
+    gap: 32px;
+
+    .more-link {
+      display: none;
+    }
+  }
+
+  .learning-note-table {
+    border-radius: 8px;
+  }
+
+  .summary-section {
+    gap: 24px;
+  }
+
+  .section-heading {
+    .more-link {
+      font-size: var.$font-size-18;
+
+      .more-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+      }
+    }
   }
 }
 
@@ -233,8 +295,106 @@
       width: 850px;
     }
   }
+}
+
+@media (max-width: 480px) {
+  .mypage {
+    padding: 24px 20px 64px;
+  }
+
+  .container {
+    gap: 48px;
+  }
+
+  .profile-section,
+  .learning-note-section,
+  .summary-section {
+    gap: 24px;
+
+    h2 {
+      font-size: var.$font-size-24;
+    }
+  }
+
+  .profile-content {
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+
+    .profile-image {
+      width: 100px;
+      height: 100px;
+    }
+
+    .profile-details {
+      width: auto;
+      min-width: 0;
+      flex: 1;
+      gap: 24px;
+
+      .profile-text {
+        font-size: var.$font-size-14;
+
+        .nickname {
+          font-size: var.$font-size-24;
+        }
+      }
+
+      .profile-form {
+        width: 100%;
+        max-width: none;
+        gap: 12px;
+
+        label input {
+          height: 40px;
+        }
+      }
+    }
+
+    .profile-edit-button {
+      width: 120px;
+      height: 40px;
+      font-size: var.$font-size-14;
+    }
+  }
+
+  .section-heading {
+    .more-link {
+      font-size: 12px;
+
+      .more-icon {
+        width: 12px;
+        height: 12px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .learning-note-table {
+    overflow: hidden;
+    border-radius: 8px;
+
+    .table-header {
+      width: 100%;
+      padding: 10px 16px;
+      font-size: 15px;
+
+      .table-leading {
+        gap: 24px;
+      }
+
+      > span:last-child {
+        width: 80px;
+        text-align: right;
+      }
+    }
+  }
 
   .summary-list {
-    grid-template-columns: minmax(0, 312px);
+    > * {
+      width: 325px;
+      flex-basis: 325px;
+    }
   }
 }
