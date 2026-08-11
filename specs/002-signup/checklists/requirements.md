@@ -1,40 +1,39 @@
-# Specification Quality Checklist: 회원가입
+# 명세 품질 체크리스트: 회원가입
 
-**Purpose**: 계획 단계 전에 회원가입 명세의 완전성과 품질을 검증한다.
-**Created**: 2026-08-05
-**Feature**: [spec.md](../spec.md)
+**목적**: 계획 단계 전에 갱신된 회원가입 명세의 완전성과 품질을 검증한다.
 
-## Content Quality
+**갱신일**: 2026-08-10
 
-- [x] No implementation details (languages, frameworks, APIs)
-- [x] Focused on user value and business needs
-- [x] Written for non-technical stakeholders
-- [x] All mandatory sections completed
+**대상**: [spec.md](../spec.md)
 
-## Requirement Completeness
+## 내용 품질
 
-- [x] No [NEEDS CLARIFICATION] markers remain
-- [x] Requirements are testable and unambiguous
-- [x] Success criteria are measurable
-- [x] Success criteria are technology-agnostic (no implementation details)
-- [x] All acceptance scenarios are defined
-- [x] Edge cases are identified
-- [x] Scope is clearly bounded
-- [x] Dependencies and assumptions identified
+- [x] 사용자 가치와 업무 요구에 초점을 맞췄다.
+- [x] 필수 사용자 시나리오, 요구사항과 성공 기준을 작성했다.
+- [x] 사용자에게 확정받지 않은 인증·통신 구조를 임의로 결정하지 않았다.
+- [x] 구현 파일과 공통 요소에 관한 내용은 사용자가 지정한 작업 경계로만 기록했다.
 
-## Feature Readiness
+## 요구사항 완전성
 
-- [x] All functional requirements have clear acceptance criteria
-- [x] User scenarios cover primary flows
-- [x] Feature meets measurable outcomes defined in Success Criteria
-- [x] No implementation details leak into specification
+- [x] `[NEEDS CLARIFICATION]` 표시가 남아 있지 않다.
+- [x] 요구사항은 검증 가능하고 모호하지 않다.
+- [x] 성공 기준은 측정 가능하다.
+- [x] 주요 사용자 흐름과 예외 상황을 포함했다.
+- [x] UI 우선 범위와 후속 인증 연동 범위를 구분했다.
+- [x] Header, Loading, 로그인 명세와 공통 스타일 의존성을 기록했다.
+- [x] 데스크톱·태블릿·모바일 디자인을 모두 참조했다.
 
-## Notes
+## 기능 준비 상태
 
-- 원본 명세의 미정 사항과 Figma 충돌 사항은 사용자 답변 Q1~Q12로 모두 확정했다.
-- Signup 원본이 참조한 `docs/specs/Header.md`와 비로그인·접힘 및 로그인·접힘 Figma 프레임을 의존 관계로 반영했다.
-- 비로그인 기본 화면과 로그인 접근 제한 중 Header 상태, 사용자 상태 이미지, 펼침 및 메뉴 동작의 인수 조건을 추가했다.
-- 비밀번호 조건은 8~16자, 두 비밀번호 입력란 모두 표시·숨김 제공으로 확정했다.
-- 닉네임·이메일 중복 검사와 입력 검증은 포커스 이탈 시 수행한다.
-- 전체 화면 로딩, 오류별 사용자용 메시지 Modal, 로그인 사용자 안내 후 3초 자동 이동을 반영했다.
-- 모든 품질 항목을 통과했으며 계획 단계로 진행할 수 있다.
+- [x] 입력 항목의 이름과 순서를 모든 화면에서 통일했다.
+- [x] 전체 동의와 개별 약관의 양방향 선택 관계를 정의했다.
+- [x] 기존 닉네임·이메일 중복 확인 요구사항을 유지했다.
+- [x] 비밀번호 길이는 사용자 답변에 따라 `8~16자`로 확정했다.
+- [x] Figma의 `8~10자` 문구와의 충돌 및 교체 기준을 기록했다.
+- [x] 실제 요청 없이 가짜 성공·중복 결과·Promise를 만들지 않는 범위를 기록했다.
+
+## 비고
+
+- 태블릿과 모바일의 `이름` 표기는 `닉네임`으로 변경한다.
+- 비밀번호 길이는 기존 확정안인 `8~16자`를 우선하며 디자인 안내 문구를 이에 맞춘다.
+- 명세는 계획 단계로 진행할 준비가 완료됐다.
