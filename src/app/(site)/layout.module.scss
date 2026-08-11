@@ -9,5 +9,8 @@
   .site-content {
     min-width: 0;
     flex: 1;
+    container-name: site-content;
+    container-type: inline-size;
+    overflow-x: clip;
   }
 }
