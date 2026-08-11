@@ -16,7 +16,7 @@
 
 **저장소**: 해당 없음
 
-**테스트**: 개발 확인 화면 수동 검증, ESLint, Next.js production build
+**테스트**: 개발 확인 화면 수동 검증, ESLint
 
 **대상 플랫폼**: 데스크톱 웹 브라우저
 
@@ -114,7 +114,7 @@ public/
 2. `Loading.module.scss`에 전체 화면 차단, 중앙 정렬, 막대 배치·순차 투명도 변화와 모션 감소 스타일을 작성한다.
 3. `/dev/loading` 개발 확인 화면에서 `isLoading` 토글과 뒤쪽 상호작용 차단을 검증한다.
 4. UI 계약 및 quickstart 시나리오에 따라 디자인, 중복 렌더링, 키보드 접근과 표시 해제를 확인한다.
-5. ESLint와 production build를 실행한다.
+5. 개발 확인 화면의 최종 동작과 ESLint를 검증한다. Production build는 페이지 통합 또는 배포 전 검증 범위에서 실행한다.
 
 ## 복잡성 기록
 

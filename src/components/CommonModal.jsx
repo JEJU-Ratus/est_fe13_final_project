@@ -115,7 +115,7 @@ export default function CommonModal(props) {
             src="/images/프비메인.webp"
             alt=""
             fill
-            sizes="220px"
+            sizes="348px"
             priority
           />
         </div>
@@ -137,18 +137,10 @@ export default function CommonModal(props) {
 
         {mode === "confirmDelete" && (
           <div className={styles["button-group"]}>
-            <button
-              className={styles["primary-button"]}
-              type="button"
-              onClick={handleConfirm}
-            >
+            <button className={styles["primary-button"]} type="button" onClick={handleConfirm}>
               삭제
             </button>
-            <button
-              className={styles["secondary-button"]}
-              type="button"
-              onClick={handleClose}
-            >
+            <button className={styles["secondary-button"]} type="button" onClick={handleClose}>
               취소
             </button>
           </div>

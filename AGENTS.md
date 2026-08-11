@@ -37,6 +37,23 @@ page.js
 page.module.scss
 ```
 
+- SCSS Module 파일은 대상 JavaScript 파일에서 상대 경로로 import한다.
+
+```js
+import styles from "./page.module.scss";
+```
+
+- SCSS 내부에서 `src/styles`의 공통 파일을 불러올 때는 `styles/` 기준 경로를 사용한다.
+
+```scss
+@use "styles/abstracts/colors" as color;
+@use "styles/abstracts/variables" as var;
+@use "styles/abstracts/typography" as typography;
+@use "styles/abstracts/mixins" as mixin;
+```
+
+- 공통 SCSS 파일을 불러올 때 `@/styles/...` 또는 긴 상대 경로를 혼용하지 않는다.
+
 - 전역 스타일은 `src/app/globals.scss`에서 관리한다.
 - 공통 색상, 변수, 믹스인, 타이포그래피는 `src/styles/abstracts`에서 관리한다.
 - CSS Reset은 `src/styles/base/_reset.scss`에서 관리한다.
