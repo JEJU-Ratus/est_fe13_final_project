@@ -196,11 +196,11 @@
   @include type.text-24-semibold;
 
   min-height: 56px;
+  border-radius: 50px;
   color: color.$white;
 
   &:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
   }
 }
 
