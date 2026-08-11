@@ -146,10 +146,10 @@ export default function Header({ isLoggedIn = false }) {
             </div>
           ) : (
             <div className={styles["guest-buttons"]}>
-              <Link href="#" className={styles["login-button"]} type="button">
+              <Link href="/login" className={styles["login-button"]} type="button">
                 로그인
               </Link>
-              <Link href="#" className={styles["signup-button"]} type="button">
+              <Link href="/signup" className={styles["signup-button"]} type="button">
                 가입하기
               </Link>
             </div>
