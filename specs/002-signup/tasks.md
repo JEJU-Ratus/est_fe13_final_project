@@ -95,12 +95,12 @@
 
 ### 사용자 스토리 3 구현
 
-- [ ] T018 [US3] 데스크톱 1320px 기준 중앙 콘텐츠, 약관 영역, 라벨·입력 가로 배치와 전체 너비 버튼을 `src/app/(site)/signup/page.module.scss`에 완성한다.
-- [ ] T019 [US3] 태블릿 1024px 기준 축소된 중앙 콘텐츠와 라벨·입력 배치를 `src/app/(site)/signup/page.module.scss`의 반응형 규칙으로 구현한다.
-- [ ] T020 [US3] 모바일 480px 기준 20px 여백, 모바일 폼 배치와 전체 너비 버튼을 `src/app/(site)/signup/page.module.scss`의 반응형 규칙으로 구현한다.
-- [ ] T021 [US3] 기준점 사이 너비에서 `max-width`, 유연한 너비와 `box-sizing`으로 가로 넘침과 콘텐츠 잘림을 방지하도록 `src/app/(site)/signup/page.module.scss`를 보완한다.
-- [ ] T022 [US3] `이미 계정이 있습니다.`가 `next/link`의 `Link`로 `/login`에 한 번에 이동하는지 `src/app/(site)/signup/page.js`에서 확인하고 필요한 링크 문구·스타일 연결만 보완한다.
-- [ ] T023 [US3] 1320px, 1024px, 480px, 1025px, 1023px, 481px, 479px에서 배치·입력 순서·잘림·가로 스크롤과 `/login` 이동을 `specs/002-signup/quickstart.md`의 4·5번 기준으로 수동 검증한다.
+- [x] T018 [US3] 데스크톱 1320px 기준 중앙 콘텐츠, 약관 영역, 라벨·입력 가로 배치와 전체 너비 버튼을 `src/app/(site)/signup/page.module.scss`에 완성한다.
+- [x] T019 [US3] 태블릿 1024px 기준 축소된 중앙 콘텐츠와 라벨·입력 배치를 `src/app/(site)/signup/page.module.scss`의 반응형 규칙으로 구현한다.
+- [x] T020 [US3] 모바일 480px 기준 20px 여백, 모바일 폼 배치와 전체 너비 버튼을 `src/app/(site)/signup/page.module.scss`의 반응형 규칙으로 구현한다.
+- [x] T021 [US3] 기준점 사이 너비에서 `max-width`, 유연한 너비와 `box-sizing`으로 가로 넘침과 콘텐츠 잘림을 방지하도록 `src/app/(site)/signup/page.module.scss`를 보완한다.
+- [x] T022 [US3] `이미 계정이 있습니다.`가 `next/link`의 `Link`로 `/login`에 한 번에 이동하는지 `src/app/(site)/signup/page.js`에서 확인하고 필요한 링크 문구·스타일 연결만 보완한다.
+- [x] T023 [US3] 1320px, 1024px, 480px, 1025px, 1023px, 481px, 479px에서 배치·입력 순서·잘림·가로 스크롤과 `/login` 이동을 `specs/002-signup/quickstart.md`의 4·5번 기준으로 수동 검증한다.
 
 **확인 지점**: 세 기준 화면과 경계 너비에서 같은 기능과 입력 순서를 유지한다.
 
