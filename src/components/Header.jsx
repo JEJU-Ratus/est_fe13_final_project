@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -45,6 +45,20 @@ export default function Header({ isLoggedIn = false }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
 
+  useEffect(() => {
+    const mobileMediaQuery = window.matchMedia("(max-width: 480px)");
+
+    function handleMobileViewportChange(event) {
+      setIsHeaderCollapsed(event.matches || COLLAPSED_PATHS.includes(pathname));
+    }
+
+    handleMobileViewportChange(mobileMediaQuery);
+    mobileMediaQuery.addEventListener("change", handleMobileViewportChange);
+
+    return () => {
+      mobileMediaQuery.removeEventListener("change", handleMobileViewportChange);
+    };
+  }, [pathname]);
 
   function handleCollapse() {
     setIsHeaderCollapsed(true);

@@ -11,3 +11,13 @@
     flex: 1;
   }
 }
+
+@media (max-width: 480px) {
+  .site-layout {
+    display: block;
+
+    .site-content {
+      padding-top: 60px;
+    }
+  }
+}
