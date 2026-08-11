@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -45,6 +45,20 @@ export default function Header({ isLoggedIn = false }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
 
+  useEffect(() => {
+    const mobileMediaQuery = window.matchMedia("(max-width: 480px)");
+
+    function handleMobileViewportChange(event) {
+      setIsHeaderCollapsed(event.matches || COLLAPSED_PATHS.includes(pathname));
+    }
+
+    handleMobileViewportChange(mobileMediaQuery);
+    mobileMediaQuery.addEventListener("change", handleMobileViewportChange);
+
+    return () => {
+      mobileMediaQuery.removeEventListener("change", handleMobileViewportChange);
+    };
+  }, [pathname]);
 
   function handleCollapse() {
     setIsHeaderCollapsed(true);
@@ -77,7 +91,20 @@ export default function Header({ isLoggedIn = false }) {
             aria-expanded="false"
             onClick={handleExpand}
           >
-            <Image src="/images/프! 로고.png" alt="로고" width={40} height={36} />
+            <Image
+              className={styles["collapsed-logo-image"]}
+              src="/images/프! 로고.png"
+              alt=""
+              width={40}
+              height={36}
+            />
+            {/* 아이콘 전환은 장식 표현이므로 스크린 리더에는 버튼의 "헤더 펼치기" 이름만 전달합니다. */}
+            <span
+              className={`material-symbols-outlined ${styles["collapsed-panel-icon"]}`}
+              aria-hidden="true"
+            >
+              left_panel_close
+            </span>
           </button>
         ) : (
           <Link href="/" className={styles["logo-button"]} aria-label="홈으로 이동">
