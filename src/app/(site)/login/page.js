@@ -1,11 +1,19 @@
 "use client";
+// 함수 호출
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
+// 컴포넌트 호출
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import Loading from "@/components/Loading";
+import CommonModal from "@/components/CommonModal";
+
+// 스타일 호출
 import styles from "./page.module.scss";
 
+// 정규화
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function validateEmail(email) {
@@ -25,6 +33,8 @@ function validatePassword(password) {
 }
 
 export default function LoginPage() {
+  const router = useRouter();
+
   // 사용자가 입력한 이메일 값을 제어하고 이메일 검증에 사용합니다.
   const [email, setEmail] = useState("");
   // 사용자가 입력한 비밀번호 값을 제어하며 실제 인증 연동 시 요청 값으로 사용합니다.
@@ -36,26 +46,31 @@ export default function LoginPage() {
   // 로그인 상태 유지 체크박스의 선택 여부만 관리하며 세션 저장은 아직 수행하지 않습니다.
   const [isLoginPersistent, setIsLoginPersistent] = useState(false);
 
-  // 실제 인증 연동 전에는 요청을 시작하지 않으며, 추후 요청 생명주기만 이 상태에 연결합니다.
-  const [isLoading] = useState(false);
-  // 자격 정보 실패 문구는 실제 인증 결과가 연결된 뒤 이 상태로 관리합니다.
-  const [formError] = useState("");
+  // 로그인 요청 상태를 관리해 중복 제출을 막고 공통 Loading을 제어합니다.
+  const [isLoading, setIsLoading] = useState(false);
+  // 입력 형식은 정상이지만 Supabase 인증에 실패했을 때 표시할 문구를 관리합니다.
+  const [authError, setAuthError] = useState("");
+  // 네트워크 또는 서버 장애만 공통 오류 모달에 전달합니다.
+  const [modalStatus, setModalStatus] = useState(null);
+
   const emailError = validateEmail(email);
   const passwordError = validatePassword(password);
   const shouldShowValidation = isEmailTouched || isPasswordTouched;
   const validationMessage = shouldShowValidation ? emailError || passwordError : "";
-  const visibleErrorMessage = formError || validationMessage;
+  const visibleErrorMessage = authError || validationMessage;
   const hasVisibleEmailError = shouldShowValidation && Boolean(emailError);
   const hasVisiblePasswordError = shouldShowValidation && !emailError && Boolean(passwordError);
-  const isFormValid = !emailError && !passwordError;
-  const isLoginDisabled = !isFormValid || isLoading;
+  const isFormValid = !emailError && !passwordError; // 입력값이 유효한지
+  const isLoginDisabled = !isFormValid || isLoading; // 입력값 유효하지 않거나, 로딩중이거나
 
-  function handleEmailChange(event) {
-    setEmail(event.target.value);
+  function handleEmailChange(e) {
+    setEmail(e.target.value);
+    setAuthError("");
   }
 
-  function handlePasswordChange(event) {
-    setPassword(event.target.value);
+  function handlePasswordChange(e) {
+    setPassword(e.target.value);
+    setAuthError("");
   }
 
   function handleEmailBlur() {
@@ -66,22 +81,60 @@ export default function LoginPage() {
     setIsPasswordTouched(true);
   }
 
-  function handlePersistenceChange(event) {
-    setIsLoginPersistent(event.target.checked);
+  function handlePersistenceChange(e) {
+    setIsLoginPersistent(e.target.checked);
   }
-
-  function handleSubmit(event) {
-    event.preventDefault();
+  // 폼 제출
+  async function handleSubmit(e) {
+    e.preventDefault();
     setIsEmailTouched(true);
     setIsPasswordTouched(true);
 
-    // 실제 Supabase 인증 계약이 확정되기 전에는 검증을 통과해도 요청이나 이동을 실행하지 않습니다.
+    if (isLoginDisabled) {
+      return;
+    }
+    setIsLoading(true);
+    setAuthError("");
+    setModalStatus(null);
+    // 로그인 시도
+    try {
+      const supabase = createClient();
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (error) {
+        setPassword("");
+        if (error.code === "invalid_credentials") {
+          setAuthError("이메일 또는 비밀번호를 확인해 주세요.");
+          return;
+        }
+        if (error.status === 429 || error.status >= 500) {
+          setModalStatus(error.status);
+          return;
+        }
+        setAuthError("로그인에 실패 했습니다. 다시 시도해 주세요.");
+        return;
+      }
+      router.replace("/");
+      router.refresh();
+    } catch {
+      setPassword("");
+      setModalStatus("network");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <main className={styles["login-page"]}>
-      <div className={styles["login-content"]}>
-        <div className={styles["brand-area"]}>
+      <section className={styles["login-content"]} aria-labelledby="login-page-title">
+        <h1 className={styles["visually-hidden"]} id="login-page-title">
+          로그인
+        </h1>
+
+        <header className={styles["brand-area"]}>
           <Image
             className={styles["brand-logo"]}
             src="/images/프다로고.png"
@@ -91,11 +144,13 @@ export default function LoginPage() {
             priority
           />
           <p className={styles["brand-description"]}>프론트엔드 지식을, 더 쉽게</p>
-        </div>
+        </header>
 
         <form className={styles["login-form"]} onSubmit={handleSubmit} noValidate>
           <div className={styles["credential-row"]}>
-            <div className={styles["input-section"]}>
+            <fieldset className={styles["input-section"]}>
+              <legend className={styles["visually-hidden"]}>이메일 로그인 정보</legend>
+
               <div className={styles["field-group"]}>
                 <label className={styles["visually-hidden"]} htmlFor="login-email">
                   이메일
@@ -115,9 +170,7 @@ export default function LoginPage() {
                     disabled={isLoading}
                     // 오류 상태와 문구의 관계를 보조기기가 함께 인식하도록 연결합니다.
                     aria-invalid={hasVisibleEmailError}
-                    aria-describedby={
-                      hasVisibleEmailError ? "login-validation-message" : undefined
-                    }
+                    aria-describedby={hasVisibleEmailError ? "login-validation-message" : undefined}
                     onChange={handleEmailChange}
                     onBlur={handleEmailBlur}
                   />
@@ -151,13 +204,9 @@ export default function LoginPage() {
                   />
                 </div>
               </div>
-            </div>
+            </fieldset>
 
-            <button
-              className={styles["login-button"]}
-              type="submit"
-              disabled={isLoginDisabled}
-            >
+            <button className={styles["login-button"]} type="submit" disabled={isLoginDisabled}>
               로그인
             </button>
           </div>
@@ -188,7 +237,9 @@ export default function LoginPage() {
             <span aria-hidden="true" />
           </div>
 
-          <div className={styles["social-buttons"]}>
+          <fieldset className={styles["social-buttons"]}>
+            <legend className={styles["visually-hidden"]}>간편 로그인 제공자</legend>
+
             <button
               className={styles["social-button"]}
               type="button"
@@ -207,16 +258,17 @@ export default function LoginPage() {
               {/* 접근 가능한 이름은 버튼이 제공하므로 아이콘의 중복 낭독을 막습니다. */}
               <Image src="/images/google-icon.svg" alt="" width={56} height={56} />
             </button>
-          </div>
+          </fieldset>
 
           <p className={styles["signup-guide"]}>
             아직 계정이 없으신가요?
             <Link href="/signup">회원가입</Link>
           </p>
         </form>
-      </div>
+      </section>
 
       {isLoading && <Loading />}
+      <CommonModal isOpen={modalStatus !== null} mode="error" status={modalStatus} />
     </main>
   );
 }
