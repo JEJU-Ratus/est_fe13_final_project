@@ -1,8 +1,29 @@
+"use client";
+
 import styles from "./AllSummary.module.scss";
 import SummaryItemCard from "./SummaryItemCard";
 import summaries from "@/mocks/summaries.json";
 import users from "@/mocks/users.json";
 import bookmarks from "@/mocks/bookmarks.json";
+import { useEffect, useRef, useState } from "react";
+
+const BATCH_SIZE = {
+  mobile: 3,
+  tablet: 6,
+  pc: 12,
+};
+
+function getBatchSize(mobileMediaQuery, tabletMediaQuery) {
+  if (mobileMediaQuery.matches) {
+    return BATCH_SIZE.mobile;
+  }
+
+  if (tabletMediaQuery.matches) {
+    return BATCH_SIZE.tablet;
+  }
+
+  return BATCH_SIZE.pc;
+}
 
 function getSummariesByView(view, currentUserId) {
   if (view === "mine") {
@@ -23,6 +44,10 @@ function getSummariesByView(view, currentUserId) {
 }
 
 export default function AllSummary({ title, view = "all", currentUserId }) {
+  const [batchSize, setBatchSize] = useState(BATCH_SIZE.mobile);
+  const [visibleCount, setVisibleCount] = useState(BATCH_SIZE.mobile);
+  const batchSizeRef = useRef(BATCH_SIZE.mobile);
+  const sentinelRef = useRef(null);
   const filteredSummaries = getSummariesByView(view, currentUserId);
   const summaryCards = filteredSummaries.map(summary => {
     const author = users.find(user => user.userId === summary.authorId);
@@ -37,6 +62,67 @@ export default function AllSummary({ title, view = "all", currentUserId }) {
       isBookmarked,
     };
   });
+  const resultKey = summaryCards.map(summary => summary.summaryId).join("|");
+  const hasMore = visibleCount < summaryCards.length;
+  // TODO: Supabase 연결 시 client-side slice 방식에서 DB pagination 조회·append 방식으로 교체
+  const visibleSummaryCards = summaryCards.slice(0, visibleCount);
+
+  useEffect(() => {
+    const mobileMediaQuery = window.matchMedia("(max-width: 480px)");
+    const tabletMediaQuery = window.matchMedia("(min-width: 481px) and (max-width: 1024px)");
+
+    function handleBreakpointChange() {
+      const nextBatchSize = getBatchSize(mobileMediaQuery, tabletMediaQuery);
+
+      batchSizeRef.current = nextBatchSize;
+      setBatchSize(nextBatchSize);
+      setVisibleCount(currentCount => Math.max(currentCount, nextBatchSize));
+    }
+
+    handleBreakpointChange();
+    mobileMediaQuery.addEventListener("change", handleBreakpointChange);
+    tabletMediaQuery.addEventListener("change", handleBreakpointChange);
+
+    return () => {
+      mobileMediaQuery.removeEventListener("change", handleBreakpointChange);
+      tabletMediaQuery.removeEventListener("change", handleBreakpointChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    setVisibleCount(batchSizeRef.current);
+  }, [view, currentUserId, resultKey]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+
+    if (!sentinel || !hasMore) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (!entries[0]?.isIntersecting) {
+          return;
+        }
+
+        setVisibleCount(currentCount =>
+          Math.min(currentCount + batchSize, summaryCards.length),
+        );
+      },
+      {
+        root: null,
+        rootMargin: "200px 0px",
+        threshold: 0,
+      },
+    );
+
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [batchSize, hasMore, summaryCards.length, visibleCount]);
 
   return (
     <main className={styles["summary-page"]}>
@@ -61,7 +147,7 @@ export default function AllSummary({ title, view = "all", currentUserId }) {
         </div>
 
         <div className={styles["summary-content"]}>
-          {summaryCards.map(summary => (
+          {visibleSummaryCards.map(summary => (
             <SummaryItemCard
               key={summary.summaryId}
               summaryId={summary.summaryId}
@@ -75,6 +161,11 @@ export default function AllSummary({ title, view = "all", currentUserId }) {
             />
           ))}
         </div>
+
+        {hasMore && (
+          /* 화면에 보이는 콘텐츠가 아닌 다음 묶음 감지 지점이므로 보조 기술에서 제외 */
+          <div className={styles["scroll-sentinel"]} ref={sentinelRef} aria-hidden="true" />
+        )}
       </section>
     </main>
   );
