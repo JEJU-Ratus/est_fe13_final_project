@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,12 +11,12 @@ const menuItems = [
   {
     label: "요약 노트 생성",
     icon: "assignment_add",
-    href: "#",
+    href: "/",
   },
   {
     label: "전체 요약 노트",
     icon: "book_4",
-    href: "#",
+    href: "/summary",
   },
   {
     label: "퀴즈",
@@ -45,6 +45,20 @@ export default function Header({ isLoggedIn = false }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
 
+  useEffect(() => {
+    const mobileMediaQuery = window.matchMedia("(max-width: 480px)");
+
+    function handleMobileViewportChange(event) {
+      setIsHeaderCollapsed(event.matches || COLLAPSED_PATHS.includes(pathname));
+    }
+
+    handleMobileViewportChange(mobileMediaQuery);
+    mobileMediaQuery.addEventListener("change", handleMobileViewportChange);
+
+    return () => {
+      mobileMediaQuery.removeEventListener("change", handleMobileViewportChange);
+    };
+  }, [pathname]);
 
   function handleCollapse() {
     setIsHeaderCollapsed(true);
@@ -77,7 +91,20 @@ export default function Header({ isLoggedIn = false }) {
             aria-expanded="false"
             onClick={handleExpand}
           >
-            <Image src="/images/프! 로고.png" alt="로고" width={40} height={36} />
+            <Image
+              className={styles["collapsed-logo-image"]}
+              src="/images/프! 로고.png"
+              alt=""
+              width={40}
+              height={36}
+            />
+            {/* 아이콘 전환은 장식 표현이므로 스크린 리더에는 버튼의 "헤더 펼치기" 이름만 전달합니다. */}
+            <span
+              className={`material-symbols-outlined ${styles["collapsed-panel-icon"]}`}
+              aria-hidden="true"
+            >
+              left_panel_close
+            </span>
           </button>
         ) : (
           <Link href="/" className={styles["logo-button"]} aria-label="홈으로 이동">
@@ -108,21 +135,21 @@ export default function Header({ isLoggedIn = false }) {
               <div className={styles["profile-content"]}>
                 <p className={styles["user-name"]}>user name</p>
                 <div className={styles["account-buttons"]}>
-                  <button className={styles["profile-button"]} type="button">
+                  <Link href="#" className={styles["profile-button"]} type="button">
                     프로필 수정
-                  </button>
-                  <button className={styles["logout-button"]} type="button">
+                  </Link>
+                  <Link href="#" className={styles["logout-button"]} type="button">
                     로그아웃
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
           ) : (
             <div className={styles["guest-buttons"]}>
-              <Link href="#" className={styles["login-button"]} type="button">
+              <Link href="/login" className={styles["login-button"]} type="button">
                 로그인
               </Link>
-              <Link href="#" className={styles["signup-button"]} type="button">
+              <Link href="/signup" className={styles["signup-button"]} type="button">
                 가입하기
               </Link>
             </div>

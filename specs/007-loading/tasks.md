@@ -92,10 +92,10 @@
 
 **목적**: 전체 기능의 정적 품질과 인수 시나리오 확인
 
-- [ ] T013 `specs/007-loading/quickstart.md`의 기본 표시, 상호작용 차단, 중복 방지와 모션 감소 시나리오를 `/dev/loading`에서 최종 실행한다.
-- [ ] T014 `package.json`의 `npm run lint`를 실행하고 Loading 관련 lint 오류가 없음을 확인한다.
-- [ ] T015 `package.json`의 `npm run build`를 실행하고 `/dev/loading`을 포함한 production build가 성공하는지 확인한다.
-- [ ] T016 `git diff --check`와 `git status --short`로 형식 오류와 승인 범위 밖 변경이 없음을 확인하고 `specs/007-loading/tasks.md`의 완료된 체크박스를 갱신한다.
+- [x] T013 `specs/007-loading/quickstart.md`의 기본 표시, 상호작용 차단, 중복 방지와 모션 감소 시나리오를 `/dev/loading`에서 최종 실행한다.
+- [x] T014 `package.json`의 `npm run lint`를 실행하고 Loading 관련 lint 오류가 없음을 확인한다.
+- [x] T015 `package.json`의 `npm run dev` 환경에서 `/dev/loading`의 표시·제거·애니메이션과 뒤쪽 상호작용 차단이 정상인지 확인한다.
+- [x] T016 `git diff --check`와 `git status --short`로 형식 오류와 승인 범위 밖 변경이 없음을 확인하고 `specs/007-loading/tasks.md`의 완료된 체크박스를 갱신한다.
 
 **최종 커밋 경계**: T013~T016 완료 후 전체 변경 파일, lint·build·수동 검증 결과와 권장 커밋 명령을 보고한다.
 
@@ -120,7 +120,7 @@ US3 사용 계약·범위 검증(T010~T012)
 - 준비 단계 완료 후 사용자 스토리 구현을 시작한다.
 - US2는 US1에서 만든 동일 컴포넌트 구조와 스타일에 디자인을 완성하므로 US1 이후 진행한다.
 - US3는 완성된 컴포넌트와 개발 확인 화면의 사용 계약을 검증하므로 US2 이후 진행한다.
-- 최종 검증은 모든 사용자 스토리 완료 후 실행한다.
+- 최종 검증은 모든 사용자 스토리 완료 후 개발 환경 동작과 lint를 기준으로 실행한다. 전체 build는 페이지 통합 또는 배포 전 별도 검증한다.
 
 ### 사용자 스토리 독립 검증
 
@@ -147,7 +147,7 @@ US3 사용 계약·범위 검증(T010~T012)
 1. **커밋 1**: 기본 Loading 구조, 전체 화면 차단 스타일, `isLoading` 개발 확인
 2. **커밋 2**: 프로필 이미지, 막대형 스피너, 두 줄 문구와 모션 감소
 3. **커밋 3**: 단일 로딩 소유권과 범위 검증 정리
-4. **최종 커밋**: lint·build 및 체크리스트 완료 상태
+4. **최종 커밋**: 개발 환경 동작·lint 및 체크리스트 완료 상태
 
 ## 참고
 

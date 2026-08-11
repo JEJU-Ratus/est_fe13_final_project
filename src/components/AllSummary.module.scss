@@ -1,8 +1,9 @@
-@use "../styles/abstracts/colors" as color;
-@use "../styles/abstracts/typography" as typography;
+@use "styles/abstracts/colors" as color;
+@use "styles/abstracts/typography" as typography;
 
 .summary-page {
   background: color.$white-2;
+  min-height: 100vh;
 }
 
 .summary-container {
@@ -11,6 +12,7 @@
   gap: 40px;
 
   max-width: 1320px;
+
   margin: 0 auto;
   padding: 96px 0;
 }
@@ -25,8 +27,11 @@
 
 .summary-title {
   @include typography.text-36-bold;
-
   color: color.$black;
+}
+
+.bookmark-btn {
+  display: none;
 }
 
 .search-box {
@@ -61,4 +66,101 @@
   display: grid;
   grid-template-columns: repeat(4, 312px);
   gap: 32px 24px;
+}
+
+.scroll-sentinel {
+  width: 100%;
+  height: 1px;
+}
+
+@media (min-width: 481px) and (max-width: 1024px) {
+  .summary-page {
+    width: 100%;
+    padding: 0;
+  }
+
+  .summary-container {
+    width: 715px;
+    margin-left: calc(12.5% + 26px);
+  }
+
+  .summary-content {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 24px;
+    row-gap: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-page {
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .summary-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+
+    padding: 0;
+  }
+
+  .summary-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    height: 45px;
+  }
+
+  .summary-title {
+    @include typography.text-24-semibold;
+
+    color: color.$black;
+  }
+
+  .search-box {
+    align-self: flex-end;
+
+    width: 212px;
+
+    input {
+      min-width: 0;
+    }
+  }
+
+  .summary-content {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 32px;
+
+    > article {
+      width: 100%;
+    }
+  }
+
+  .bookmark-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .bookmark-icon {
+    color: color.$gray-light-3;
+
+    &.is-active {
+      color: color.$fda-navy;
+    }
+  }
 }

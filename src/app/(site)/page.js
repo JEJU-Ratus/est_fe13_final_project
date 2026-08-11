@@ -7,9 +7,32 @@ import CommonModal from "@/components/CommonModal";
 import styles from "./page.module.scss";
 import Link from "next/link";
 
+const loggedInUsers = [];
+
 export default function Home() {
   const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
   const [isSuggestLoginModalOpen, setIsSuggestLoginModalOpen] = useState(false);
+  const [isPasswordEnabled, setIsPasswordEnabled] = useState(false);
+  const [password, setPassword] = useState("");
+  const isLoggedIn = loggedInUsers.length > 0;
+
+  function handlePasswordEnabledChange(event) {
+    const isChecked = event.target.checked;
+
+    setIsPasswordEnabled(isChecked);
+
+    if (!isChecked) {
+      setPassword("");
+    }
+  }
+
+  function handleSummarySubmit(event) {
+    event.preventDefault();
+
+    if (!isLoggedIn) {
+      setIsSuggestLoginModalOpen(true);
+    }
+  }
 
   return (
     <main className={styles["main-page"]}>
@@ -30,7 +53,7 @@ export default function Home() {
               <p className={styles.description}>궁금한 건 프비에게 물어보세요!</p>
             </div>
 
-            <form className={styles["summary-form"]}>
+            <form className={styles["summary-form"]} onSubmit={handleSummarySubmit}>
               <div className={styles["topic-input"]}>
                 <span className="material-symbols-outlined" aria-hidden="true">
                   add
@@ -39,12 +62,18 @@ export default function Home() {
                   type="text"
                   aria-label="요약할 내용"
                   placeholder="궁금한 내용을 입력하면 프비가 핵심만 요약해 드려요."
+                  required
                 />
-                <Link href="#" className={styles["submit-button"]} type="button" aria-label="요약 요청">
+                <button
+                  className={styles["submit-button"]}
+                  type="submit"
+                  aria-label="요약 요청"
+                  formNoValidate={!isLoggedIn}
+                >
                   <span className={`material-symbols-outlined ${styles["submit-icon"]}`} aria-hidden="true">
                     arrow_upward
                   </span>
-                </Link>
+                </button>
               </div>
 
               <div className={styles["form-bottom"]}>
@@ -55,10 +84,29 @@ export default function Home() {
                 </p>
 
                 <div className={styles["password-option"]}>
-                  <span className={`material-symbols-outlined ${styles["checkbox-icon"]}`} aria-hidden="true">
-                    check_box
-                  </span>
-                  <span>비밀번호 입력</span>
+                  <label className={styles["password-label"]}>
+                    <input
+                      className={styles["checkbox-input"]}
+                      type="checkbox"
+                      checked={isPasswordEnabled}
+                      onChange={handlePasswordEnabledChange}
+                    />
+                    <span className={`material-symbols-outlined ${styles["checkbox-icon"]}`} aria-hidden="true">
+                      {isPasswordEnabled ? "check_box" : "check_box_outline_blank"}
+                    </span>
+                    <span className={isPasswordEnabled ? styles["visually-hidden"] : undefined}>비밀번호 입력</span>
+                  </label>
+                  {isPasswordEnabled && (
+                    <input
+                      className={styles["password-input"]}
+                      type="text"
+                      inputMode="numeric"
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      placeholder="비밀번호"
+                      required
+                    />
+                  )}
                 </div>
               </div>
             </form>
@@ -69,7 +117,7 @@ export default function Home() {
           <Banner />
 
           <div className={styles["quick-menu"]}>
-            <Link href="#" className={styles["quick-menu-card"]}>
+            <Link href="/summary" className={styles["quick-menu-card"]}>
               <span className="material-symbols-outlined" aria-hidden="true">
                 assignment_add
               </span>

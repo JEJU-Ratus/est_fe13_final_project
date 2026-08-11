@@ -1,36 +1,36 @@
-# Specification Quality Checklist: 회원가입 완료 안내
+# 명세 품질 체크리스트: 회원가입 완료 페이지
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-08-06
-**Feature**: [spec.md](../spec.md)
+**목적**: 계획 단계 전에 회원가입 완료 페이지 명세의 완전성과 품질을 검증한다.
 
-## Content Quality
+**작성일**: 2026-08-11
 
-- [x] No implementation details (languages, frameworks, APIs)
-- [x] Focused on user value and business needs
-- [x] Written for non-technical stakeholders
-- [x] All mandatory sections completed
+**대상**: [spec.md](../spec.md)
 
-## Requirement Completeness
+## 내용 품질
 
-- [x] No [NEEDS CLARIFICATION] markers remain
-- [x] Requirements are testable and unambiguous
-- [x] Success criteria are measurable
-- [x] Success criteria are technology-agnostic (no implementation details)
-- [x] All acceptance scenarios are defined
-- [x] Edge cases are identified
-- [x] Scope is clearly bounded
-- [x] Dependencies and assumptions identified
+- [x] 사용자 가치와 화면에서 제공할 결과에 초점을 맞췄다.
+- [x] 비기술 이해관계자가 주요 흐름과 범위를 이해할 수 있다.
+- [x] 모든 필수 섹션을 작성했다.
+- [x] 사용자가 지정한 파일·자산·그라디언트 내용은 작업 경계와 디자인 제약으로만 기록했다.
 
-## Feature Readiness
+## 요구사항 완전성
 
-- [x] All functional requirements have clear acceptance criteria
-- [x] User scenarios cover primary flows
-- [x] Feature meets measurable outcomes defined in Success Criteria
-- [x] No implementation details leak into specification
+- [x] `[NEEDS CLARIFICATION]` 표시가 남아 있지 않다.
+- [x] 요구사항은 검증 가능하고 모호하지 않다.
+- [x] 성공 기준은 측정 가능하며 사용자 결과 중심이다.
+- [x] 모든 인수 시나리오와 주요 예외 상황을 정의했다.
+- [x] 기능 범위, 공통 Header 의존성과 모바일 Header 제외 범위를 기록했다.
+- [x] 실제 인증·세션·완료 판정과 자동 동작의 제외 범위를 명확히 했다.
 
-## Notes
+## 기능 준비 상태
 
-- 원본 명세와 사용자 답변을 반영했다. 자동 로그인과 세션 스토리지는 범위에서 제외했다.
-- `docs/specs/Header.md`의 비로그인·접힘 상태 및 관련 Figma 프레임을 의존성으로 기록했다.
-- Figma 가입완료 프레임에는 시간 기반 모션 정보가 없으므로, 사용자 확정값(확대 0.3초, 0.8초 주기·12px 상하 이동·무한 반복)을 반영했다.
+- [x] 핵심 완료 안내와 로그인 이동 흐름을 검증할 수 있다.
+- [x] 데스크톱·태블릿·모바일 Figma를 모두 참조했다.
+- [x] 마스코트 원본 비율과 원형 배경 요구사항을 정의했다.
+- [x] 이전 명세의 애니메이션·접근 판정·모달 충돌을 제거했다.
+- [x] 계획 단계로 진행할 수 있다.
+
+## 비고
+
+- 기존 `Signupcomplete.md`는 새 `spec.md`를 가리키는 호환 안내 문서로 유지한다.
+- 모바일 Figma에는 Header가 포함되어 있지만 공통 Header 명세가 모바일 동작을 제외하므로, 이번 페이지는 Header 아래 완료 콘텐츠만 담당한다.
