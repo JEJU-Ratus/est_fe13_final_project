@@ -83,6 +83,14 @@
         color: color.$gray;
         font-size: var.$font-size-18;
         font-weight: var.$font-weight-regular;
+        transition: box-shadow 0.25s ease;
+
+        // 마우스와 키보드 사용자 모두 입력 위치를 명확히 확인할 수 있도록 래퍼에 포커스를 표시합니다.
+        &:focus-within {
+          box-shadow:
+            0 0 8px rgba(color.$fda-navy, 0.3),
+            0 0 18px rgba(color.$fda-navy, 0.24);
+        }
 
         input {
           min-width: 0;
@@ -233,6 +241,20 @@
       font-weight: var.$font-weight-semibold;
       text-align: left;
       text-decoration: none;
+      transition: box-shadow 0.25s ease;
+
+      &:hover,
+      &:focus-visible {
+        background-color: color.$white;
+        box-shadow:
+          0 0 8px rgba(color.$fda-orange, 0.3),
+          0 0 18px rgba(color.$fda-orange, 0.24);
+      }
+
+      &:focus-visible {
+        outline: 2px solid color.$fda-orange;
+        outline-offset: 3px;
+      }
 
       &[type="button"] {
         cursor: pointer;
