@@ -121,6 +121,11 @@
     }
   }
 
+}
+
+.field-control {
+  min-width: 0;
+
   > input {
     @include mixin.input-base;
     @include type.text-18-medium;
@@ -137,11 +142,18 @@
       border-color: color.$fda-orange;
       outline: 0;
     }
-  }
-}
 
-.password-field {
-  min-width: 0;
+    &[aria-invalid="true"] {
+      border-color: color.$fda-orange;
+    }
+  }
+
+  > p {
+    @include type.text-14-regular;
+
+    margin-top: 6px;
+    color: color.$fda-orange;
+  }
 }
 
 .password-input {
@@ -180,6 +192,10 @@
   }
 
   &:focus-within {
+    border-color: color.$fda-orange;
+  }
+
+  &:has(input[aria-invalid="true"]) {
     border-color: color.$fda-orange;
   }
 }

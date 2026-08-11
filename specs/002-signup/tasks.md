@@ -68,13 +68,13 @@
 
 ### 사용자 스토리 2 구현
 
-- [ ] T011 [US2] 서비스 이용약관과 AI 생성 콘텐츠 이용 안내의 Boolean 상태, 계산된 전체 동의 값과 전체·개별 변경 처리 함수를 `src/app/(site)/signup/page.js`에 구현한다.
-- [ ] T012 [US2] 닉네임 필수, 이메일 필수·형식, 비밀번호 영문·숫자·특수문자 포함 8~16자, 비밀번호 확인 일치 검증 함수를 `src/app/(site)/signup/page.js`에 구현한다.
-- [ ] T013 [US2] 네 입력의 touched 상태와 blur·submit 공개 시점을 `src/app/(site)/signup/page.js`에 구현해 최초 화면에는 오류를 숨기고 수정 후 유효해지면 오류를 해제한다.
-- [ ] T014 [US2] 공개된 오류에만 `aria-invalid`와 오류 문구 연결을 적용하고 각 접근성 속성의 목적을 설명하는 주석을 `src/app/(site)/signup/page.js`에 작성한다.
-- [ ] T015 [US2] 두 필수 약관과 로컬 입력 검증 결과로 UI 단계의 폼 유효 상태를 계산하되 닉네임·이메일 중복 통과 상태나 가짜 결과를 생성하지 않고 실제 요청은 계속 차단하도록 `src/app/(site)/signup/page.js`에 구현한다.
-- [ ] T016 [US2] 약관, 오류, focus, disabled 및 비밀번호 안내 상태를 Figma와 공통 mixin 외형에 맞게 `src/app/(site)/signup/page.module.scss`에 작성한다.
-- [ ] T017 [US2] 전체·개별 약관 관계와 입력 오류 공개·해제, `8~16자` 안내 및 네트워크 요청 부재를 `specs/002-signup/quickstart.md`의 2·3·4번 기준으로 수동 검증한다.
+- [x] T011 [US2] 서비스 이용약관과 AI 생성 콘텐츠 이용 안내의 Boolean 상태, 계산된 전체 동의 값과 전체·개별 변경 처리 함수를 `src/app/(site)/signup/page.js`에 구현한다.
+- [x] T012 [US2] 닉네임 필수, 이메일 필수·형식, 비밀번호 영문·숫자·특수문자 포함 8~16자, 비밀번호 확인 일치 검증 함수를 `src/app/(site)/signup/page.js`에 구현한다.
+- [x] T013 [US2] 네 입력의 touched 상태와 blur·submit 공개 시점을 `src/app/(site)/signup/page.js`에 구현해 최초 화면에는 오류를 숨기고 수정 후 유효해지면 오류를 해제한다.
+- [x] T014 [US2] 공개된 오류에만 `aria-invalid`와 오류 문구 연결을 적용하고 각 접근성 속성의 목적을 설명하는 주석을 `src/app/(site)/signup/page.js`에 작성한다.
+- [x] T015 [US2] 두 필수 약관과 로컬 입력 검증 결과로 UI 단계의 폼 유효 상태를 계산하되 닉네임·이메일 중복 통과 상태나 가짜 결과를 생성하지 않고 실제 요청은 계속 차단하도록 `src/app/(site)/signup/page.js`에 구현한다.
+- [x] T016 [US2] 약관, 오류, focus, disabled 및 비밀번호 안내 상태를 Figma와 공통 mixin 외형에 맞게 `src/app/(site)/signup/page.module.scss`에 작성한다.
+- [x] T017 [US2] 전체·개별 약관 관계와 입력 오류 공개·해제, `8~16자` 안내 및 네트워크 요청 부재를 `specs/002-signup/quickstart.md`의 2·3·4번 기준으로 수동 검증한다.
 
 **확인 지점**: 약관과 로컬 입력 검증은 완성되며 닉네임·이메일 중복 확인은 후속 인증 범위로 남는다.
 
