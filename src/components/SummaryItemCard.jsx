@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./SummaryItemCard.module.scss";
 import { useState } from "react";
 
@@ -33,21 +34,21 @@ export default function SummaryItemCard({
 
   return (
     <article className={styles["item-card"]} data-summary-id={summaryId}>
+      <Link
+        className={styles["card-link"]}
+        href={`/summary/${summaryId}`}
+        aria-label={`${title || "요약 노트"} 상세 보기`}
+      />
+
       <div className={styles["card-main"]}>
         <div className={styles["card-header"]}>
           <div className={styles["user-info"]}>
-            <Image
-              className={styles["profile-img"]}
-              src={profileImageUrl}
-              alt="사용자 프로필"
-              width={32}
-              height={32}
-            />
+            <Image className={styles["profile-img"]} src={profileImageUrl} alt="사용자 프로필" width={32} height={32} />
 
             <p className={styles["nickname"]}>{nickname}</p>
           </div>
 
-          {/* 북마크의 현재 선택 상태와 토글 목적을 보조 기술 사용자에게 전달합니다. */}
+          {/* 북마크의 현재 선택 상태와 토글 목적을 보조 기술 사용자에게 전달 */}
           <button
             className={styles["bookmark-btn"]}
             type="button"
@@ -76,7 +77,7 @@ export default function SummaryItemCard({
           {formattedCreatedAt}
         </time>
 
-        {/* 잠금 아이콘이 비공개 요약 노트의 접근 제한 상태임을 전달합니다. */}
+        {/* 잠금 아이콘이 비공개 요약 노트의 접근 제한 상태임을 전달 */}
         {isPrivate && (
           <span className={`material-symbols-outlined ${styles["lock-icon"]}`} aria-label="비공개 게시물">
             lock

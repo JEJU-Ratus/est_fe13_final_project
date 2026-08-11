@@ -13,7 +13,7 @@
   width: calc(100% - 48px);
   max-width: 1320px;
   margin: 0 auto;
-  padding: 60px 0;
+  padding: 64px 0;
 }
 
 .ai-summary {
@@ -77,5 +77,16 @@
     margin-top: 4px;
     padding-left: 12px;
     @include typography.text-14-regular;
+  }
+}
+
+@media (max-width: 480px) {
+  .Ai-header {
+    .Ai-title {
+      @include typography.text-24-semibold;
+    }
+  }
+  .bookmark-btn {
+    display: none;
   }
 }

@@ -2,6 +2,7 @@
 @use "styles/abstracts/typography" as typography;
 
 .item-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -22,6 +23,13 @@
     box-shadow: 0 0 10px rgba(250, 129, 47, 0.7);
     cursor: pointer;
   }
+}
+
+.card-link {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
 }
 
 .card-main {
@@ -51,6 +59,8 @@
 }
 
 .bookmark-btn {
+  position: relative;
+  z-index: 2;
   padding: 0;
   border: 0;
   background: transparent;
@@ -83,7 +93,7 @@
 
   color: color.$black;
 
-  &:hover {
+  .item-card:hover & {
     text-decoration: underline;
   }
 }
