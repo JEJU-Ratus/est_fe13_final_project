@@ -1,13 +1,17 @@
 "use client";
 
-import styles from "./SummaryId.module.scss";
-import { useState } from "react";
+import styles from "./summaryId.module.scss";
+import summaries from "@/mocks/summaries.json";
+import { use, useState } from "react";
 
-export default function AiSummaryLayout({ children }) {
+export default function AiSummaryLayout({ children, params }) {
+  const { summaryId } = use(params);
+  const summary = summaries.find(item => item.summaryId === summaryId);
+  const aiSummarySections = summary?.aiSummary?.sections ?? [];
   const [isBookmarked, setBookmarked] = useState(false);
 
   function handleBookmarkToggle() {
-    setBookmarked((currentIsBookmarked) => !currentIsBookmarked);
+    setBookmarked(currentIsBookmarked => !currentIsBookmarked);
   }
 
   return (
@@ -15,9 +19,9 @@ export default function AiSummaryLayout({ children }) {
       <div className={styles["Ai-container"]}>
         <section className={styles["ai-summary"]}>
           <div className={styles["Ai-header"]}>
-            <h2 className={styles["Ai-title"]}>생성 주제</h2>
+            <h2 className={styles["Ai-title"]}>{summary?.topic ?? ""}</h2>
 
-            {/* 토글의 현재 상태와 동작 목적을 보조 기술 사용자에게 전달합니다. */}
+            {/* 토글의 현재 상태와 동작 목적을 보조 기술 사용자에게 전달 */}
             <button
               className={styles["bookmark-btn"]}
               type="button"
@@ -35,17 +39,15 @@ export default function AiSummaryLayout({ children }) {
           </div>
 
           <div className={styles["Ai-content"]}>
-            <h3>제목</h3>
-            <h4>1. 한 줄 요약</h4>
-            <h4>2. 개념 설명</h4>
-            <h4>3. 기본 문법</h4>
-            <h4>4. 실무 예제</h4>
-            <div>
-              <h4>5. 핵심 포인트</h4>
-              <p>- 꼭 기억할 내용</p>
-            </div>
-            <h4>6. 자주 하는 실수</h4>
-            <h4>7. 관련 개념</h4>
+            <h3>{summary?.aiSummary?.title ?? ""}</h3>
+            {aiSummarySections.map((section, index) => (
+              <div key={section.sectionId}>
+                <h4>{`${index + 1}. ${section.heading}`}</h4>
+                {section.content.map(content => (
+                  <p key={content}>{content}</p>
+                ))}
+              </div>
+            ))}
           </div>
         </section>
 

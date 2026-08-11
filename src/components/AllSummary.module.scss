@@ -25,8 +25,11 @@
 
 .summary-title {
   @include typography.text-36-bold;
-
   color: color.$black;
+}
+
+.bookmark-btn {
+  display: none;
 }
 
 .search-box {
