@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "./summaryId.module.scss";
+import styles from "./SummaryId.module.scss";
 import summaries from "@/mocks/summaries.json";
 import { use, useState } from "react";
 
