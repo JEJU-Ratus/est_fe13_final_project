@@ -35,28 +35,27 @@ function getErrorMessage(status) {
   return ERROR_MESSAGES[status] ?? "문제가 발생했습니다.";
 }
 
-function getErrorDestination(status) {
-  return Number(status) === 401 ? "/login" : "/";
-}
-
 export default function CommonModal(props) {
   const { isOpen, mode, status, onClose, onConfirm } = props;
   const router = useRouter();
   const timerRef = useRef(null);
-  const autoDestination = mode === "error" ? getErrorDestination(status) : AUTO_DESTINATIONS[mode];
-  const message =
-    mode === "error"
-      ? `${getErrorMessage(status)}\n${Number(status) === 401 ? "로그인페이지로 이동합니다." : "메인페이지로 이동합니다."}`
-      : (MODE_MESSAGES[mode] ?? "");
+  const autoDestination = AUTO_DESTINATIONS[mode];
+  const message = mode === "error" ? getErrorMessage(status) : (MODE_MESSAGES[mode] ?? "");
 
   useEffect(() => {
-    if (!isOpen || !autoDestination) {
+    if (!isOpen || (!autoDestination && mode !== "error")) {
       return undefined;
     }
 
     timerRef.current = window.setTimeout(() => {
       timerRef.current = null;
-      router.replace(autoDestination);
+
+      if (autoDestination) {
+        router.replace(autoDestination);
+        return;
+      }
+
+      onClose?.();
     }, 3000);
 
     return () => {
@@ -65,7 +64,7 @@ export default function CommonModal(props) {
         timerRef.current = null;
       }
     };
-  }, [autoDestination, isOpen, router]);
+  }, [autoDestination, isOpen, mode, onClose, router]);
 
   function handleClose() {
     if (timerRef.current !== null) {
