@@ -19,7 +19,7 @@
 | `isOpen` | Boolean | 항상 | 모달 표시 여부 |
 | `mode` | 허용된 문자열 | `isOpen=true`일 때 | 문구·버튼·이동 규칙 선택 |
 | `status` | Number 또는 `network` | `mode="error"`일 때 선택 | 고정 오류 문구 선택; 미지정·미지원 값은 일반 오류 |
-| `onClose` | Function | `preparing`, `confirmDelete`, `suggestLogin` | 호출 측 공개 상태 종료 |
+| `onClose` | Function | `preparing`, `confirmDelete`, `suggestLogin`, `error` | 호출 측 공개 상태 종료 |
 | `onConfirm` | Function | `confirmDelete` | 삭제 승인 의사를 한 번 전달 |
 
 호출자는 문구, 버튼명, 자동 이동 시간 또는 고정 경로를 전달하지 않는다. `onConfirm`은 삭제 요청 자체가 아니며 삭제 대상도 인자로 받지 않는다.
@@ -33,7 +33,7 @@
 | `suggestLogin` | 로그인 → `/login`, 전체 요약 노트 → `/summary` | `onClose` | 없음 |
 | `requireLogin` | 없음 | 즉시 `/login` | 3초 후 `/login` |
 | `alreadyLoggedIn` | 없음 | 즉시 `/` | 3초 후 `/` |
-| `error` | 없음 | 401은 즉시 `/login`, 나머지는 즉시 `/` | 401은 3초 후 `/login`, 나머지는 3초 후 `/` |
+| `error` | 없음 | `onClose`를 호출하고 현재 페이지 유지 | 3초 후 `onClose`를 호출하고 현재 페이지 유지 |
 
 ## 오류 계약
 

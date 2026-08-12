@@ -1,7 +1,13 @@
 "use client";
 
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+// 컴포넌트
 import Link from "next/link";
-import { useState } from "react";
+import Loading from "@/components/Loading";
+import CommonModal from "@/components/CommonModal";
+// 스타일
 import styles from "./page.module.scss";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,6 +40,12 @@ function validatePassword(password) {
 }
 
 export default function SignupPage() {
+  const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false); // 회원가입 요청과 공통 Loading 표시 여부
+  const [signupError, setSignupError] = useState(""); // 사용자가 수정할 수 있는 회원가입 오류 문구
+  const [emailAuthError, setEmailAuthError] = useState(""); // 가입 요청에서 확인된 이메일 전용 오류
+  const [modalStatus, setModalStatus] = useState(null); // 서버·네트워크 오류 모달에 전달할 상태
   const [nickname, setNickname] = useState(""); // 닉네임 입력값
   const [email, setEmail] = useState(""); // 이메일 입력값
   const [password, setPassword] = useState(""); // 비밀번호 입력값
@@ -46,6 +58,8 @@ export default function SignupPage() {
   const [isPasswordConfirmTouched, setIsPasswordConfirmTouched] = useState(false); // 비밀번호 확인 오류 공개 여부
   const [isPasswordVisible, setIsPasswordVisible] = useState(false); // 비밀번호 공개 여부
   const [isPasswordConfirmVisible, setIsPasswordConfirmVisible] = useState(false); // 비밀번호 확인 공개 여부
+  const [nicknameAvailability, setNicknameAvailability] = useState(null); // 닉네임 중복 확인 상태
+  const nicknameCheckIdRef = useRef(0); // 늦게 도착한 이전 중복 확인 결과가 최신 입력을 덮지 않게 구분합니다.
 
   const isAllTermsAccepted = isServiceTermsAccepted && isAiTermsAccepted;
   const nicknameError = nickname.trim() ? "" : "닉네임을 입력해 주세요.";
@@ -59,31 +73,58 @@ export default function SignupPage() {
   const visibleNicknameError = isNicknameTouched ? nicknameError : "";
   const visibleEmailError = isEmailTouched ? emailError : "";
   const visiblePasswordError = isPasswordTouched ? passwordError : "";
-  const visiblePasswordConfirmError = isPasswordConfirmTouched
-    ? passwordConfirmError
-    : "";
+  const visiblePasswordConfirmError = isPasswordConfirmTouched ? passwordConfirmError : "";
+  const nicknameFeedback = visibleNicknameError
+    ? visibleNicknameError
+    : nicknameAvailability === "checking"
+      ? "닉네임을 확인하고 있습니다."
+      : nicknameAvailability === "available"
+        ? "사용 가능한 닉네임입니다."
+        : nicknameAvailability === "duplicate"
+          ? "이미 사용 중인 닉네임입니다."
+          : nicknameAvailability === "error"
+            ? "닉네임 확인에 실패했습니다. 다시 시도해 주세요."
+            : "";
+  const emailFeedback =
+    visibleEmailError || emailAuthError || (isEmailTouched ? "사용 가능한 이메일 형식입니다." : "");
+  const passwordFeedback =
+    visiblePasswordError || (isPasswordTouched ? "사용 가능한 비밀번호입니다." : "");
+  const passwordConfirmFeedback =
+    visiblePasswordConfirmError || (isPasswordConfirmTouched ? "비밀번호가 일치합니다." : "");
+  const isNicknameFeedbackError =
+    Boolean(visibleNicknameError) ||
+    nicknameAvailability === "duplicate" ||
+    nicknameAvailability === "error";
   const isFormLocallyValid =
-    isAllTermsAccepted &&
-    !nicknameError &&
-    !emailError &&
-    !passwordError &&
-    !passwordConfirmError;
+    isAllTermsAccepted && !nicknameError && !emailError && !passwordError && !passwordConfirmError;
+  const isSignupDisabled =
+    !isFormLocallyValid ||
+    nicknameAvailability !== "available" ||
+    Boolean(emailAuthError) ||
+    isLoading;
 
   // 각 입력을 제어 상태로 유지해 검증 결과가 현재 화면 값과 항상 일치하게 합니다.
   function handleNicknameChange(event) {
     setNickname(event.target.value);
+    nicknameCheckIdRef.current += 1;
+    setNicknameAvailability(null);
+    setSignupError("");
   }
 
   function handleEmailChange(event) {
     setEmail(event.target.value);
+    setEmailAuthError("");
+    setSignupError("");
   }
 
   function handlePasswordChange(event) {
     setPassword(event.target.value);
+    setSignupError("");
   }
 
   function handlePasswordConfirmChange(event) {
     setPasswordConfirm(event.target.value);
+    setSignupError("");
   }
 
   // 전체 동의는 별도 원본 상태로 저장하지 않고 두 필수 약관을 같은 값으로 변경합니다.
@@ -102,8 +143,42 @@ export default function SignupPage() {
   }
 
   // 입력을 한 번 벗어난 뒤부터 오류를 공개하기 위해 입력별 touched 상태를 기록합니다.
-  function handleNicknameBlur() {
+  async function handleNicknameBlur() {
     setIsNicknameTouched(true);
+
+    if (nicknameError) {
+      setNicknameAvailability(null);
+      return;
+    }
+
+    const nicknameToCheck = nickname.trim();
+    const checkId = nicknameCheckIdRef.current + 1;
+    nicknameCheckIdRef.current = checkId;
+    setNicknameAvailability("checking");
+
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("nickname", nicknameToCheck)
+        .maybeSingle();
+
+      if (nicknameCheckIdRef.current !== checkId) {
+        return;
+      }
+
+      if (error) {
+        setNicknameAvailability("error");
+        return;
+      }
+
+      setNicknameAvailability(data ? "duplicate" : "available");
+    } catch {
+      if (nicknameCheckIdRef.current === checkId) {
+        setNicknameAvailability("error");
+      }
+    }
   }
 
   function handleEmailBlur() {
@@ -165,13 +240,56 @@ export default function SignupPage() {
     }
   }
 
-  // 제출 시 모든 로컬 오류를 공개하지만 실제 회원가입이나 중복 확인은 실행하지 않습니다.
-  function handleSubmit(event) {
+  // 폼 제출
+  async function handleSubmit(event) {
     event.preventDefault();
     setIsNicknameTouched(true);
     setIsEmailTouched(true);
     setIsPasswordTouched(true);
     setIsPasswordConfirmTouched(true);
+
+    if (isSignupDisabled) {
+      return;
+    }
+    setIsLoading(true);
+    setSignupError("");
+    setEmailAuthError("");
+    setModalStatus(null);
+
+    // 회원가입 요청
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: {
+            nickname: nickname.trim(),
+          },
+        },
+      });
+      if (error) {
+        if (error.status === 429 || error.status >= 500) {
+          setModalStatus(error.status);
+          return;
+        }
+
+        setSignupError("회원가입을 완료하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+        return;
+      }
+
+      // 이메일 존재 여부 노출 방지 설정에서는 기존 사용자도 오류 없이 빈 identities로 반환될 수 있습니다.
+      if (data.user?.identities?.length === 0) {
+        setEmailAuthError("이미 가입된 이메일입니다.");
+        return;
+      }
+
+      router.replace("/signup/complete");
+    } catch {
+      setModalStatus("network");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -212,11 +330,7 @@ export default function SignupPage() {
               </label>
 
               <label className={styles["term-option"]}>
-                <input
-                  type="checkbox"
-                  checked={isAiTermsAccepted}
-                  onChange={handleAiTermsChange}
-                />
+                <input type="checkbox" checked={isAiTermsAccepted} onChange={handleAiTermsChange} />
                 <span>(필수) AI 생성 콘텐츠 이용 안내 동의</span>
               </label>
             </div>
@@ -236,15 +350,23 @@ export default function SignupPage() {
                   placeholder="닉네임"
                   autoComplete="nickname"
                   // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
-                  aria-invalid={Boolean(visibleNicknameError)}
-                  // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
-                  aria-describedby={visibleNicknameError ? "signup-nickname-error" : undefined}
+                  aria-invalid={isNicknameFeedbackError}
+                  // 검증 결과가 있을 때 입력과 성공·오류 안내를 연결합니다.
+                  aria-describedby={nicknameFeedback ? "signup-nickname-feedback" : undefined}
                   onChange={handleNicknameChange}
                   onBlur={handleNicknameBlur}
                 />
-                {visibleNicknameError && (
-                  <p id="signup-nickname-error" role="alert">
-                    {visibleNicknameError}
+                {nicknameFeedback && (
+                  <p
+                    className={
+                      isNicknameFeedbackError
+                        ? styles["feedback-error"]
+                        : styles["feedback-success"]
+                    }
+                    id="signup-nickname-feedback"
+                    role={isNicknameFeedbackError ? "alert" : "status"}
+                  >
+                    {nicknameFeedback}
                   </p>
                 )}
               </div>
@@ -263,15 +385,23 @@ export default function SignupPage() {
                   placeholder="사용할 이메일을 입력해 주세요."
                   autoComplete="email"
                   // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
-                  aria-invalid={Boolean(visibleEmailError)}
+                  aria-invalid={Boolean(visibleEmailError || emailAuthError)}
                   // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
-                  aria-describedby={visibleEmailError ? "signup-email-error" : undefined}
+                  aria-describedby={emailFeedback ? "signup-email-feedback" : undefined}
                   onChange={handleEmailChange}
                   onBlur={handleEmailBlur}
                 />
-                {visibleEmailError && (
-                  <p id="signup-email-error" role="alert">
-                    {visibleEmailError}
+                {emailFeedback && (
+                  <p
+                    className={
+                      visibleEmailError || emailAuthError
+                        ? styles["feedback-error"]
+                        : styles["feedback-success"]
+                    }
+                    id="signup-email-feedback"
+                    role={visibleEmailError || emailAuthError ? "alert" : "status"}
+                  >
+                    {emailFeedback}
                   </p>
                 )}
               </div>
@@ -293,7 +423,7 @@ export default function SignupPage() {
                     // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
                     aria-invalid={Boolean(visiblePasswordError)}
                     // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
-                    aria-describedby={visiblePasswordError ? "signup-password-error" : undefined}
+                    aria-describedby={passwordFeedback ? "signup-password-feedback" : undefined}
                     onChange={handlePasswordChange}
                     onBlur={handlePasswordBlur}
                   />
@@ -316,9 +446,15 @@ export default function SignupPage() {
                     </span>
                   </button>
                 </div>
-                {visiblePasswordError && (
-                  <p id="signup-password-error" role="alert">
-                    {visiblePasswordError}
+                {passwordFeedback && (
+                  <p
+                    className={
+                      visiblePasswordError ? styles["feedback-error"] : styles["feedback-success"]
+                    }
+                    id="signup-password-feedback"
+                    role={visiblePasswordError ? "alert" : "status"}
+                  >
+                    {passwordFeedback}
                   </p>
                 )}
               </div>
@@ -341,7 +477,7 @@ export default function SignupPage() {
                     aria-invalid={Boolean(visiblePasswordConfirmError)}
                     // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
                     aria-describedby={
-                      visiblePasswordConfirmError ? "signup-password-confirm-error" : undefined
+                      passwordConfirmFeedback ? "signup-password-confirm-feedback" : undefined
                     }
                     onChange={handlePasswordConfirmChange}
                     onBlur={handlePasswordConfirmBlur}
@@ -365,21 +501,29 @@ export default function SignupPage() {
                     </span>
                   </button>
                 </div>
-                {visiblePasswordConfirmError && (
-                  <p id="signup-password-confirm-error" role="alert">
-                    {visiblePasswordConfirmError}
+                {passwordConfirmFeedback && (
+                  <p
+                    className={
+                      visiblePasswordConfirmError
+                        ? styles["feedback-error"]
+                        : styles["feedback-success"]
+                    }
+                    id="signup-password-confirm-feedback"
+                    role={visiblePasswordConfirmError ? "alert" : "status"}
+                  >
+                    {passwordConfirmFeedback}
                   </p>
                 )}
               </div>
             </div>
           </div>
-
+          {signupError && (
+            <p className={styles["signup-error"]} role="alert">
+              {signupError}
+            </p>
+          )}
           <div className={styles["action-area"]}>
-            <button
-              className={styles["signup-button"]}
-              type="submit"
-              disabled={!isFormLocallyValid}
-            >
+            <button className={styles["signup-button"]} type="submit" disabled={isSignupDisabled}>
               가입하기
             </button>
             <Link className={styles["login-link"]} href="/login">
