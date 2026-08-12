@@ -12,7 +12,7 @@ export default function AuthGuard({ children }) {
     return <Loading />;
   }
 
-  // 비로그인 사용자는 보호 화면 대신 로그인 안내만 확인할 수 있습니다.
+  // 보호할 children을 렌더링하지 않아 비로그인 사용자에게 페이지 내용이 모달 뒤로 노출되지 않게 합니다.
   if (!isAuthenticated) {
     return <CommonModal isOpen mode="requireLogin" />;
   }

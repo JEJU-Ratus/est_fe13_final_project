@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 
 const AuthContext = createContext(null);
 
+// 사이트 레이아웃 아래의 모든 Client Component가 같은 Supabase 사용자 상태를 공유하게 합니다.
 export function AuthProvider({ children }) {
   // 페이지가 다시 렌더링되어도 같은 브라우저용 Supabase 클라이언트를 유지합니다.
   const [supabase] = useState(() => createClient());
@@ -86,6 +87,7 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const auth = useContext(AuthContext);
 
+  // Provider 밖에서 호출하면 기본값으로 오동작하는 대신 구성 오류를 즉시 알립니다.
   if (!auth) {
     throw new Error("useAuth는 AuthProvider 내부에서 사용해야 합니다.");
   }
