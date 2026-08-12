@@ -122,7 +122,6 @@
       color: color.$fda-orange;
     }
   }
-
 }
 
 .field-control {
@@ -154,8 +153,16 @@
     @include type.text-14-regular;
 
     margin-top: 6px;
-    color: color.$fda-orange;
+    text-align: left;
   }
+}
+
+.feedback-error {
+  color: color.$fda-orange;
+}
+
+.feedback-success {
+  color: #2e7d32;
 }
 
 .password-input {
@@ -201,7 +208,13 @@
     border-color: color.$fda-orange;
   }
 }
+.signup-error {
+  @include type.text-14-regular;
 
+  margin-top: 24px;
+  color: color.$fda-orange;
+  text-align: left;
+}
 .action-area {
   display: flex;
   flex-direction: column;
