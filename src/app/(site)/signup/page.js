@@ -269,6 +269,15 @@ export default function SignupPage() {
         },
       });
       if (error) {
+        if (
+          error.name === "AuthRetryableFetchError" ||
+          error.status === 0 ||
+          typeof error.status !== "number"
+        ) {
+          setModalStatus("network");
+          return;
+        }
+
         if (error.status === 429 || error.status >= 500) {
           setModalStatus(error.status);
           return;
@@ -310,6 +319,7 @@ export default function SignupPage() {
                 <input
                   type="checkbox"
                   checked={isAllTermsAccepted}
+                  disabled={isLoading}
                   onChange={handleAllTermsChange}
                 />
                 <span>
@@ -324,13 +334,19 @@ export default function SignupPage() {
                 <input
                   type="checkbox"
                   checked={isServiceTermsAccepted}
+                  disabled={isLoading}
                   onChange={handleServiceTermsChange}
                 />
                 <span>(필수) 서비스 이용약관 동의</span>
               </label>
 
               <label className={styles["term-option"]}>
-                <input type="checkbox" checked={isAiTermsAccepted} onChange={handleAiTermsChange} />
+                <input
+                  type="checkbox"
+                  checked={isAiTermsAccepted}
+                  disabled={isLoading}
+                  onChange={handleAiTermsChange}
+                />
                 <span>(필수) AI 생성 콘텐츠 이용 안내 동의</span>
               </label>
             </div>
@@ -349,6 +365,7 @@ export default function SignupPage() {
                   value={nickname}
                   placeholder="닉네임"
                   autoComplete="nickname"
+                  disabled={isLoading}
                   // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
                   aria-invalid={isNicknameFeedbackError}
                   // 검증 결과가 있을 때 입력과 성공·오류 안내를 연결합니다.
@@ -384,6 +401,7 @@ export default function SignupPage() {
                   value={email}
                   placeholder="사용할 이메일을 입력해 주세요."
                   autoComplete="email"
+                  disabled={isLoading}
                   // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
                   aria-invalid={Boolean(visibleEmailError || emailAuthError)}
                   // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
@@ -420,6 +438,7 @@ export default function SignupPage() {
                     value={password}
                     placeholder="비밀번호"
                     autoComplete="new-password"
+                    disabled={isLoading}
                     // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
                     aria-invalid={Boolean(visiblePasswordError)}
                     // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
@@ -429,6 +448,7 @@ export default function SignupPage() {
                   />
                   <button
                     type="button"
+                    disabled={isLoading}
                     // 아이콘만 있는 버튼의 기능을 보조기기가 알 수 있도록 동작을 이름으로 제공합니다.
                     aria-label="누르고 있는 동안 비밀번호 보기"
                     // 현재 비밀번호가 표시되는지 버튼의 눌림 상태로 전달합니다.
@@ -473,6 +493,7 @@ export default function SignupPage() {
                     value={passwordConfirm}
                     placeholder="비밀번호 확인"
                     autoComplete="new-password"
+                    disabled={isLoading}
                     // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
                     aria-invalid={Boolean(visiblePasswordConfirmError)}
                     // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
@@ -484,6 +505,7 @@ export default function SignupPage() {
                   />
                   <button
                     type="button"
+                    disabled={isLoading}
                     // 아이콘만 있는 버튼의 기능을 보조기기가 알 수 있도록 동작을 이름으로 제공합니다.
                     aria-label="누르고 있는 동안 비밀번호 확인 보기"
                     // 확인 입력의 공개 여부를 첫 번째 비밀번호와 독립된 눌림 상태로 전달합니다.
@@ -532,6 +554,14 @@ export default function SignupPage() {
           </div>
         </form>
       </section>
+      {isLoading && <Loading />}
+
+      <CommonModal
+        isOpen={modalStatus !== null}
+        mode="error"
+        status={modalStatus}
+        onClose={() => setModalStatus(null)}
+      />
     </main>
   );
 }
