@@ -1,48 +1,47 @@
 # 구현 계획: 요약 및 학습노트 상세
 
-**브랜치**: `feature/summary-detail` | **작성일**: 2026-08-10 | **명세**: [spec.md](./spec.md)
+**브랜치**: `feature/summary-detail` | **작성일**: 2026-08-12 | **명세**: [spec.md](./spec.md)
 
-**입력**: `/specs/002-summary-detail/spec.md`의 기능 명세
-
-**안내**: 이 템플릿은 `/speckit-plan` 명령으로 작성한다.
+**입력**: 기존 `src/mocks`를 사용하는 요약 상세 read-only 증분 요구사항(FR-041–FR-052)
 
 ## 요약
 
-네 개의 동적 경로에서 요약본과 학습노트를 조회하고 학습노트 생성·수정·삭제, 요약본 삭제, 잠금 인증, 북마크, 퀴즈 상호작용을 제공한다. 공통 `layout.js`가 생성 주제와 AI 요약 내용을 소유하고 각 페이지는 해당 경로의 콘텐츠만 렌더링한다. 기존 `CommonModal`, `NotePwModal`, `Loading`, `Header`를 재사용하고 새 공통 컴포넌트는 명세와 프로젝트 구조에 이미 정의된 `NoteItem`, `QuizModal` 두 개로 제한한다. 인증·데이터 저장의 구체적인 통신 구조는 만들지 않고 [프런트엔드 계약](./contracts/summary-detail-contract.md)을 구현 전제조건으로 사용한다.
+기존 정적 요약 상세 UI를 `summaries.json`, `learning-notes.json`, `users.json`, `bookmarks.json`의 실제 식별자와 연결한다. 공통 mock 어댑터가 원본 데이터를 변경하지 않고 화면 계약으로 정규화하며, 공통 레이아웃·요약 상세·학습노트 상세·수정 화면은 동일한 조회 결과를 사용한다. 존재하지 않거나 상위 요약본과 관계가 다른 식별자는 `notFound()`로 처리한다. 고정 검증 사용자 `user-001`의 북마크는 읽기 상태만 표시하고 모든 쓰기·인증·잠금·퀴즈·Supabase/API 동작은 이번 증분에서 구현하지 않는다.
 
 ## 기술 배경
 
 **언어/버전**: JavaScript, React 19.2.4
 
-**주요 의존성**: Next.js 16.2.12 App Router, Sass 1.102.x, `next/link`, `next/navigation`, 기존 `Header`, `CommonModal`, `NotePwModal`, `Loading`
+**주요 의존성**: Next.js 16.2.12 App Router, 기존 JSON module import, `next/navigation`의 `notFound`, 기존 `EmptyState`, `NoteItem`
 
-**저장소**: 기존 인증·요약본·학습노트·북마크·퀴즈 서비스에 의존한다. Supabase 스키마, 쿼리와 세션 저장 방식은 현재 명세에 없으므로 이번 계획에서 정의하지 않는다.
+**저장소**: `src/mocks/summaries.json`, `learning-notes.json`, `users.json`, `bookmarks.json`을 read-only 입력으로 사용
 
-**테스트**: `npm run lint`, `npm run build`, `npm run dev` 기반 수동 시나리오 검증. 자동 테스트 프레임워크는 현재 설치되어 있지 않으므로 추가하지 않는다.
+**테스트**: `npm run lint`, `npm run build`, `npm run dev` 기반 실제 경로 검증, 구현 전후 mock 파일 diff 비교
 
-**대상 플랫폼**: 데스크톱 웹 브라우저
+**대상 플랫폼**: 데스크톱 웹 브라우저와 기존 반응형 스타일 범위
 
-**프로젝트 유형**: Next.js 웹 애플리케이션
+**프로젝트 유형**: Next.js App Router 웹 애플리케이션
 
-**성능 목표**: 접근 가능한 상세의 주요 내용을 3초 이내 표시하고, 생성·수정 흐름을 2분 이내 완료하며, 삭제 승인 후 3초 이내 `/allnote`로 이동한다. 동일 작업의 중복 요청은 0건이어야 한다.
+**성능 목표**: 준비된 mock 데이터 범위에서 요약·학습노트 상세를 3초 이내 표시하고, 잘못된 식별자는 정상 콘텐츠를 노출하지 않음
 
-**제약 사항**: 데스크톱 디자인만 대상으로 한다. 새 패키지·상태 관리·데이터 요청 라이브러리를 도입하지 않는다. 실제 API, Supabase 인증·테이블·세션 구조를 임의로 구현하지 않는다. 잠금 비밀번호 원문을 클라이언트 영속 저장소에 보관하지 않는다. 기존 공통 컴포넌트의 공개 계약을 변경하지 않는다.
+**제약 사항**: 새 패키지·API·Supabase·인증·영속 저장·퀴즈 데이터를 추가하지 않는다. JSON 파일을 수정하지 않는다. 생성·수정·삭제·북마크 토글을 성공한 작업처럼 표시하지 않는다. 기존 경로·파일명을 변경하지 않는다. SCSS Module은 JavaScript에서 상대 경로로 import하고 SCSS 공통 모듈은 `styles/...` 기준 경로를 유지한다.
 
-**작업 규모**: 동적 경로 4개, 공통 상세 레이아웃 1개, 새 공통 컴포넌트 2개, 기존 공통 컴포넌트 4개 재사용, 서비스·라우트·UI 계약 1개
+**작업 규모**: 공통 mock 어댑터 1개 추가, 기존 동적 레이아웃과 페이지 4개 수정, 기존 공통 컴포넌트 공개 계약 유지
 
 ## 헌법 점검
 
-*관문: 0단계 조사 전에 통과해야 하며 1단계 설계 후 다시 확인한다.*
+*관문: 조사 전과 설계 후 모두 통과했다.*
 
-- [x] `AGENTS.md`, `docs/specs/Summary.md`, 기능 명세, 관련 공통 컴포넌트 명세와 기존 코드를 확인했다.
-- [x] Next.js App Router, JavaScript, SCSS Module, `@/*` 별칭을 유지한다.
-- [x] 승인되지 않은 의존성, 폴더, 데이터 통신 또는 Supabase 구조를 추가하지 않는다.
-- [x] 기존 `Header`, `CommonModal`, `NotePwModal`, `Loading`을 재사용하며 공개 props를 변경하지 않는다.
-- [x] 요약 및 학습노트 상세 한 기능과 명세에 정의된 경로·컴포넌트만 다룬다.
-- [x] 컴포넌트는 PascalCase, 함수·변수는 camelCase, Boolean은 `is`·`has` 접두사, CSS 클래스는 kebab-case를 사용한다.
+- [x] `AGENTS.md`, `docs/specs/Summary.md`, 기능 명세와 현재 코드를 확인했다.
+- [x] Next.js App Router, JavaScript, 기존 SCSS Module과 `@/*` JavaScript 별칭을 유지한다.
+- [x] 기존 `src/mocks` 데이터만 읽고 새 데이터 요청 라이브러리·API·Supabase 구조를 만들지 않는다.
+- [x] 새 폴더를 만들지 않고 기존 `src/mocks`에 read-only 어댑터 파일 하나만 둔다.
+- [x] `EmptyState`, `NoteItem`의 공개 props와 기존 페이지 스타일을 재사용한다.
+- [x] 완료된 정적 UI를 다시 만들지 않고 데이터 연결에 필요한 최소 파일만 수정한다.
+- [x] 실제 인증·권한·잠금·쓰기·퀴즈 완료를 주장하지 않는다.
 - [x] 모든 Spec Kit 산출물을 한국어로 작성한다.
 
-**설계 후 재점검**: 조사, 데이터 모델, 인터페이스 계약과 검증 안내는 기존 구조와 공통 컴포넌트 계약을 보존한다. 데이터·인증 구조는 외부 전제조건으로 분리했으며 헌법 위반이나 복잡성 예외가 없다.
+**설계 후 재점검**: 공통 어댑터는 네 경로의 중복 데이터 매핑과 관계 검증을 한곳에 제한하기 위한 최소 파일이다. 원본 JSON과 공통 컴포넌트 계약을 변경하지 않으며, 향후 Supabase 연결 시 호출 영역의 화면 계약을 유지할 수 있다. 헌법 또는 `AGENTS.md` 위반 예외가 없다.
 
 ## 프로젝트 구조
 
@@ -57,103 +56,88 @@ specs/002-summary-detail/
 ├── quickstart.md
 ├── contracts/
 │   └── summary-detail-contract.md
-└── tasks.md                     # /speckit-tasks에서 생성
+└── tasks.md
 ```
 
-### 소스 코드
+### 이번 증분의 소스 코드
 
 ```text
 src/
-├── app/
-│   └── (site)/
-│       └── Summary/
-│           └── [summaryId]/
-│               ├── layout.js
-│               ├── layout.module.scss
-│               ├── page.js
-│               ├── page.module.scss
-│               └── notes/
-│                   ├── new/
-│                   │   ├── page.js
-│                   │   └── page.module.scss
-│                   └── [noteId]/
-│                       ├── page.js
-│                       ├── page.module.scss
-│                       └── edit/
-│                           ├── page.js
-│                           └── page.module.scss
-└── components/
-    ├── header.jsx                    # 실제 구현 재사용, 이름 변경은 범위 제외
-    ├── CommonModal.jsx               # 기존 구현 재사용
-    ├── NotePwModal.jsx               # 기존 구현 재사용
-    ├── Loading.jsx                   # 기존 구현 재사용
-    ├── NoteItem.jsx
-    ├── NoteItem.module.scss
-    ├── QuizModal.jsx
-    └── QuizModal.module.scss
+├── mocks/
+│   ├── summaries.json                 # 기존, 수정 금지
+│   ├── learning-notes.json            # 기존, 수정 금지
+│   ├── users.json                     # 기존, 수정 금지
+│   ├── bookmarks.json                 # 기존, 수정 금지
+│   └── summary-detail.js              # 추가: 순수 조회·정규화 함수
+└── app/
+    └── (site)/
+        └── summary/
+            └── [summaryId]/
+                ├── layout.js
+                ├── page.js
+                └── notes/
+                    └── [noteId]/
+                        ├── page.js
+                        └── edit/
+                            └── page.js
 ```
 
-**구조 결정**: 사용자의 실제 경로 우선 결정에 따라 `src/app/(site)/Summary`와 `src/components/header.jsx`를 그대로 사용하고 이름을 변경하지 않는다. `layout.js`는 모든 하위 페이지의 생성 주제·AI 요약 영역을 공유한다. 빈 목록은 요약 상세 페이지 내부의 단순 상태로 표현해 별도 공통 컴포넌트를 추가하지 않는다. 찾을 수 없는 식별자는 서비스 연결 후 `notFound()`로 기존 404 처리에 위임하고 새 `not-found.js`는 만들지 않는다. 공통 `(site)/layout.js` 정렬 수정은 사용자 결정에 따라 이번 정적 UI 범위에서 제외한다.
+**구조 결정**: 실제 Git 추적 경로인 소문자 `src/app/(site)/summary`를 사용한다. 데이터 정규화는 `src/mocks/summary-detail.js` 한 파일에서 수행해 페이지별 JSON 조인과 필드 변환 중복을 막는다. 새 폴더, Route Handler, Server Action, 서비스 폴더 또는 테스트용 영속 저장소는 만들지 않는다.
 
 ## 구현 설계
 
-### 라우트와 렌더링 경계
+### read-only mock 어댑터
 
-- 각 동적 경로는 Next.js 16의 비동기 `params`에서 `summaryId`, 필요한 경우 `noteId`를 해석한다.
-- 공통 `layout.js`는 요약본 존재 여부와 접근 상태를 확인하고 생성 주제·AI 요약 영역 및 `children`을 구성한다.
-- 존재하지 않는 요약본 또는 학습노트는 `notFound()`로 현재 경로 렌더링을 종료한다.
-- 조회·공통 배치처럼 이벤트가 필요 없는 경계는 Server Component로 유지한다.
-- 입력 상태, blur 검증, 요청 상태, 모달, 북마크와 퀴즈를 소유하는 최소 페이지 또는 컴포넌트에만 `"use client"`를 선언한다.
-- 고정 목적지는 `Link`로 이동하고 생성·수정·삭제 성공, 권한 판정과 비밀번호 모달 취소처럼 결과에 따른 이동에만 `useRouter`를 사용한다.
+- `src/mocks/summary-detail.js`는 네 JSON을 정적 import하고 조회 결과를 새 객체로 반환한다.
+- 공개 함수는 요약본 단건 조회, 요약본별 학습노트 목록 조회, 요약본에 속한 학습노트 단건 조회, 사용자별 북마크 상태 조회로 제한한다.
+- 학습노트 목록은 먼저 `summaryId`로 필터링한 뒤 `createdAt` 내림차순으로 정렬한다. 원본 배열에는 `sort()`를 직접 적용하지 않는다.
+- 학습노트의 `authorId`를 사용자 데이터와 결합하고 사용자가 없으면 `알 수 없는 사용자`를 사용한다.
+- `isQuizCompleted`는 `completed` 또는 `notStarted`로 변환한다.
+- mock의 단일 `content`는 `learnedSummary`로 변환하고 `reflection`, `references`는 빈 문자열로 제공한다.
+- 북마크 상태는 `userId`와 `summaryId`가 모두 일치하는 관계의 존재 여부로 계산한다.
+- INSERT, UPDATE, DELETE, 토글 또는 파일 쓰기 함수는 제공하지 않는다.
 
-### 공통 레이아웃과 조회
+### 동적 경로와 404 경계
 
-- 레이아웃은 `Header`와 생성 주제·AI 요약을 한 번만 표시하고 각 하위 페이지가 이를 중복 렌더링하지 않게 한다.
-- 요약 상세 페이지는 최신 작성순 학습노트와 빈 목록 상태, 로그인 사용자의 생성 버튼, 작성자의 삭제 버튼, 로그인 사용자의 북마크 상태를 구성한다.
-- `NoteItem`은 퀴즈 학습 상태, 작성자, 주제, 작성일과 학습노트 상세 목적지를 props로 받고 표시·정적 이동만 담당한다.
-- `더보기`와 작성 버튼은 각각 `/allnote`, `/Summary/[summaryId]/notes/new`로 연결한다.
+- 각 레이아웃과 페이지는 Next.js 16의 Promise인 `params`를 `await`하거나 필요한 Client Component 경계에서 React `use`로 해석한다.
+- 공통 `layout.js`가 `summaryId`로 요약본을 조회하고 결과가 없으면 `notFound()`를 호출하므로 네 하위 경로가 공통으로 잘못된 요약본을 차단한다.
+- 학습노트 상세와 수정 페이지는 `summaryId`, `noteId`가 함께 일치하는 단건만 사용하고 결과가 없으면 `notFound()`를 호출한다.
+- 별도 `not-found.js`는 전용 디자인 명세가 없으므로 만들지 않고 기존 404 처리를 사용한다.
 
-### 작성·수정 양식
+### 공통 레이아웃과 북마크 표시
 
-- 작성과 수정 페이지는 제목, 오늘 배운 내용 요약, 오늘의 회고, 참고자료의 같은 필드 계약을 사용하되 별도 추상화 파일을 만들지 않고 각 페이지 범위에서 명세 동작을 구현한다.
-- 제출과 blur 검증 전에 앞뒤 공백을 제거한다. 제목은 필수·최대 50자, 세 본문은 선택·각 최대 1,000자를 적용한다.
-- 수정 페이지는 계약에서 받은 기존 값을 초기값으로 표시한다.
-- 유효하지 않으면 요청하지 않으며 요청 중 입력과 제출을 비활성화하고 `Loading`을 하나만 표시한다.
-- 생성 성공은 생성된 학습노트 상세, 수정 성공은 수정한 학습노트 상세로 조건부 이동한다.
+- 공통 레이아웃의 정적 제목과 AI 요약 placeholder를 조회된 `topic`, `aiSummary.title`, `aiSummary.sections`로 교체한다.
+- `user-001`의 북마크 관계를 읽어 아이콘 선택 상태와 접근성 상태에 반영한다.
+- 북마크는 read-only 표시이므로 로컬 토글 상태와 변경 핸들러를 제거하고 사용자가 성공한 저장으로 오인할 동작을 제공하지 않는다.
+- 실제 로그인·작성자 판정과 저장 퀴즈 조회가 없으므로 퀴즈 조회 흐름을 이번 증분에서 연결하거나 완료 처리하지 않는다.
+- 비공개 mock 항목의 `isPrivate` 값은 표시 데이터일 뿐 잠금 인증 완료의 근거로 사용하지 않는다.
 
-### 권한과 잠금
+### 요약 상세 학습노트 목록
 
-- 서비스 계약은 로그인 여부, 현재 사용자 식별자, 요약본·학습노트 작성자 식별자와 현재 요약본의 세션 인증 여부를 함께 제공한다.
-- 잠긴 요약본의 네 경로는 보호 콘텐츠보다 먼저 인증 상태를 확인하고 미인증이면 `NotePwModal`을 표시한다.
-- `NotePwModal`에는 기존 계약의 `isOpen`, `isSubmitting`, `errorMessage`, `onSubmit`, `onClose`만 전달한다.
-- 비밀번호 불일치는 모달 내부에서 재입력하고 시스템 오류는 비밀번호 모달을 닫은 뒤 `CommonModal`의 `error` 모드로 전달한다.
-- 성공한 인증의 동일 브라우저 세션 유지와 하위 경로 공유는 외부 인증 서비스가 소유한다. 클라이언트는 원문 비밀번호를 저장하지 않는다.
-- 비로그인 작성 접근은 `/login`, 비작성자 수정 접근은 `/allnote`로 이동한다. 수정·삭제 버튼은 소유자에게만 렌더링한다.
+- `page.js`는 현재 `summaryId`의 정규화된 학습노트 목록을 받아 `NoteItem`으로 렌더링한다.
+- 항목이 없으면 기존 `EmptyState`에 `현재 리스트가 없습니다.`를 전달한다.
+- `NoteItem`에는 `summaryId`, `noteId`, `authorNickname`, 요약본 `topic`, `YYYY.MM.DD` 표시용 작성일, `quizStatus`를 전달한다.
+- 생성·삭제 버튼은 실제 로그인·소유권·쓰기 서비스가 없으므로 현재 비활성 상태를 유지한다.
 
-### 삭제·북마크·오류
+### 학습노트 상세와 수정 초기값
 
-- 요약본과 학습노트 삭제는 각각 작성자에게만 `CommonModal mode="confirmDelete"`를 열 수 있게 한다.
-- 삭제 승인 후 요청 중 `Loading`을 표시한다. 요약본 삭제는 하위 학습노트까지 제거하는 외부 서비스 연산 하나로 취급하고 두 삭제 모두 성공 시 `/allnote`로 이동한다.
-- 북마크는 로그인 사용자에게만 제공하고 요청 성공 후 확정 상태로 표시한다. 실패하면 기존 상태를 보존한다.
-- 생성·수정·삭제·북마크의 시스템 오류는 정규화한 상태를 `CommonModal mode="error"`에 전달하고 현재 입력 또는 화면 상태를 보존한다.
-
-### 퀴즈
-
-- `QuizModal`은 기존 저장 퀴즈의 문제, 답안 목록과 정답 판정에 필요한 값을 표시용 props로 받는다.
-- 로그인 사용자가 퀴즈 풀기를 선택하면 저장 퀴즈를 조회한 뒤 모달을 열고, 비로그인 사용자는 `CommonModal mode="suggestLogin"`을 본다.
-- 모달은 답안 선택, 단일 제출, 채점 결과, 닫기를 소유하며 퀴즈 데이터 생성이나 저장은 담당하지 않는다.
-- 저장 퀴즈가 없거나 조회 실패하면 모달 안에 풀 수 없는 상태를 표시하고 제출을 허용하지 않는다.
+- 학습노트 상세는 정규화된 `title`, `learnedSummary`, `reflection`, `references`를 현재 세 섹션에 표시한다.
+- 수정 화면은 같은 조회 결과의 제목과 세 본문 필드를 `defaultValue`로 표시한다.
+- 수정 입력은 조회 결과 확인 용도로만 제공하고 수정 완료 버튼은 비활성 상태를 유지한다. 저장 성공, 로딩 또는 이동을 모사하지 않는다.
+- 작성 페이지는 이번 데이터 조회 범위에서 변경하지 않으며 공통 레이아웃의 요약본 404 경계만 공유한다.
 
 ## 구현 순서
 
-1. 서비스·라우트·공통 UI 계약을 구현 입력으로 확정하고 실제 서비스 제공 여부를 확인한다.
-2. 동적 공통 레이아웃과 요약본 조회·잠금·404 경계를 구성한다.
-3. `NoteItem`과 요약 상세 목록·빈 상태·생성·삭제·북마크 동작을 구성한다.
-4. 학습노트 작성 및 수정 페이지의 입력·검증·로딩·성공 이동·오류 보존을 구성한다.
-5. 학습노트 상세와 작성자 전용 수정·삭제 동작을 구성한다.
-6. `QuizModal`과 로그인 여부별 퀴즈 흐름을 구성한다.
-7. 권한·잠금·실패·중복 요청·404 시나리오를 검증하고 lint와 production build를 실행한다.
+1. 기존 mock 파일의 shape와 테스트 식별자를 기준으로 read-only 어댑터 계약을 구현한다.
+2. 공통 레이아웃을 요약 단건 조회와 404에 연결하고 북마크를 읽기 상태로 고정한다.
+3. 요약 상세에서 학습노트 필터·정렬·작성자 결합 결과와 빈 상태를 연결한다.
+4. 학습노트 상세에서 관계 검증·404와 정규화 본문을 연결한다.
+5. 수정 페이지에서 관계 검증·404와 기존 값을 연결하고 쓰기 비활성 경계를 확인한다.
+6. 유효·빈·잘못된·관계 불일치·북마크 시나리오와 mock 원본 무변경을 검증한다.
+7. `npm run lint`, `npm run build`, `git diff --check`를 실행하고 최종 범위를 검토한다.
 
 ## 복잡성 기록
 
-헌법을 위반하는 예외가 없다.
+| 결정 | 필요한 이유 | 더 단순한 대안을 사용하지 않은 이유 |
+|---|---|---|
+| `src/mocks/summary-detail.js` 파일 1개 추가 | 네 경로가 같은 관계 검증·사용자 조인·필드 변환을 사용하고 향후 데이터 소스 교체 경계를 분명히 한다. | 각 페이지의 직접 JSON 가공은 같은 규칙을 반복하고 요약본-학습노트 관계 검증이 서로 달라질 위험이 있다. |

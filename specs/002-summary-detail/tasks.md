@@ -231,3 +231,13 @@ description: "요약 및 학습노트 상세 기능 구현 작업 목록"
 - 기존 `CommonModal`, `NotePwModal`, `Loading`의 공개 props를 변경하지 않는다.
 - 같은 파일을 수정하는 작업은 동시에 실행하지 않으며 `[P]` 표시는 선행 의존성이 해소된 경우에만 적용한다.
 - 실제 구현 전에 해당 단계의 수정 파일과 영향 범위를 사용자에게 다시 알리고 승인을 받는다.
+
+## Phase 8: Convergence
+
+- [ ] T042 `src/mocks/summary-detail.js`에 기존 `summaries.json`, `learning-notes.json`, `users.json`, `bookmarks.json`을 변경하지 않고 `getMockSummary`, `getMockSummaryNotes`, `getMockStudyNote`, `getMockBookmarkState`, `MOCK_CURRENT_USER_ID`와 `YYYY.MM.DD` 날짜·본문·퀴즈 상태·작성자 fallback 정규화를 구현한다. per plan: mock 어댑터 (missing)
+- [ ] T043 `src/app/(site)/summary/[summaryId]/layout.js`에서 공통 mock 어댑터로 `summaryId` 단건을 조회해 주제와 AI 요약을 표시하고, 결과가 없으면 모든 하위 경로에서 `notFound()`가 실행되도록 연결한다. per FR-041, FR-042 (partial)
+- [ ] T044 `src/app/(site)/summary/[summaryId]/page.js`에서 현재 `summaryId`의 학습노트만 최신 작성순으로 받아 작성자 닉네임·주제·`YYYY.MM.DD` 작성일·`completed`/`notStarted` 상태를 기존 `NoteItem`에 전달하고, 빈 배열에만 기존 `EmptyState`를 표시한다. per FR-043, FR-044, FR-045, FR-050 (missing)
+- [ ] T045 `src/app/(site)/summary/[summaryId]/notes/[noteId]/page.js`에서 `summaryId`와 `noteId`가 모두 일치하는 mock 학습노트를 조회해 제목과 세 본문 영역을 표시하고, 없거나 상위 관계가 다르면 `notFound()`로 처리한다. per FR-046, FR-047 (missing)
+- [ ] T046 `src/app/(site)/summary/[summaryId]/layout.js`에서 `user-001`의 mock 북마크 상태를 읽기 전용으로 표시하고 로컬 북마크 토글, 제외 범위인 퀴즈·pathname 상태와 불필요한 Client Component 경계를 제거하되 기존 접근성 상태 설명은 현재 동작과 일치시킨다. per FR-049, FR-051, FR-052, plan: Server Component (contradicts)
+- [ ] T047 `src/app/(site)/summary/[summaryId]/notes/[noteId]/edit/page.js`에서 관계가 일치하는 mock 학습노트의 제목·학습 내용·빈 회고·빈 참고자료를 기존 값으로 표시하고, 없거나 상위 관계가 다르면 `notFound()`로 처리하며 저장 버튼은 비활성 상태로 유지한다. per FR-046, FR-047, FR-048 (partial)
+- [ ] T048 `specs/002-summary-detail/quickstart.md`의 유효 요약본·빈 목록·잘못된 요약본·학습노트 관계 일치/불일치·수정 초기값·`user-001` 북마크 시나리오를 실행하고 `npm run lint`, `npm run build`, `git diff --check` 및 네 원본 mock JSON 무변경을 검증해 선행 저장소 오류와 이번 변경 결과를 분리해 기록한다. per SC-009, SC-010, SC-011, SC-012, SC-013 (missing)

@@ -1,7 +1,7 @@
 # Specification Quality Checklist: 요약 및 학습노트 상세
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-08-11
+**Created**: 2026-08-12
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -13,13 +13,13 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
-- [ ] Requirements are testable and unambiguous
+- [x] No [NEEDS CLARIFICATION] markers remain
+- [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
 - [x] Edge cases are identified
-- [ ] Scope is clearly bounded
+- [x] Scope is clearly bounded
 - [x] Dependencies and assumptions identified
 
 ## Feature Readiness
@@ -32,5 +32,6 @@
 ## Notes
 
 - 기존 UI 요구사항과 완료된 정적 구현 범위는 유지했다.
-- 실제 데이터 영속 범위를 추가했으며 연결 대상, 요약본 생성 책임과 퀴즈 기록 수준의 사용자 결정이 필요하다.
-- 세 명확화가 해결되면 요구사항의 모호성과 범위를 다시 검증한다.
+- 이번 증분은 기존 검증용 데이터의 동적 조회·필터·정렬·작성자 결합·상세 및 수정 초기값·북마크 읽기 상태로 제한했다.
+- 원본 데이터 변경, 쓰기 영속성, 실제 인증·권한·잠금·퀴즈와 Supabase/API는 명시적으로 제외했다.
+- 갱신 후 1차 품질 검증에서 모든 항목을 통과했다.
