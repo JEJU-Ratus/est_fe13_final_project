@@ -191,7 +191,17 @@ export default function Header({ isLoggedIn = false }) {
       </nav>
 
       {isHeaderCollapsed ? (
-        <div className={styles["collapsed-user-slot"]} aria-label="사용자 이미지 영역" />
+        <div className={styles["collapsed-user-slot"]}>
+          <Image
+            className={`${styles["collapsed-profile-image"]} ${
+              !isLoggedIn ? styles["is-guest"] : ""
+            }`}
+            src="/images/main_profile.webp"
+            alt={isLoggedIn ? "프로필 이미지" : "비로그인 사용자 프로필 이미지"}
+            width={30}
+            height={30}
+          />
+        </div>
       ) : (
         <footer className={styles.footer}>
           <span>이용약관</span>
