@@ -197,6 +197,10 @@
 .logout-button {
   color: color.$white;
   background-color: color.$fda-navy;
+  cursor: pointer;
+  &:disabled {
+    cursor: default;
+  }
 }
 
 .menu-list {

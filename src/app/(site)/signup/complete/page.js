@@ -49,8 +49,6 @@ export default function SignupCompletePage() {
       setModalMode("error");
       setIsAccessChecked(true);
       return;
-
-      setIsAccessChecked(true);
     }
 
     checkLoginStatus();
