@@ -103,7 +103,7 @@ export default function Header({ isLoggedIn = false }) {
               className={`material-symbols-outlined ${styles["collapsed-panel-icon"]}`}
               aria-hidden="true"
             >
-              left_panel_close
+              left_panel_open
             </span>
           </button>
         ) : (
