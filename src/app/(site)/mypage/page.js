@@ -250,7 +250,7 @@ export default function Mypage() {
             onPointerUp={handleSummaryListPointerEnd}
             onPointerCancel={handleSummaryListPointerCancel}
             onClickCapture={handleSummaryListClickCapture}>
-            {summaryCards.map(summary => (
+            {mySummaryCards.map(summary => (
               <SummaryItemCard key={summary.summaryId} {...summary} />
             ))}
           </div>
@@ -281,7 +281,7 @@ export default function Mypage() {
             onPointerUp={handleSummaryListPointerEnd}
             onPointerCancel={handleSummaryListPointerCancel}
             onClickCapture={handleSummaryListClickCapture}>
-            {summaryCards.map(summary => (
+            {bookmarkCards.map(summary => (
               <SummaryItemCard
                 key={`bookmark-${summary.summaryId}`}
                 {...summary}
