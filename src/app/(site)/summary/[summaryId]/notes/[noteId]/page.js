@@ -1,9 +1,20 @@
+import { getMockStudyNote } from "@/mocks/summary-detail";
+import { notFound } from "next/navigation";
 import styles from "./page.module.scss";
 
-const noteSections = ["오늘 배운 내용 요약", "오늘의 회고", "참고자료"];
+const noteSections = [
+  { key: "learnedSummary", label: "오늘 배운 내용 요약" },
+  { key: "reflection", label: "오늘의 회고" },
+  { key: "references", label: "참고자료" },
+];
 
 export default async function NoteDetailPage({ params }) {
   const { summaryId, noteId } = await params;
+  const note = getMockStudyNote(summaryId, noteId);
+
+  if (!note) {
+    notFound();
+  }
 
   return (
     <section
@@ -11,24 +22,16 @@ export default async function NoteDetailPage({ params }) {
       data-summary-id={summaryId}
       data-note-id={noteId}
     >
-      <div className={styles["quiz-action"]}>
-        {/* 로그인 상태와 저장 퀴즈를 확인할 수 있을 때 서비스 단계에서 활성화합니다. */}
-        <button type="button" disabled>
-          퀴즈 풀기
-        </button>
-      </div>
-
       <div className={styles["note-heading"]}>
-        <h2>제목</h2>
+        <h2>{note.title}</h2>
       </div>
       <div className={styles["accent-line"]} />
 
       <div className={styles["note-content"]}>
         {noteSections.map(section => (
-          <section className={styles["content-section"]} key={section}>
-            <h3>{section}</h3>
-            {/* 학습노트 조회 결과가 연결될 자리이며 임시 본문을 생성하지 않습니다. */}
-            <p />
+          <section className={styles["content-section"]} key={section.key}>
+            <h3>{section.label}</h3>
+            <p>{note[section.key]}</p>
           </section>
         ))}
       </div>

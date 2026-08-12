@@ -34,6 +34,10 @@ export default function Home() {
     }
   }
 
+  function handlePasswordChange(event) {
+    setPassword(event.target.value.replace(/\D/g, "").slice(0, 4));
+  }
+
   return (
     <main className={styles["main-page"]}>
       <div className={styles.container}>
@@ -97,15 +101,30 @@ export default function Home() {
                     <span className={isPasswordEnabled ? styles["visually-hidden"] : undefined}>비밀번호 입력</span>
                   </label>
                   {isPasswordEnabled && (
-                    <input
-                      className={styles["password-input"]}
-                      type="text"
-                      inputMode="numeric"
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      placeholder="비밀번호"
-                      required
-                    />
+                    <div className={styles["password-field"]}>
+                      {/* 입력 조건을 시각적 문구뿐 아니라 스크린 리더 사용자에게도 함께 전달합니다. */}
+                      <input
+                        className={styles["password-input"]}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]{4}"
+                        maxLength={4}
+                        value={password}
+                        onChange={handlePasswordChange}
+                        placeholder="비밀번호"
+                        aria-describedby={password.length !== 4 ? "password-error" : undefined}
+                        aria-invalid={password.length !== 4}
+                        required
+                      />
+                      <span
+                        id="password-error"
+                        className={`${styles["password-error"]} ${
+                          password.length === 4 ? styles["is-hidden"] : ""
+                        }`}
+                      >
+                        숫자 4자리를 입력해주세요
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>
@@ -114,7 +133,9 @@ export default function Home() {
         </section>
 
         <section className={styles["content-section"]} aria-label="주요 콘텐츠">
-          <Banner />
+          <div className={styles["wide-parent"]}>
+              <Banner href="/dev" alt="넓은 영역의 프론트엔드 스킬업 이벤트" />
+          </div>
 
           <div className={styles["quick-menu"]}>
             <Link href="/summary" className={styles["quick-menu-card"]}>

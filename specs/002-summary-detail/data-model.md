@@ -1,153 +1,138 @@
-# 데이터 모델: 요약 및 학습노트 상세
+# 데이터 모델: 요약 및 학습노트 상세 mock read-only 연결
 
-이 문서는 프런트엔드가 표시·검증·권한 판정에 필요로 하는 논리 데이터 모델이다. 데이터베이스 테이블이나 Supabase 스키마를 정의하지 않는다.
+이 문서는 현재 증분에서 기존 JSON을 화면에 연결하기 위한 논리 모델을 정의한다. 데이터베이스 테이블이나 Supabase 스키마가 아니며, 생성·수정·삭제 결과를 저장하는 모델도 아니다.
 
-## Summary
+## 원본 fixture 모델
 
-| 필드 | 형태 | 필수 | 규칙 |
-|---|---|---:|---|
-| `summaryId` | 문자열 | 예 | URL의 `[summaryId]`와 일치하는 고유 식별자 |
-| `topic` | 문자열 | 예 | 생성 주제로 공통 레이아웃에 표시 |
-| `content` | 문자열 또는 구조화된 표시 데이터 | 예 | AI 요약본으로 모든 하위 페이지에 표시 |
-| `authorId` | 문자열 | 예 | 현재 사용자의 삭제 권한 판정에 사용 |
-| `isLocked` | Boolean | 예 | 참이면 세션 인증 전 보호 콘텐츠 비공개 |
-| `isBookmarked` | Boolean | 로그인 사용자에게 예 | 북마크 버튼의 확정 표시 상태 |
+원본 파일은 조회 입력으로만 사용하며 필드 추가·수정·삭제 또는 배열 재정렬을 하지 않는다.
 
-### 관계
+### MockSummary (`summaries.json`)
 
-- Summary 하나는 StudyNote 0개 이상을 가진다.
-- Summary 하나는 로그인 사용자별 BookmarkState 0개 또는 1개를 가진다.
-- 잠긴 Summary 하나는 현재 브라우저 세션의 SummaryAccessState와 연결된다.
+| 필드 | 형태 | 현재 용도 |
+|---|---|---|
+| `summaryId` | 문자열 | `[summaryId]` 조회 키 |
+| `authorId` | 문자열 | 작성자 관계 식별자 |
+| `topic` | 문자열 | 공통 레이아웃 주제 및 학습노트 항목 주제 |
+| `title` | 문자열 | 요약본 제목 데이터 |
+| `excerpt` | 문자열 | 현재 상세 화면에서는 사용하지 않음 |
+| `aiSummary` | `{ title, sections[] }` | 공통 레이아웃 AI 요약 표시 |
+| `isPrivate` | Boolean | 표시 데이터이며 잠금 인증에는 사용하지 않음 |
+| `createdAt`, `updatedAt` | ISO 날짜·시간 문자열 | 원본 메타데이터 |
 
-## StudyNote
+### MockStudyNote (`learning-notes.json`)
 
-| 필드 | 형태 | 필수 | 규칙 |
-|---|---|---:|---|
-| `noteId` | 문자열 | 예 | Summary 안에서 학습노트를 식별 |
-| `summaryId` | 문자열 | 예 | 상위 Summary 식별자와 일치 |
-| `authorId` | 문자열 | 예 | 수정·삭제 권한 판정에 사용 |
-| `authorNickname` | 문자열 | 예 | 목록과 상세 표시 |
-| `title` | 문자열 | 예 | trim 후 1~50자 |
-| `learnedSummary` | 문자열 | 아니오 | trim 후 0~1,000자 |
-| `reflection` | 문자열 | 아니오 | trim 후 0~1,000자 |
-| `references` | 문자열 | 아니오 | trim 후 0~1,000자 |
-| `createdAt` | 날짜·시간 값 | 예 | 목록을 최신 작성순으로 정렬하고 작성일 표시 |
-| `quizStatus` | `notStarted` 또는 `completed` | 예 | 목록의 퀴즈 학습 상태 표시, 백분율은 사용하지 않음 |
+| 필드 | 형태 | 현재 용도 |
+|---|---|---|
+| `noteId` | 문자열 | `[noteId]` 조회 키 |
+| `summaryId` | 문자열 | 상위 요약본 관계 검증·목록 필터 |
+| `authorId` | 문자열 | 사용자 결합 키 |
+| `title` | 문자열 | 목록·상세·수정 초기 제목 |
+| `content` | 문자열 | 화면의 `learnedSummary`로 변환 |
+| `isQuizCompleted` | Boolean | 목록의 퀴즈 완료 여부 표시 |
+| `createdAt`, `updatedAt` | ISO 날짜·시간 문자열 | 최신순 정렬 및 표시 |
 
-### 관계
+### MockUser (`users.json`)
 
-- StudyNote는 Summary 하나에만 속한다.
-- StudyNote는 저장된 Quiz 0개 또는 1개와 연결된다.
+| 필드 | 형태 | 현재 용도 |
+|---|---|---|
+| `userId` | 문자열 | 학습노트 `authorId` 결합 키 |
+| `nickname` | 문자열 | 학습노트 목록의 작성자 표시 |
+| `profileImageUrl`, `bio` | 문자열 | 현재 상세 화면에서는 사용하지 않음 |
 
-## NoteForm
+### MockBookmark (`bookmarks.json`)
 
-| 필드 | 형태 | 초기값 | 검증 |
-|---|---|---|---|
-| `title` | 문자열 | 작성 `""`, 수정 기존 제목 | trim 후 필수, 최대 50자 |
-| `learnedSummary` | 문자열 | 작성 `""`, 수정 기존 값 | 선택, trim 후 최대 1,000자 |
-| `reflection` | 문자열 | 작성 `""`, 수정 기존 값 | 선택, trim 후 최대 1,000자 |
-| `references` | 문자열 | 작성 `""`, 수정 기존 값 | 선택, trim 후 최대 1,000자 |
-| `errors` | 필드별 문자열 | 빈 객체 | blur 또는 제출 시 설정, 유효한 값으로 수정하면 해제 |
-| `isSubmitting` | Boolean | `false` | 참이면 입력·제출 비활성화 및 Loading 표시 |
+| 필드 | 형태 | 현재 용도 |
+|---|---|---|
+| `bookmarkId` | 문자열 | 원본 관계 식별자 |
+| `userId` | 문자열 | 고정 검증 사용자 `user-001` 비교 |
+| `summaryId` | 문자열 | 현재 요약본 비교 |
+| `createdAt` | ISO 날짜·시간 문자열 | 현재 상세 화면에서는 사용하지 않음 |
 
-### 상태 전이
+## 정규화 화면 모델
 
-```text
-초기/수정값 표시
-  ├─ 입력 변경 → 편집 중
-  ├─ blur → 정규화·필드 검증 → 오류 있음 또는 유효
-  └─ 제출 → 전체 정규화·검증
-                  ├─ 오류 있음 → 요청 없음, 오류 표시
-                  └─ 유효 → isSubmitting=true → 저장 요청
-                                   ├─ 성공 → 상세 페이지 이동
-                                   └─ 실패 → isSubmitting=false, 입력 유지, 오류 모달
-```
-
-## Quiz
+### SummaryView
 
 | 필드 | 형태 | 필수 | 규칙 |
 |---|---|---:|---|
-| `quizId` | 문자열 | 예 | 저장된 퀴즈 식별자 |
-| `noteId` | 문자열 | 예 | 대상 StudyNote 식별자와 일치 |
-| `question` | 문자열 | 예 | 모달의 문제 문구 |
-| `options` | QuizOption 배열 | 예 | 최소 2개의 선택지 |
-| `correctOptionId` | 문자열 | 예 | options 중 하나와 일치 |
+| `summaryId` | 문자열 | 예 | 원본과 동일하며 URL 식별자와 일치 |
+| `authorId` | 문자열 | 예 | 원본 작성자 식별자 |
+| `topic` | 문자열 | 예 | 공통 레이아웃과 `NoteItem`에 표시 |
+| `title` | 문자열 | 예 | 원본 제목 |
+| `aiSummary` | `{ title, sections[] }` | 예 | 원본 값을 복사해 표시 |
+| `isPrivate` | Boolean | 예 | 잠금 인증을 수행하지 않는 읽기 데이터 |
 
-## QuizOption
+조회 결과가 없으면 `null`이며 호출 경로에서 `notFound()`로 처리한다.
+
+### StudyNoteView
 
 | 필드 | 형태 | 필수 | 규칙 |
 |---|---|---:|---|
-| `optionId` | 문자열 | 예 | Quiz 안에서 고유 |
-| `label` | 문자열 | 예 | 사용자가 선택할 답안 문구 |
+| `noteId` | 문자열 | 예 | 원본 학습노트 식별자 |
+| `summaryId` | 문자열 | 예 | 요청의 상위 `summaryId`와 일치해야 함 |
+| `authorId` | 문자열 | 예 | 원본 작성자 식별자 |
+| `authorNickname` | 문자열 | 예 | 사용자 결합 결과, 누락 시 `알 수 없는 사용자` |
+| `title` | 문자열 | 예 | 목록·상세·수정 초기값 |
+| `learnedSummary` | 문자열 | 예 | 원본 `content` 값 |
+| `reflection` | 문자열 | 예 | mock에 필드가 없어 `""` |
+| `references` | 문자열 | 예 | mock에 필드가 없어 `""` |
+| `createdAt` | ISO 날짜·시간 문자열 | 예 | 최신순 정렬 기준 |
+| `createdAtDisplay` | `YYYY.MM.DD` 문자열 | 예 | ISO 원본의 날짜 부분을 변환해 기존 `NoteItem`에 전달 |
+| `quizStatus` | `notStarted` 또는 `completed` | 예 | `isQuizCompleted`에서 변환 |
 
-## QuizModalState
+### BookmarkDisplayState
 
-| 필드 | 형태 | 초기값 | 규칙 |
-|---|---|---|---|
-| `isOpen` | Boolean | `false` | 퀴즈 모달 표시 여부 |
-| `selectedOptionId` | 문자열 또는 null | null | 제출 전 사용자가 선택한 한 답안 |
-| `result` | `idle`, `correct`, `incorrect`, `unavailable` | `idle` | 제출·조회 결과 표시 |
-| `isSubmitting` | Boolean | `false` | 참이면 중복 제출 차단 |
-
-### 상태 전이
-
-```text
-닫힘 → 퀴즈 조회
-          ├─ 데이터 있음 → 열림/idle → 답안 선택 → 제출 → correct 또는 incorrect
-          └─ 없음·조회 실패 → 열림/unavailable
-열림 → 닫기 → 상태 초기화/닫힘
-```
-
-## UserAccess
-
-| 필드 | 형태 | 필수 | 의미 |
+| 필드 | 형태 | 필수 | 규칙 |
 |---|---|---:|---|
-| `isLoggedIn` | Boolean | 예 | 작성, 북마크, 퀴즈 접근 분기 |
-| `userId` | 문자열 또는 null | 예 | 로그인 사용자의 소유권 비교 |
+| `userId` | 문자열 | 예 | 현재 증분에서는 `user-001` 고정 |
+| `summaryId` | 문자열 | 예 | 현재 경로의 요약본 |
+| `isBookmarked` | Boolean | 예 | 두 식별자가 모두 일치하는 관계의 존재 여부 |
 
-### 파생 권한
+이 상태는 표시 전용이다. 토글·추가·삭제 상태 전이는 없다.
 
-| 권한 | 조건 |
-|---|---|
-| `canCreateNote` | `isLoggedIn` |
-| `canEditNote` | `isLoggedIn && userId === note.authorId` |
-| `canDeleteNote` | `isLoggedIn && userId === note.authorId` |
-| `canDeleteSummary` | `isLoggedIn && userId === summary.authorId` |
-| `canToggleBookmark` | `isLoggedIn` |
-| `canOpenQuiz` | `isLoggedIn`이며 저장 퀴즈가 조회 가능 |
+### EditNoteInitialValues
 
-## SummaryAccessState
+| 필드 | 형태 | 초기값 규칙 |
+|---|---|---|
+| `title` | 문자열 | `StudyNoteView.title` |
+| `learnedSummary` | 문자열 | `StudyNoteView.learnedSummary` |
+| `reflection` | 문자열 | `StudyNoteView.reflection`, 현재 `""` |
+| `references` | 문자열 | `StudyNoteView.references`, 현재 `""` |
 
-| 필드 | 형태 | 필수 | 의미 |
-|---|---|---:|---|
-| `summaryId` | 문자열 | 예 | 인증 대상 Summary |
-| `isVerified` | Boolean | 예 | 현재 브라우저 세션에서 인증 완료 여부 |
-| `isSubmitting` | Boolean | UI 상태 | 비밀번호 검증 요청 중 여부 |
-| `errorMessage` | 문자열 | UI 상태 | 불일치 시 `비밀번호가 일치하지 않습니다.` |
+수정 화면은 이 값을 표시하지만 입력 변경이나 저장 결과를 영속화하지 않는다.
 
-### 상태 전이
+## 관계와 조회 흐름
 
 ```text
-공개 Summary → 콘텐츠 표시
-잠김 + isVerified=true → 콘텐츠 표시
-잠김 + isVerified=false → NotePwModal 표시
-  ├─ 올바른 비밀번호 → 외부 세션 인증 완료 → 콘텐츠 표시
-  ├─ 불일치 → 입력 초기화·모달 유지·재입력
-  ├─ 시스템 오류 → 비밀번호 모달 닫기·CommonModal error
-  └─ 닫기 → 이전 페이지 이동
+summaryId
+  ├─ MockSummary 단건 조회
+  │    ├─ 없음 → notFound()
+  │    └─ 있음 → SummaryView
+  ├─ MockStudyNote 필터 → 파생 배열 최신순 정렬
+  │    └─ MockUser 결합 → StudyNoteView[]
+  └─ user-001 + MockBookmark 관계 조회 → BookmarkDisplayState
+
+summaryId + noteId
+  └─ 두 식별자가 모두 일치하는 MockStudyNote 조회
+       ├─ 없음 → notFound()
+       └─ 있음 → StudyNoteView → 상세 또는 EditNoteInitialValues
 ```
 
-## RequestState
+## 불변 조건
 
-생성·수정·삭제·북마크 연산은 공통으로 다음 상태를 사용한다.
+- 모든 함수는 원본 JSON 객체와 배열을 변경하지 않는다.
+- 목록 정렬은 필터로 생성한 파생 배열에만 수행한다.
+- 학습노트 단건은 `noteId`만 맞아도 반환하지 않고 `summaryId` 관계까지 확인한다.
+- 존재하지 않는 사용자는 학습노트 조회 실패 원인이 아니며 작성자명을 `알 수 없는 사용자`로 표시한다.
+- 북마크는 고정 사용자 기준의 현재 값만 반환하고 화면에서 변경하지 않는다.
+- mock에 없는 회고·참고자료·퀴즈 본문·잠금 비밀번호·권한 정보는 추정해 채우지 않는다.
 
-```text
-idle → pending → success
-              └→ error → idle 또는 재시도
-```
+## 이후 실제 서비스에서 별도 설계할 모델
 
-- `pending` 중 동일 연산 재진입을 차단한다.
-- 생성·수정·삭제는 `pending` 중 전체 화면 Loading을 표시한다.
-- 실패 시 원본 입력 또는 확정된 페이지 상태를 유지한다.
-- 북마크는 성공 응답의 확정값으로 `isBookmarked`를 변경하고 실패 시 기존 값을 보존한다.
+다음 모델은 최종 목표인 실제 DB 연결 단계에 필요하지만 현재 mock read-only 증분에는 포함하지 않는다.
 
+- 생성·수정 입력 검증과 요청 상태
+- 삭제 및 북마크 변경 명령
+- 실제 로그인 사용자와 소유권 판정
+- 잠금 비밀번호와 세션 인증 상태
+- 퀴즈 문제·선택지·정답·제출 결과
+- Supabase 테이블, 정책, 쿼리와 오류 형식

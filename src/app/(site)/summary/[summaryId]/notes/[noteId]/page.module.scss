@@ -5,26 +5,7 @@
   padding-top: 24px;
 }
 
-.quiz-action {
-  display: flex;
-  justify-content: flex-end;
-  padding-bottom: 24px;
 
-  button {
-    @include typography.text-20-semibold;
-
-    width: 150px;
-    height: 50px;
-    color: color.$white;
-    background: color.$fda-orange;
-    border: 0;
-    border-radius: 100px;
-
-    &:disabled {
-      cursor: not-allowed;
-    }
-  }
-}
 
 .note-heading {
   display: flex;

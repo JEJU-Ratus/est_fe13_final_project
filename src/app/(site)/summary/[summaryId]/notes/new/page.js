@@ -1,3 +1,5 @@
+import { getMockSummary } from "@/mocks/summary-detail";
+import { notFound } from "next/navigation";
 import styles from "./page.module.scss";
 
 const noteFields = [
@@ -23,6 +25,10 @@ const noteFields = [
 
 export default async function NewNotePage({ params }) {
   const { summaryId } = await params;
+
+  if (!getMockSummary(summaryId)) {
+    notFound();
+  }
 
   return (
     <section className={styles["note-form-section"]} data-summary-id={summaryId}>

@@ -104,6 +104,14 @@ export default function LoginPage() {
           setAuthError("이메일 또는 비밀번호를 확인해 주세요.");
           return;
         }
+        if (
+          error.name === "AuthRetryableFetchError" ||
+          error.status === 0 ||
+          typeof error.status !== "number"
+        ) {
+          setModalStatus("network");
+          return;
+        }
         if (error.status === 429 || error.status >= 500) {
           setModalStatus(error.status);
           return;
@@ -260,7 +268,12 @@ export default function LoginPage() {
       </section>
 
       {isLoading && <Loading />}
-      <CommonModal isOpen={modalStatus !== null} mode="error" status={modalStatus} />
+      <CommonModal
+        isOpen={modalStatus !== null}
+        mode="error"
+        status={modalStatus}
+        onClose={() => setModalStatus(null)}
+      />
     </main>
   );
 }
