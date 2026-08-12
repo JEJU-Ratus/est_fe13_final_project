@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import CommonModal from "@/components/CommonModal";
-import { createClient } from "@/lib/supabase/client";
 import styles from "./page.module.scss";
+import { useAuth } from "@/components/AuthProvider";
 
 const SIGNUP_COMPLETED_KEY = "signupCompletedAt";
 const SIGNUP_COMPLETE_ACCESS_TIME = 5 * 60 * 1000;
@@ -14,49 +14,36 @@ const SIGNUP_COMPLETE_ACCESS_TIME = 5 * 60 * 1000;
 export default function SignupCompletePage() {
   const router = useRouter();
   const [modalMode, setModalMode] = useState(null);
-  const [isAccessChecked, setIsAccessChecked] = useState(false);
-
+  const [isAccessChecked, setIsAccessChecked] = useState(false); // 정상 접근 체크
+  const { isAuthenticated, isAuthLoading } = useAuth();
   useEffect(() => {
-    let isMounted = true;
-    // 로그인 상태 확인
-    async function checkLoginStatus() {
-      const supabase = createClient();
-      const { data } = await supabase.auth.getClaims();
-      const claims = data?.claims;
+    if (isAccessChecked) {
+      return;
+    }
 
-      if (!isMounted) {
-        return;
-      }
+    // 가입 세션이 살아있음
+    const completedAt = Number(sessionStorage.getItem(SIGNUP_COMPLETED_KEY));
+    const hasValidSignupCompletion =
+      Number.isFinite(completedAt) &&
+      completedAt > 0 &&
+      Date.now() - completedAt <= SIGNUP_COMPLETE_ACCESS_TIME;
 
-      // 가입 세션이 살아있음
-      const completedAt = Number(sessionStorage.getItem(SIGNUP_COMPLETED_KEY));
-      const hasValidSignupCompletion =
-        Number.isFinite(completedAt) &&
-        completedAt > 0 &&
-        Date.now() - completedAt <= SIGNUP_COMPLETE_ACCESS_TIME;
-      // 정상적인 회원가입 직후 접근 세션 확인
-      if (hasValidSignupCompletion) {
-        setIsAccessChecked(true);
-        return;
-      }
-      if (claims) {
-        setModalMode("alreadyLoggedIn");
-        setIsAccessChecked(true);
-        return;
-      }
-      // 가입 세션 만료
-      sessionStorage.removeItem(SIGNUP_COMPLETED_KEY);
-      setModalMode("error");
+    // 정상적인 회원가입 직후 접근 세션 확인
+    if (hasValidSignupCompletion) {
       setIsAccessChecked(true);
       return;
     }
 
-    checkLoginStatus();
+    if (isAuthLoading) {
+      return;
+    }
 
-    return () => {
-      isMounted = false;
-    };
-  }, [router]);
+    // 가입 세션 만료
+    sessionStorage.removeItem(SIGNUP_COMPLETED_KEY);
+    setModalMode(isAccessChecked ? "alreadyLoggedIn" : "error");
+    setIsAccessChecked(true);
+    return;
+  }, [isAccessChecked, isAuthenticated, isAuthLoading]);
 
   if (!isAccessChecked) {
     return null;
