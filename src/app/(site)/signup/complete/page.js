@@ -3,12 +3,18 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import CommonModal from "@/components/CommonModal";
 import { createClient } from "@/lib/supabase/client";
 import styles from "./page.module.scss";
 
+const SIGNUP_COMPLETED_KEY = "signupCompletedAt";
+const SIGNUP_COMPLETE_ACCESS_TIME = 5 * 60 * 1000;
+
 export default function SignupCompletePage() {
-  const [isAlreadyLoggedIn, setIsAlreadyLoggedIn] = useState(false);
+  const router = useRouter();
+  const [modalMode, setModalMode] = useState(null);
+  const [isAccessChecked, setIsAccessChecked] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -19,9 +25,30 @@ export default function SignupCompletePage() {
         data: { claims },
       } = await supabase.auth.getClaims();
 
-      if (isMounted && claims) {
-        setIsAlreadyLoggedIn(true);
+      if (!isMounted) {
+        return;
       }
+
+      if (claims) {
+        setModalMode("alreadyLoggedIn");
+        setIsAccessChecked(true);
+        return;
+      }
+      // 세션이 살아있음
+      const completedAt = Number(sessionStorage.getItem(SIGNUP_COMPLETED_KEY));
+      const hasValidSignupCompletion =
+        Number.isFinite(completedAt) &&
+        completedAt > 0 &&
+        Date.now() - completedAt <= SIGNUP_COMPLETE_ACCESS_TIME;
+      // 세션이 죽음
+      if (!hasValidSignupCompletion) {
+        sessionStorage.removeItem(SIGNUP_COMPLETED_KEY);
+        setModalMode("error");
+        setIsAccessChecked(true);
+        return;
+      }
+
+      setIsAccessChecked(true);
     }
 
     checkLoginStatus();
@@ -29,7 +56,17 @@ export default function SignupCompletePage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [router]);
+
+  if (!isAccessChecked) {
+    return null;
+  }
+
+  function handleModalClose() {
+    if (modalMode === "error") {
+      router.replace("/");
+    }
+  }
 
   return (
     <main className={styles["complete-page"]}>
@@ -56,7 +93,12 @@ export default function SignupCompletePage() {
           로그인 하러 가기
         </Link>
       </div>
-      <CommonModal isOpen={isAlreadyLoggedIn} mode="alreadyLoggedIn" />
+      <CommonModal
+        isOpen={modalMode !== null}
+        mode={modalMode}
+        status={modalMode === "error" ? 403 : undefined}
+        onClose={handleModalClose}
+      />
     </main>
   );
 }

@@ -12,6 +12,7 @@ import styles from "./page.module.scss";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d\s])\S{8,16}$/;
+const SIGNUP_COMPLETED_KEY = "signupCompletedAt";
 
 // 빈 값과 이메일 형식 오류의 우선순위를 한곳에서 관리합니다.
 function validateEmail(email) {
@@ -317,6 +318,7 @@ export default function SignupPage() {
         return;
       }
 
+      sessionStorage.setItem(SIGNUP_COMPLETED_KEY, Date.now().toString());
       router.replace("/signup/complete");
     } catch {
       setModalStatus("network");
