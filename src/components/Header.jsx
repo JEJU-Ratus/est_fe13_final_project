@@ -1,11 +1,12 @@
 "use client";
-
+import { useAuth } from "./AuthProvider";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import CommonModal from "./CommonModal";
 import styles from "./Header.module.scss";
+import Loading from "./Loading";
 
 const menuItems = [
   {
@@ -34,16 +35,19 @@ const menuItems = [
 //헤더가 접힌 페이지
 const COLLAPSED_PATHS = ["/login", "/signup", "/signup/complete"];
 
-
-export default function Header({ isLoggedIn = false }) {
-   // 최초 헤더 렌더링 시 현재 경로를 기준으로 접힘/펼침 상태 결정
-   // useState의 초기값, 페이지 이동 시 사용자가 선택된 상태 유지
+export default function Header() {
+  const { user, isAuthenticated, isAuthLoading, supabase } = useAuth();
+  // 최초 헤더 렌더링 시 현재 경로를 기준으로 접힘/펼침 상태 결정
+  // useState의 초기값, 페이지 이동 시 사용자가 선택된 상태 유지
   const pathname = usePathname();
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(() =>
-    COLLAPSED_PATHS.includes(pathname)
+    COLLAPSED_PATHS.includes(pathname),
   );
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const mobileMediaQuery = window.matchMedia("(max-width: 480px)");
@@ -69,7 +73,7 @@ export default function Header({ isLoggedIn = false }) {
   }
 
   function handleMypageClick() {
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       setIsLoginModalOpen(true);
     }
   }
@@ -78,8 +82,31 @@ export default function Header({ isLoggedIn = false }) {
     setIsPreparingModalOpen(true);
   }
 
-  const headerClassName = [styles.header, isHeaderCollapsed && styles["is-collapsed"]].filter(Boolean).join(" ");
+  const headerClassName = [styles.header, isHeaderCollapsed && styles["is-collapsed"]]
+    .filter(Boolean)
+    .join(" ");
 
+  //로그아웃
+  async function handleLogout() {
+    if (isLoggingOut) {
+      return;
+    }
+    setIsLoggingOut(true);
+
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("로그아웃에 실패했습니다.", error);
+        return;
+      }
+      router.replace("/");
+      router.refresh();
+    } catch (error) {
+      console.error;
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
   return (
     <aside className={headerClassName} aria-label="사이드 헤더">
       <div className={styles["header-top"]}>
@@ -120,14 +147,16 @@ export default function Header({ isLoggedIn = false }) {
             aria-expanded={!isHeaderCollapsed}
             onClick={handleCollapse}
           >
-            <span className={`material-symbols-outlined left_panel_close ${styles.icon}`}>left_panel_close</span>
+            <span className={`material-symbols-outlined left_panel_close ${styles.icon}`}>
+              left_panel_close
+            </span>
           </button>
         )}
       </div>
 
       {!isHeaderCollapsed && (
         <div className={styles["user-section"]}>
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <div className={styles["logged-in-user"]}>
               <div className={styles["profile-slot"]}>
                 <Image src="/images/main_profile.webp" alt="프로필 이미지" width={48} height={48} />
@@ -138,9 +167,14 @@ export default function Header({ isLoggedIn = false }) {
                   <Link href="#" className={styles["profile-button"]} type="button">
                     프로필 수정
                   </Link>
-                  <Link href="#" className={styles["logout-button"]} type="button">
+                  <button
+                    className={styles["logout-button"]}
+                    type="button"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                  >
                     로그아웃
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
@@ -158,10 +192,13 @@ export default function Header({ isLoggedIn = false }) {
       )}
 
       <nav className={styles["menu-list"]} aria-label="주요 메뉴">
-        {menuItems.map((menu) => {
+        {menuItems.map(menu => {
           const menuContent = (
             <>
-              <span className={`material-symbols-outlined ${styles["menu-icon-slot"]}`} aria-hidden="true">
+              <span
+                className={`material-symbols-outlined ${styles["menu-icon-slot"]}`}
+                aria-hidden="true"
+              >
                 {menu.icon}
               </span>
 
@@ -169,7 +206,7 @@ export default function Header({ isLoggedIn = false }) {
             </>
           );
 
-          if (menu.href && (!menu.requiresLogin || isLoggedIn)) {
+          if (menu.href && (!menu.requiresLogin || isAuthenticated)) {
             return (
               <Link className={styles["menu-item"]} href={menu.href} key={menu.label}>
                 {menuContent}
@@ -182,7 +219,13 @@ export default function Header({ isLoggedIn = false }) {
               className={styles["menu-item"]}
               type="button"
               key={menu.label}
-              onClick={menu.requiresLogin ? handleMypageClick : menu.modalMode ? handleQuizClick : undefined}
+              onClick={
+                menu.requiresLogin
+                  ? handleMypageClick
+                  : menu.modalMode
+                    ? handleQuizClick
+                    : undefined
+              }
             >
               {menuContent}
             </button>
@@ -194,10 +237,10 @@ export default function Header({ isLoggedIn = false }) {
         <div className={styles["collapsed-user-slot"]}>
           <Image
             className={`${styles["collapsed-profile-image"]} ${
-              !isLoggedIn ? styles["is-guest"] : ""
+              !isAuthenticated ? styles["is-guest"] : ""
             }`}
             src="/images/main_profile.webp"
-            alt={isLoggedIn ? "프로필 이미지" : "비로그인 사용자 프로필 이미지"}
+            alt={isAuthenticated ? "프로필 이미지" : "비로그인 사용자 프로필 이미지"}
             width={30}
             height={30}
           />
@@ -221,6 +264,7 @@ export default function Header({ isLoggedIn = false }) {
         mode="preparing"
         onClose={() => setIsPreparingModalOpen(false)}
       />
+      {isLoggingOut && <Loading />}
     </aside>
   );
 }
