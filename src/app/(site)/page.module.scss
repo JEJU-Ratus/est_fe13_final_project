@@ -145,6 +145,8 @@
           display: flex;
           align-items: center;
           gap: 8px;
+          width: 172px;
+          min-height: 48px;
           flex-shrink: 0;
           color: color.$gray-medium;
           font-size: var.$font-size-18;
@@ -187,18 +189,39 @@
             font-size: 24px;
           }
 
+          .password-field {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+          }
+
           .password-input {
             width: 140px;
-            padding: 4px 0;
             border: 0;
             border-bottom: 1px solid color.$gray-medium;
-            color: color.$black;
+            color: color.$gray-medium;
             background-color: transparent;
             font: inherit;
+
+            &::placeholder {
+              color: color.$gray-medium;
+              opacity: 1;
+            }
 
             &:focus {
               border-bottom-color: color.$fda-orange;
               outline: 0;
+            }
+          }
+
+          .password-error {
+            color: color.$fda-orange;
+            font-size: 12px;
+            font-weight: var.$font-weight-medium;
+            line-height: 1.2;
+
+            &.is-hidden {
+              visibility: hidden;
             }
           }
         }
@@ -213,8 +236,13 @@
   gap: 56px;
   align-items: center;
 
+  .wide-parent {
+    width: 100%;
+    max-width: 1100px;
+  }
+
   :global(.banner) {
-    width: min(100%, 1096px);
+    width: 100%;
     overflow: hidden;
     border-radius: 15px;
   }
@@ -319,9 +347,8 @@
 
     .quick-menu {
       display: grid;
-      grid-template-columns: repeat(3, minmax(212px, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 24px;
-      overflow-x: auto;
 
       .quick-menu-card {
         width: 100%;
@@ -329,7 +356,6 @@
         min-width: 0;
         padding: 16px;
         font-size: var.$font-size-20;
-        white-space: nowrap;
       }
     }
   }
