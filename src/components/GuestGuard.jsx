@@ -9,16 +9,16 @@ export default function GuestGuard({ children }) {
   const { isAuthenticated, isAuthLoading } = useAuth();
 
   // 페이지 최초 진입 시의 인증 상태만 판정하고 이후 로그인 변화에는 유지합니다
-  const [accessStatus, setAccessStatus] = useState("checked");
+  const [accessStatus, setAccessStatus] = useState("checking");
 
   useEffect(() => {
-    if (isAuthLoading || accessStatus !== "checked") {
+    if (isAuthLoading || accessStatus !== "checking") {
       return;
     }
     setAccessStatus(isAuthenticated ? "blocked" : "allowed");
   }, [accessStatus, isAuthenticated, isAuthLoading]);
 
-  if (isAuthenticated || accessStatus === "checked") {
+  if (isAuthLoading || accessStatus === "checking") {
     return <Loading />;
   }
 
@@ -26,7 +26,7 @@ export default function GuestGuard({ children }) {
     <>
       {children}
 
-      <CommonModal isOpen={isAuthenticated} mode="alreadyLoggedIn" />
+      <CommonModal isOpen={accessStatus === "blocked"} mode="alreadyLoggedIn" />
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const AuthContext = createContext(null);
@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   // 최초 세션 확인 전의 null 사용자를 비로그인으로 오판하지 않도록 별도로 구분합니다.
   const [isAuthLoading, setIsAuthLoading] = useState(true); // 인증 정보를 불러오는 중인지 확인
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -43,14 +44,40 @@ export function AuthProvider({ children }) {
     };
   }, [supabase]);
 
+  const signOut = useCallback(async () => {
+    if (isLoggingOut) {
+      return { error: null };
+    }
+
+    setIsLoggingOut(true);
+
+    try {
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        setIsLoggingOut(false);
+        return { error };
+      }
+
+      // 로그아웃된 상태로 앱을 다시 시작하여 보호 페이지의 모달이 잠깐 나타나는 것을 방지합니다.
+      window.location.replace("/");
+
+      return { error: null };
+    } catch (error) {
+      setIsLoggingOut(false);
+      return { error };
+    }
+  }, [isLoggingOut, supabase]);
   const authValue = useMemo(
     () => ({
       supabase,
       user,
       isAuthenticated: Boolean(user),
       isAuthLoading,
+      isLoggingOut,
+      signOut,
     }),
-    [isAuthLoading, supabase, user],
+    [isAuthLoading, isLoggingOut, signOut, supabase, user],
   );
 
   return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;

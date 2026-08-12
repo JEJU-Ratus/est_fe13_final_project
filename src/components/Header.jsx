@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "./AuthProvider";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import CommonModal from "./CommonModal";
@@ -36,7 +36,7 @@ const menuItems = [
 const COLLAPSED_PATHS = ["/login", "/signup", "/signup/complete"];
 
 export default function Header() {
-  const { user, isAuthenticated, isAuthLoading, supabase } = useAuth();
+  const { isAuthenticated, isLoggingOut, signOut } = useAuth();
   // 최초 헤더 렌더링 시 현재 경로를 기준으로 접힘/펼침 상태 결정
   // useState의 초기값, 페이지 이동 시 사용자가 선택된 상태 유지
   const pathname = usePathname();
@@ -45,9 +45,6 @@ export default function Header() {
   );
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  const router = useRouter();
 
   useEffect(() => {
     const mobileMediaQuery = window.matchMedia("(max-width: 480px)");
@@ -88,23 +85,10 @@ export default function Header() {
 
   //로그아웃
   async function handleLogout() {
-    if (isLoggingOut) {
-      return;
-    }
-    setIsLoggingOut(true);
+    const { error } = await signOut();
 
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("로그아웃에 실패했습니다.", error);
-        return;
-      }
-      router.replace("/");
-      router.refresh();
-    } catch (error) {
-      console.error;
-    } finally {
-      setIsLoggingOut(false);
+    if (error) {
+      console.error("로그아웃에 실패했습니다.", error);
     }
   }
   return (
