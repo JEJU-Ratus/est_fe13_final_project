@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 // 컴포넌트
@@ -46,6 +46,7 @@ export default function SignupPage() {
   const [signupError, setSignupError] = useState(""); // 사용자가 수정할 수 있는 회원가입 오류 문구
   const [emailAuthError, setEmailAuthError] = useState(""); // 가입 요청에서 확인된 이메일 전용 오류
   const [modalStatus, setModalStatus] = useState(null); // 서버·네트워크 오류 모달에 전달할 상태
+  const [isAlreadyLoggedIn, setIsAlreadyLoggedIn] = useState(false); // 로그인 사용자의 회원가입 페이지 접근 안내
   const [nickname, setNickname] = useState(""); // 닉네임 입력값
   const [email, setEmail] = useState(""); // 이메일 입력값
   const [password, setPassword] = useState(""); // 비밀번호 입력값
@@ -60,6 +61,27 @@ export default function SignupPage() {
   const [isPasswordConfirmVisible, setIsPasswordConfirmVisible] = useState(false); // 비밀번호 확인 공개 여부
   const [nicknameAvailability, setNicknameAvailability] = useState(null); // 닉네임 중복 확인 상태
   const nicknameCheckIdRef = useRef(0); // 늦게 도착한 이전 중복 확인 결과가 최신 입력을 덮지 않게 구분합니다.
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function checkLoginStatus() {
+      const supabase = createClient();
+      const {
+        data: { claims },
+      } = await supabase.auth.getClaims();
+
+      if (isMounted && claims) {
+        setIsAlreadyLoggedIn(true);
+      }
+    }
+
+    checkLoginStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const isAllTermsAccepted = isServiceTermsAccepted && isAiTermsAccepted;
   const nicknameError = nickname.trim() ? "" : "닉네임을 입력해 주세요.";
@@ -102,6 +124,7 @@ export default function SignupPage() {
     nicknameAvailability !== "available" ||
     Boolean(emailAuthError) ||
     isLoading;
+  const modalMode = isAlreadyLoggedIn ? "alreadyLoggedIn" : modalStatus !== null ? "error" : null;
 
   // 각 입력을 제어 상태로 유지해 검증 결과가 현재 화면 값과 항상 일치하게 합니다.
   function handleNicknameChange(event) {
@@ -266,6 +289,7 @@ export default function SignupPage() {
           data: {
             nickname: nickname.trim(),
           },
+          emailRedirectTo: `${window.location.origin}/auth/confirm`,
         },
       });
       if (error) {
@@ -557,8 +581,8 @@ export default function SignupPage() {
       {isLoading && <Loading />}
 
       <CommonModal
-        isOpen={modalStatus !== null}
-        mode="error"
+        isOpen={modalMode !== null}
+        mode={modalMode}
         status={modalStatus}
         onClose={() => setModalStatus(null)}
       />

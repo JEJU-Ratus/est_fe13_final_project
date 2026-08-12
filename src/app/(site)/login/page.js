@@ -1,6 +1,6 @@
 "use client";
 // 함수 호출
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -49,6 +49,28 @@ export default function LoginPage() {
   const [authError, setAuthError] = useState("");
   // 네트워크 또는 서버 장애만 공통 오류 모달에 전달합니다.
   const [modalStatus, setModalStatus] = useState(null);
+  const [isAlreadyLoggedIn, setIsAlreadyLoggedIn] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function checkLoginStatus() {
+      const supabase = createClient();
+      const {
+        data: { claims },
+      } = await supabase.auth.getClaims();
+
+      if (isMounted && claims) {
+        setIsAlreadyLoggedIn(true);
+      }
+    }
+
+    checkLoginStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const emailError = validateEmail(email);
   const passwordError = validatePassword(password);
@@ -59,6 +81,7 @@ export default function LoginPage() {
   const hasVisiblePasswordError = shouldShowValidation && !emailError && Boolean(passwordError);
   const isFormValid = !emailError && !passwordError; // 입력값이 유효한지
   const isLoginDisabled = !isFormValid || isLoading; // 입력값 유효하지 않거나, 로딩중이거나
+  const modalMode = isAlreadyLoggedIn ? "alreadyLoggedIn" : modalStatus !== null ? "error" : null;
 
   function handleEmailChange(e) {
     setEmail(e.target.value);
@@ -269,8 +292,8 @@ export default function LoginPage() {
 
       {isLoading && <Loading />}
       <CommonModal
-        isOpen={modalStatus !== null}
-        mode="error"
+        isOpen={modalMode !== null}
+        mode={modalMode}
         status={modalStatus}
         onClose={() => setModalStatus(null)}
       />
