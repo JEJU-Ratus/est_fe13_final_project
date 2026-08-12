@@ -9,7 +9,7 @@
 
 ## 입력 계약
 
-이 페이지는 props, URL 파라미터, 쿼리 문자열, 사용자 정보, 세션 또는 API 응답을 입력으로 받지 않는다.
+이 페이지는 props, URL 파라미터, 쿼리 문자열 또는 API 응답을 입력으로 받지 않는다. 로그인 사용자의 직접 접근 안내를 위해 Supabase 세션만 확인한다.
 
 ## 출력 계약
 
@@ -52,7 +52,8 @@
 
 - Header 직접 렌더링 또는 수정
 - 실제 회원가입 완료 여부와 로그인 상태 판정
-- Supabase, API, 세션과 저장소
-- CommonModal, Loading, Suspense와 `loading.js`
+- 회원가입 완료 여부를 판정하는 Supabase API와 별도 저장소
+- Loading, Suspense와 `loading.js`
+- 새로운 모달 구현; 로그인 사용자 접근은 기존 CommonModal의 `alreadyLoggedIn` 모드를 재사용한다.
 - 승인된 프비 상하 이동 외의 애니메이션, 타이머, 자동 이동과 새로고침
 - 새 패키지, 상태 관리 도구와 공통 컴포넌트
