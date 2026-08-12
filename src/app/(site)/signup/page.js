@@ -68,9 +68,8 @@ export default function SignupPage() {
 
     async function checkLoginStatus() {
       const supabase = createClient();
-      const {
-        data: { claims },
-      } = await supabase.auth.getClaims();
+      const { data } = await supabase.auth.getClaims();
+      const claims = data?.claims;
 
       if (isMounted && claims) {
         setIsAlreadyLoggedIn(true);
