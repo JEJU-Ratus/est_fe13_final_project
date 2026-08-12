@@ -89,6 +89,7 @@
 **목적**: 승인된 기능 범위와 코드 품질을 최종 확인한다.
 
 - [x] T013 `src/app/(site)/signup/complete/page.js`와 `src/app/(site)/signup/complete/page.module.scss`에서 실제 회원가입 완료 여부 판정, Loading, Suspense, `loading.js`, 자체 자동 이동·타이머와 승인되지 않은 추가 애니메이션이 없는지 확인한다. 로그인 사용자 접근은 기존 CommonModal의 `alreadyLoggedIn` 계약을 사용한다.
+- [x] T017 회원가입 성공 시 현재 탭에 완료 시각을 기록하고 `/signup/complete`에서 5분 유효성을 검사해 표식 없는 비로그인 접근에 상태 `403` CommonModal을 표시한 뒤 `/signup`으로 이동시킨다.
 - [x] T014 `src/app/(site)/signup/complete/page.js`, `src/app/(site)/signup/complete/page.module.scss`, `src/app/(site)/layout.js`, `src/components/Header.jsx`를 비교해 페이지가 Header를 직접 렌더링하지 않고 공통 파일을 수정하지 않았는지 확인한다.
 - [x] T015 `specs/003-signup-complete/quickstart.md`의 기능·반응형·키보드 검증 시나리오를 모두 실행하고 결과를 `specs/003-signup-complete/tasks.md` 체크박스에 반영한다.
 - [x] T016 프로젝트 루트에서 `npm run lint`를 실행하고 회원가입 완료 페이지 관련 오류가 없는지 확인한 뒤 결과를 `specs/003-signup-complete/tasks.md`에 반영한다.
