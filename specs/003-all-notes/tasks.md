@@ -10,9 +10,9 @@
 
 **목적**: 구현 범위와 기존 재사용 경계를 확정한다.
 
-- [ ] T001 `AGENTS.md`, `.specify/memory/constitution.md`, `specs/003-all-notes/spec.md`, `specs/003-all-notes/plan.md`와 `specs/003-all-notes/contracts/all-notes-contract.md`를 다시 확인한다.
-- [ ] T002 현재 내 목록 경로 `src/app/(site)/mypage/mysummaries/page.js`와 정식 추가 대상 `src/app/(site)/mypage/summaries/page.js`, 요약본 목록 대상 `src/app/(site)/summary/[summaryId]/notes/page.js`의 충돌·영향 범위를 기록한다.
-- [ ] T003 `package.json`, `specs/003-all-notes/quickstart.md`와 기존 `src/components/NoteItem.jsx`, `src/components/Banner.jsx`, `src/components/EmptyState.jsx`, `src/components/CommonModal.jsx`, `src/components/NotePwModal.jsx`, `src/components/AuthGuard.jsx`의 실행·재사용 조건을 확인한다.
+- [X] T001 `AGENTS.md`, `.specify/memory/constitution.md`, `specs/003-all-notes/spec.md`, `specs/003-all-notes/plan.md`와 `specs/003-all-notes/contracts/all-notes-contract.md`를 다시 확인한다.
+- [X] T002 현재 내 목록 경로 `src/app/(site)/mypage/mysummaries/page.js`와 정식 추가 대상 `src/app/(site)/mypage/summaries/page.js`, 요약본 목록 대상 `src/app/(site)/summary/[summaryId]/notes/page.js`의 충돌·영향 범위를 기록한다.
+- [X] T003 `package.json`, `specs/003-all-notes/quickstart.md`와 기존 `src/components/NoteItem.jsx`, `src/components/Banner.jsx`, `src/components/EmptyState.jsx`, `src/components/CommonModal.jsx`, `src/components/NotePwModal.jsx`, `src/components/AuthGuard.jsx`의 실행·재사용 조건을 확인한다.
 
 ## 2단계: 공통 선행 작업
 

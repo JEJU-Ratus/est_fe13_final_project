@@ -120,6 +120,12 @@ src/
 
 **구조 결정**: 두 URL에서 동일한 표·무한 스크롤·오류 상태를 유지해야 하므로 `AllNotes`를 `src/components`의 평면 구조에 기능 전용으로 둔다. 페이지 파일은 경로별 scope와 `summaryId`, 접근·오류 후속 이동만 연결한다. 목록 상태와 브라우저 API는 `AllNotes`에만 두어 페이지를 불필요하게 Client Component로 확장하지 않는다.
 
+## 준비 단계 점검 결과
+
+- T001: `AGENTS.md`, Constitution, 기능 명세, 구현 계획과 목록 계약을 확인했다. UI MVP는 mock 어댑터를 사용하고 실제 Supabase 연결은 T026 이후로 분리한다.
+- T002: 현재 `src/app/(site)/mypage/mysummaries/page.js`와 `/mypage/page.js`의 해당 링크는 유지되고, 정식 대상 `src/app/(site)/mypage/summaries/page.js`는 아직 없다. `src/app/(site)/summary/[summaryId]/notes/page.js`도 아직 없으며 `new`와 `[noteId]` 하위 경로만 존재한다. 따라서 기존 경로를 삭제·이동하지 않고 정식 진입점을 추가한다.
+- T003: `AuthGuard`는 인증 확인 전 `Loading`, 비로그인 시 `CommonModal mode="requireLogin"`, 인증 후 children 렌더링을 담당한다. `NoteItem`은 상세 링크와 상태·작성자·주제·작성일 props를, `Banner`는 이미지·내부/외부 목적지 props를, `EmptyState`는 message를, `CommonModal`은 오류·자동 이동·닫기 동작을, `NotePwModal`은 비밀번호 입력 UI를 담당하므로 공개 props를 변경하지 않는다. `package.json`의 실행 검증 명령은 `npm run lint`와 `npm run build`이며 별도 테스트 스크립트는 없다.
+
 ## 기술 설계
 
 ### 라우트 구성
