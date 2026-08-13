@@ -110,7 +110,12 @@ src/lib/supabase/
 ├── server.js  # Server Component, Server Action과 Route Handler용
 └── proxy.js   # 요청마다 세션 토큰을 검증하고 쿠키를 갱신
 
-proxy.js       # Next.js Proxy 진입점과 실행 경로 설정
+src/proxy.js   # Next.js Proxy 진입점과 실행 경로 설정
+
+src/components/
+├── AuthProvider.jsx # 사이트 전체의 브라우저 인증 상태 공유
+├── GuestGuard.jsx   # 비로그인 사용자 전용 페이지의 최초 접근 판정
+└── AuthGuard.jsx    # 로그인 사용자 전용 페이지 보호
 ```
 
 ### 브라우저 클라이언트
@@ -156,6 +161,122 @@ Proxy는 페이지 렌더링 전에 다음 작업을 수행한다.
 - [Next.js Proxy](https://nextjs.org/docs/app/api-reference/file-conventions/proxy)
 
 ## 4. 기능 개발에서 사용하는 방법
+
+### 공통 인증 구조
+
+`src/app/(site)/layout.js`가 `Header`와 모든 사이트 페이지를 `AuthProvider`로 감싸고 있다. 기능 페이지에서 사용자 세션을 확인하기 위해 `getUser()`나 `getClaims()`를 반복 호출하지 않는다. Client Component에서는 `useAuth()`로 이미 확인된 공통 상태를 읽는다.
+
+```js
+"use client";
+
+import { useAuth } from "@/components/AuthProvider";
+
+export default function ExampleComponent() {
+  const { user, isAuthenticated, isAuthLoading, supabase } = useAuth();
+
+  // 페이지 명세에 맞는 화면과 요청을 작성한다.
+}
+```
+
+`useAuth()`가 제공하는 값은 다음과 같다.
+
+| 값 | 형태 | 사용하는 상황 |
+| --- | --- | --- |
+| `user` | Supabase User 또는 `null` | `user.id`, 이메일과 사용자 메타데이터가 필요할 때 |
+| `isAuthenticated` | Boolean | 로그인 여부에 따라 버튼이나 동작을 구분할 때 |
+| `isAuthLoading` | Boolean | 앱 최초 세션 확인이 끝났는지 구분할 때 |
+| `supabase` | Browser Supabase Client | Client Component의 인증·데이터 요청에서 공통 클라이언트가 필요할 때 |
+| `isLoggingOut` | Boolean | 로그아웃 중 버튼을 비활성화하거나 공통 Loading을 표시할 때 |
+| `signOut` | Function | 공통 로그아웃 처리와 메인 페이지 이동이 필요할 때 |
+
+`isAuthLoading`은 로그인·저장 요청의 로딩 상태가 아니다. 로그인 요청은 로그인 페이지의 `isLoading`, 저장 요청은 해당 기능의 `isLoading`처럼 요청을 시작한 호출 측에서 별도로 관리한다.
+
+### 로그인 전용 페이지: AuthGuard
+
+마이페이지처럼 페이지 전체가 로그인 사용자 전용이면 최상위 화면을 `AuthGuard`로 감싼다.
+
+```js
+import AuthGuard from "@/components/AuthGuard";
+
+export default function ProtectedPage() {
+  return (
+    <AuthGuard>
+      <main>{/* 로그인 사용자에게만 공개할 페이지 */}</main>
+    </AuthGuard>
+  );
+}
+```
+
+`AuthGuard`는 최초 인증 확인 또는 로그아웃 중에는 `Loading`, 비로그인 상태에는 `CommonModal`의 `requireLogin` 모드를 표시한다. 로그인 상태에서만 `children`을 렌더링한다.
+
+현재 적용된 경로는 다음과 같다.
+
+- `/mypage`
+- `/mypage/mysummaries`
+- `/mypage/bookmarks`
+
+새 페이지가 로그인 전용인지 여부는 해당 페이지 명세를 확인한 뒤 결정한다. 공개 페이지를 편의상 `AuthGuard`로 감싸지 않는다.
+
+### 비로그인 전용 페이지: GuestGuard
+
+로그인과 회원가입처럼 비로그인 사용자만 이용하는 페이지는 최상위 화면을 `GuestGuard`로 감싼다.
+
+```js
+import GuestGuard from "@/components/GuestGuard";
+
+export default function GuestOnlyPage() {
+  return (
+    <GuestGuard>
+      <main>{/* 로그인 또는 회원가입 화면 */}</main>
+    </GuestGuard>
+  );
+}
+```
+
+`GuestGuard`는 페이지 최초 진입 시점의 인증 상태만 판정한다. 이미 로그인한 상태로 접근하면 `alreadyLoggedIn` 모달을 표시한다. 비로그인 상태로 정상 진입한 뒤 로그인이나 회원가입에 성공한 경우에는 인증 상태가 바뀌어도 현재 제출과 이동 절차를 방해하지 않는다.
+
+회원가입 완료 페이지는 회원가입 직후의 완료 표식을 로그인 상태보다 먼저 판정하는 별도 접근 규칙이 있으므로 일반 `GuestGuard`로 감싸지 않는다.
+
+### 공개 페이지의 로그인 전용 기능
+
+요약노트 상세처럼 페이지 조회는 공개지만 퀴즈나 북마크 동작만 로그인 전용이면 페이지 전체에 `AuthGuard`를 사용하지 않는다. 해당 버튼의 호출부에서 `isAuthenticated`를 확인한다.
+
+```js
+const { isAuthenticated } = useAuth();
+
+function handleProtectedAction() {
+  if (!isAuthenticated) {
+    setIsLoginModalOpen(true);
+    return;
+  }
+
+  // 로그인 사용자에게 허용된 동작을 실행한다.
+}
+```
+
+비로그인 사용자가 기능을 선택했을 때는 해당 명세에 따라 `CommonModal`의 `suggestLogin` 모드를 사용한다. 로그인 전용 버튼을 무조건 숨길지, 표시한 뒤 모달로 안내할지는 페이지 명세를 따른다.
+
+### 작성자·소유자 전용 기능
+
+수정과 삭제처럼 로그인 여부만으로 허용할 수 없는 기능은 현재 사용자 ID와 데이터의 작성자 ID를 비교한다.
+
+```js
+const { user } = useAuth();
+const isAuthor = user?.id === summary.userId;
+
+return isAuthor ? <button type="button">삭제</button> : null;
+```
+
+화면에서 버튼을 숨기는 것은 사용성 처리일 뿐 보안 정책이 아니다. 사용자가 직접 요청을 보내더라도 다른 사람의 데이터를 수정·삭제할 수 없도록 Supabase 테이블에 작성자 기준 RLS 정책을 설정해야 한다.
+
+### 페이지 담당자 작업 범위
+
+- 페이지 전체가 로그인 전용이면 `AuthGuard`를 적용한다.
+- 공개 페이지의 일부 기능만 제한하면 `useAuth()`와 `suggestLogin` 모달을 사용한다.
+- 본인 데이터 조회에는 임시 문자열 대신 `user.id`를 사용한다.
+- 수정·삭제에는 로그인 여부와 작성자 일치 여부를 모두 확인한다.
+- 데이터 조회·저장·수정·삭제 권한은 RLS로 다시 제한한다.
+- 공통 `AuthProvider`, Guard, Supabase 클라이언트와 Proxy는 페이지마다 복사하거나 임의로 수정하지 않는다.
 
 ### 어떤 클라이언트를 선택할지
 
@@ -313,7 +434,10 @@ RLS는 프론트엔드의 버튼 숨김을 대신하는 것이 아니라, 사용
 src/lib/supabase/client.js
 src/lib/supabase/server.js
 src/lib/supabase/proxy.js
-proxy.js
+src/proxy.js
+src/components/AuthProvider.jsx
+src/components/AuthGuard.jsx
+src/components/GuestGuard.jsx
 ```
 
 기능 코드에서는 상황에 맞는 `createClient()`를 import한 뒤 Supabase Auth, Database 또는 Storage API를 호출한다. 공통 코드 변경이 필요하면 인증 설정 담당자와 먼저 협의한다.

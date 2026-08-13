@@ -9,7 +9,10 @@
 
 ## 입력 계약
 
-이 페이지는 props, URL 파라미터, 쿼리 문자열, 사용자 정보, 세션 또는 API 응답을 입력으로 받지 않는다.
+이 페이지는 props, URL 파라미터, 쿼리 문자열 또는 API 응답을 입력으로 받지 않는다. Supabase 세션과 현재 탭 `sessionStorage`의 회원가입 완료 시각을 확인한다.
+
+- 로그인 사용자는 `alreadyLoggedIn` 모드로 안내한 뒤 메인으로 이동한다.
+- 유효한 완료 시각이 없는 비로그인 사용자는 `error` 모드와 상태 `403`으로 `접근 권한이 없습니다.`를 안내한 뒤 `/signup`으로 이동한다.
 
 ## 출력 계약
 
@@ -51,8 +54,9 @@
 ## 제외 계약
 
 - Header 직접 렌더링 또는 수정
-- 실제 회원가입 완료 여부와 로그인 상태 판정
-- Supabase, API, 세션과 저장소
-- CommonModal, Loading, Suspense와 `loading.js`
+- Supabase API를 통한 회원가입 완료 여부 재조회
+- 이메일, 비밀번호 또는 사용자 ID의 브라우저 저장
+- Loading, Suspense와 `loading.js`
+- 새로운 모달 구현; 로그인 사용자 접근은 기존 CommonModal의 `alreadyLoggedIn` 모드를 재사용한다.
 - 승인된 프비 상하 이동 외의 애니메이션, 타이머, 자동 이동과 새로고침
 - 새 패키지, 상태 관리 도구와 공통 컴포넌트

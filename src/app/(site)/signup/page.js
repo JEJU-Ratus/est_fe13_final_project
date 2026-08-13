@@ -7,11 +7,13 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import Loading from "@/components/Loading";
 import CommonModal from "@/components/CommonModal";
+import GuestGuard from "@/components/GuestGuard";
 // 스타일
 import styles from "./page.module.scss";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d\s])\S{8,16}$/;
+const SIGNUP_COMPLETED_KEY = "signupCompletedAt";
 
 // 빈 값과 이메일 형식 오류의 우선순위를 한곳에서 관리합니다.
 function validateEmail(email) {
@@ -102,6 +104,7 @@ export default function SignupPage() {
     nicknameAvailability !== "available" ||
     Boolean(emailAuthError) ||
     isLoading;
+  const modalMode = modalStatus !== null ? "error" : null;
 
   // 각 입력을 제어 상태로 유지해 검증 결과가 현재 화면 값과 항상 일치하게 합니다.
   function handleNicknameChange(event) {
@@ -266,6 +269,7 @@ export default function SignupPage() {
           data: {
             nickname: nickname.trim(),
           },
+          emailRedirectTo: `${window.location.origin}/auth/confirm`,
         },
       });
       if (error) {
@@ -293,6 +297,7 @@ export default function SignupPage() {
         return;
       }
 
+      sessionStorage.setItem(SIGNUP_COMPLETED_KEY, Date.now().toString());
       router.replace("/signup/complete");
     } catch {
       setModalStatus("network");
@@ -302,266 +307,268 @@ export default function SignupPage() {
   }
 
   return (
-    <main className={styles["signup-page"]}>
-      <section className={styles["signup-content"]}>
-        <header className={styles["title-area"]}>
-          <h1>회원가입</h1>
-        </header>
+    <GuestGuard>
+      <main className={styles["signup-page"]}>
+        <section className={styles["signup-content"]}>
+          <header className={styles["title-area"]}>
+            <h1>회원가입</h1>
+          </header>
 
-        <form className={styles["signup-form"]} onSubmit={handleSubmit} noValidate>
-          <fieldset className={styles["terms-section"]}>
-            <legend>
-              약관 동의 <span aria-hidden="true">*</span>
-            </legend>
+          <form className={styles["signup-form"]} onSubmit={handleSubmit} noValidate>
+            <fieldset className={styles["terms-section"]}>
+              <legend>
+                약관 동의 <span aria-hidden="true">*</span>
+              </legend>
 
-            <div className={styles["terms-box"]}>
-              <label className={styles["all-terms"]}>
-                <input
-                  type="checkbox"
-                  checked={isAllTermsAccepted}
-                  disabled={isLoading}
-                  onChange={handleAllTermsChange}
-                />
-                <span>
-                  <strong>전체동의</strong>
-                  <small>두 필수 약관에 모두 동의합니다.</small>
-                </span>
-              </label>
-
-              <div className={styles["terms-divider"]} aria-hidden="true" />
-
-              <label className={styles["term-option"]}>
-                <input
-                  type="checkbox"
-                  checked={isServiceTermsAccepted}
-                  disabled={isLoading}
-                  onChange={handleServiceTermsChange}
-                />
-                <span>(필수) 서비스 이용약관 동의</span>
-              </label>
-
-              <label className={styles["term-option"]}>
-                <input
-                  type="checkbox"
-                  checked={isAiTermsAccepted}
-                  disabled={isLoading}
-                  onChange={handleAiTermsChange}
-                />
-                <span>(필수) AI 생성 콘텐츠 이용 안내 동의</span>
-              </label>
-            </div>
-          </fieldset>
-
-          <div className={styles["fields-section"]}>
-            <div className={styles["field-row"]}>
-              <label htmlFor="signup-nickname">
-                닉네임 <span aria-hidden="true">*</span>
-              </label>
-              <div className={styles["field-control"]}>
-                <input
-                  id="signup-nickname"
-                  name="nickname"
-                  type="text"
-                  value={nickname}
-                  placeholder="닉네임"
-                  autoComplete="nickname"
-                  disabled={isLoading}
-                  // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
-                  aria-invalid={isNicknameFeedbackError}
-                  // 검증 결과가 있을 때 입력과 성공·오류 안내를 연결합니다.
-                  aria-describedby={nicknameFeedback ? "signup-nickname-feedback" : undefined}
-                  onChange={handleNicknameChange}
-                  onBlur={handleNicknameBlur}
-                />
-                {nicknameFeedback && (
-                  <p
-                    className={
-                      isNicknameFeedbackError
-                        ? styles["feedback-error"]
-                        : styles["feedback-success"]
-                    }
-                    id="signup-nickname-feedback"
-                    role={isNicknameFeedbackError ? "alert" : "status"}
-                  >
-                    {nicknameFeedback}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className={styles["field-row"]}>
-              <label htmlFor="signup-email">
-                이메일 <span aria-hidden="true">*</span>
-              </label>
-              <div className={styles["field-control"]}>
-                <input
-                  id="signup-email"
-                  name="email"
-                  type="email"
-                  value={email}
-                  placeholder="사용할 이메일을 입력해 주세요."
-                  autoComplete="email"
-                  disabled={isLoading}
-                  // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
-                  aria-invalid={Boolean(visibleEmailError || emailAuthError)}
-                  // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
-                  aria-describedby={emailFeedback ? "signup-email-feedback" : undefined}
-                  onChange={handleEmailChange}
-                  onBlur={handleEmailBlur}
-                />
-                {emailFeedback && (
-                  <p
-                    className={
-                      visibleEmailError || emailAuthError
-                        ? styles["feedback-error"]
-                        : styles["feedback-success"]
-                    }
-                    id="signup-email-feedback"
-                    role={visibleEmailError || emailAuthError ? "alert" : "status"}
-                  >
-                    {emailFeedback}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className={styles["field-row"]}>
-              <label htmlFor="signup-password">
-                비밀번호 <span aria-hidden="true">*</span>
-              </label>
-              <div className={styles["field-control"]}>
-                <div className={styles["password-input"]}>
+              <div className={styles["terms-box"]}>
+                <label className={styles["all-terms"]}>
                   <input
-                    id="signup-password"
-                    name="password"
-                    type={isPasswordVisible ? "text" : "password"}
-                    value={password}
-                    placeholder="비밀번호"
-                    autoComplete="new-password"
+                    type="checkbox"
+                    checked={isAllTermsAccepted}
+                    disabled={isLoading}
+                    onChange={handleAllTermsChange}
+                  />
+                  <span>
+                    <strong>전체동의</strong>
+                    <small>두 필수 약관에 모두 동의합니다.</small>
+                  </span>
+                </label>
+
+                <div className={styles["terms-divider"]} aria-hidden="true" />
+
+                <label className={styles["term-option"]}>
+                  <input
+                    type="checkbox"
+                    checked={isServiceTermsAccepted}
+                    disabled={isLoading}
+                    onChange={handleServiceTermsChange}
+                  />
+                  <span>(필수) 서비스 이용약관 동의</span>
+                </label>
+
+                <label className={styles["term-option"]}>
+                  <input
+                    type="checkbox"
+                    checked={isAiTermsAccepted}
+                    disabled={isLoading}
+                    onChange={handleAiTermsChange}
+                  />
+                  <span>(필수) AI 생성 콘텐츠 이용 안내 동의</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div className={styles["fields-section"]}>
+              <div className={styles["field-row"]}>
+                <label htmlFor="signup-nickname">
+                  닉네임 <span aria-hidden="true">*</span>
+                </label>
+                <div className={styles["field-control"]}>
+                  <input
+                    id="signup-nickname"
+                    name="nickname"
+                    type="text"
+                    value={nickname}
+                    placeholder="닉네임"
+                    autoComplete="nickname"
                     disabled={isLoading}
                     // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
-                    aria-invalid={Boolean(visiblePasswordError)}
-                    // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
-                    aria-describedby={passwordFeedback ? "signup-password-feedback" : undefined}
-                    onChange={handlePasswordChange}
-                    onBlur={handlePasswordBlur}
+                    aria-invalid={isNicknameFeedbackError}
+                    // 검증 결과가 있을 때 입력과 성공·오류 안내를 연결합니다.
+                    aria-describedby={nicknameFeedback ? "signup-nickname-feedback" : undefined}
+                    onChange={handleNicknameChange}
+                    onBlur={handleNicknameBlur}
                   />
-                  <button
-                    type="button"
-                    disabled={isLoading}
-                    // 아이콘만 있는 버튼의 기능을 보조기기가 알 수 있도록 동작을 이름으로 제공합니다.
-                    aria-label="누르고 있는 동안 비밀번호 보기"
-                    // 현재 비밀번호가 표시되는지 버튼의 눌림 상태로 전달합니다.
-                    aria-pressed={isPasswordVisible}
-                    onPointerDown={handlePasswordVisibilityStart}
-                    onPointerUp={handlePasswordVisibilityEnd}
-                    onPointerCancel={handlePasswordVisibilityEnd}
-                    onPointerLeave={handlePasswordVisibilityEnd}
-                    onKeyDown={handlePasswordVisibilityKeyDown}
-                    onKeyUp={handlePasswordVisibilityKeyUp}
-                    onBlur={handlePasswordVisibilityEnd}
-                  >
-                    <span className="material-symbols-outlined" aria-hidden="true">
-                      {isPasswordVisible ? "visibility_off" : "visibility"}
-                    </span>
-                  </button>
+                  {nicknameFeedback && (
+                    <p
+                      className={
+                        isNicknameFeedbackError
+                          ? styles["feedback-error"]
+                          : styles["feedback-success"]
+                      }
+                      id="signup-nickname-feedback"
+                      role={isNicknameFeedbackError ? "alert" : "status"}
+                    >
+                      {nicknameFeedback}
+                    </p>
+                  )}
                 </div>
-                {passwordFeedback && (
-                  <p
-                    className={
-                      visiblePasswordError ? styles["feedback-error"] : styles["feedback-success"]
-                    }
-                    id="signup-password-feedback"
-                    role={visiblePasswordError ? "alert" : "status"}
-                  >
-                    {passwordFeedback}
-                  </p>
-                )}
               </div>
-            </div>
 
-            <div className={styles["field-row"]}>
-              <label htmlFor="signup-password-confirm">
-                비밀번호 확인 <span aria-hidden="true">*</span>
-              </label>
-              <div className={styles["field-control"]}>
-                <div className={styles["password-input"]}>
+              <div className={styles["field-row"]}>
+                <label htmlFor="signup-email">
+                  이메일 <span aria-hidden="true">*</span>
+                </label>
+                <div className={styles["field-control"]}>
                   <input
-                    id="signup-password-confirm"
-                    name="passwordConfirm"
-                    type={isPasswordConfirmVisible ? "text" : "password"}
-                    value={passwordConfirm}
-                    placeholder="비밀번호 확인"
-                    autoComplete="new-password"
+                    id="signup-email"
+                    name="email"
+                    type="email"
+                    value={email}
+                    placeholder="사용할 이메일을 입력해 주세요."
+                    autoComplete="email"
                     disabled={isLoading}
                     // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
-                    aria-invalid={Boolean(visiblePasswordConfirmError)}
+                    aria-invalid={Boolean(visibleEmailError || emailAuthError)}
                     // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
-                    aria-describedby={
-                      passwordConfirmFeedback ? "signup-password-confirm-feedback" : undefined
-                    }
-                    onChange={handlePasswordConfirmChange}
-                    onBlur={handlePasswordConfirmBlur}
+                    aria-describedby={emailFeedback ? "signup-email-feedback" : undefined}
+                    onChange={handleEmailChange}
+                    onBlur={handleEmailBlur}
                   />
-                  <button
-                    type="button"
-                    disabled={isLoading}
-                    // 아이콘만 있는 버튼의 기능을 보조기기가 알 수 있도록 동작을 이름으로 제공합니다.
-                    aria-label="누르고 있는 동안 비밀번호 확인 보기"
-                    // 확인 입력의 공개 여부를 첫 번째 비밀번호와 독립된 눌림 상태로 전달합니다.
-                    aria-pressed={isPasswordConfirmVisible}
-                    onPointerDown={handlePasswordConfirmVisibilityStart}
-                    onPointerUp={handlePasswordConfirmVisibilityEnd}
-                    onPointerCancel={handlePasswordConfirmVisibilityEnd}
-                    onPointerLeave={handlePasswordConfirmVisibilityEnd}
-                    onKeyDown={handlePasswordConfirmVisibilityKeyDown}
-                    onKeyUp={handlePasswordConfirmVisibilityKeyUp}
-                    onBlur={handlePasswordConfirmVisibilityEnd}
-                  >
-                    <span className="material-symbols-outlined" aria-hidden="true">
-                      {isPasswordConfirmVisible ? "visibility_off" : "visibility"}
-                    </span>
-                  </button>
+                  {emailFeedback && (
+                    <p
+                      className={
+                        visibleEmailError || emailAuthError
+                          ? styles["feedback-error"]
+                          : styles["feedback-success"]
+                      }
+                      id="signup-email-feedback"
+                      role={visibleEmailError || emailAuthError ? "alert" : "status"}
+                    >
+                      {emailFeedback}
+                    </p>
+                  )}
                 </div>
-                {passwordConfirmFeedback && (
-                  <p
-                    className={
-                      visiblePasswordConfirmError
-                        ? styles["feedback-error"]
-                        : styles["feedback-success"]
-                    }
-                    id="signup-password-confirm-feedback"
-                    role={visiblePasswordConfirmError ? "alert" : "status"}
-                  >
-                    {passwordConfirmFeedback}
-                  </p>
-                )}
+              </div>
+
+              <div className={styles["field-row"]}>
+                <label htmlFor="signup-password">
+                  비밀번호 <span aria-hidden="true">*</span>
+                </label>
+                <div className={styles["field-control"]}>
+                  <div className={styles["password-input"]}>
+                    <input
+                      id="signup-password"
+                      name="password"
+                      type={isPasswordVisible ? "text" : "password"}
+                      value={password}
+                      placeholder="비밀번호"
+                      autoComplete="new-password"
+                      disabled={isLoading}
+                      // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
+                      aria-invalid={Boolean(visiblePasswordError)}
+                      // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
+                      aria-describedby={passwordFeedback ? "signup-password-feedback" : undefined}
+                      onChange={handlePasswordChange}
+                      onBlur={handlePasswordBlur}
+                    />
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      // 아이콘만 있는 버튼의 기능을 보조기기가 알 수 있도록 동작을 이름으로 제공합니다.
+                      aria-label="누르고 있는 동안 비밀번호 보기"
+                      // 현재 비밀번호가 표시되는지 버튼의 눌림 상태로 전달합니다.
+                      aria-pressed={isPasswordVisible}
+                      onPointerDown={handlePasswordVisibilityStart}
+                      onPointerUp={handlePasswordVisibilityEnd}
+                      onPointerCancel={handlePasswordVisibilityEnd}
+                      onPointerLeave={handlePasswordVisibilityEnd}
+                      onKeyDown={handlePasswordVisibilityKeyDown}
+                      onKeyUp={handlePasswordVisibilityKeyUp}
+                      onBlur={handlePasswordVisibilityEnd}
+                    >
+                      <span className="material-symbols-outlined" aria-hidden="true">
+                        {isPasswordVisible ? "visibility_off" : "visibility"}
+                      </span>
+                    </button>
+                  </div>
+                  {passwordFeedback && (
+                    <p
+                      className={
+                        visiblePasswordError ? styles["feedback-error"] : styles["feedback-success"]
+                      }
+                      id="signup-password-feedback"
+                      role={visiblePasswordError ? "alert" : "status"}
+                    >
+                      {passwordFeedback}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles["field-row"]}>
+                <label htmlFor="signup-password-confirm">
+                  비밀번호 확인 <span aria-hidden="true">*</span>
+                </label>
+                <div className={styles["field-control"]}>
+                  <div className={styles["password-input"]}>
+                    <input
+                      id="signup-password-confirm"
+                      name="passwordConfirm"
+                      type={isPasswordConfirmVisible ? "text" : "password"}
+                      value={passwordConfirm}
+                      placeholder="비밀번호 확인"
+                      autoComplete="new-password"
+                      disabled={isLoading}
+                      // 검증 이후 잘못된 값임을 보조기기에 전달합니다.
+                      aria-invalid={Boolean(visiblePasswordConfirmError)}
+                      // 공개된 오류가 있을 때만 입력과 해당 설명을 연결합니다.
+                      aria-describedby={
+                        passwordConfirmFeedback ? "signup-password-confirm-feedback" : undefined
+                      }
+                      onChange={handlePasswordConfirmChange}
+                      onBlur={handlePasswordConfirmBlur}
+                    />
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      // 아이콘만 있는 버튼의 기능을 보조기기가 알 수 있도록 동작을 이름으로 제공합니다.
+                      aria-label="누르고 있는 동안 비밀번호 확인 보기"
+                      // 확인 입력의 공개 여부를 첫 번째 비밀번호와 독립된 눌림 상태로 전달합니다.
+                      aria-pressed={isPasswordConfirmVisible}
+                      onPointerDown={handlePasswordConfirmVisibilityStart}
+                      onPointerUp={handlePasswordConfirmVisibilityEnd}
+                      onPointerCancel={handlePasswordConfirmVisibilityEnd}
+                      onPointerLeave={handlePasswordConfirmVisibilityEnd}
+                      onKeyDown={handlePasswordConfirmVisibilityKeyDown}
+                      onKeyUp={handlePasswordConfirmVisibilityKeyUp}
+                      onBlur={handlePasswordConfirmVisibilityEnd}
+                    >
+                      <span className="material-symbols-outlined" aria-hidden="true">
+                        {isPasswordConfirmVisible ? "visibility_off" : "visibility"}
+                      </span>
+                    </button>
+                  </div>
+                  {passwordConfirmFeedback && (
+                    <p
+                      className={
+                        visiblePasswordConfirmError
+                          ? styles["feedback-error"]
+                          : styles["feedback-success"]
+                      }
+                      id="signup-password-confirm-feedback"
+                      role={visiblePasswordConfirmError ? "alert" : "status"}
+                    >
+                      {passwordConfirmFeedback}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          {signupError && (
-            <p className={styles["signup-error"]} role="alert">
-              {signupError}
-            </p>
-          )}
-          <div className={styles["action-area"]}>
-            <button className={styles["signup-button"]} type="submit" disabled={isSignupDisabled}>
-              가입하기
-            </button>
-            <Link className={styles["login-link"]} href="/login">
-              이미 계정이 있습니다.
-            </Link>
-          </div>
-        </form>
-      </section>
-      {isLoading && <Loading />}
+            {signupError && (
+              <p className={styles["signup-error"]} role="alert">
+                {signupError}
+              </p>
+            )}
+            <div className={styles["action-area"]}>
+              <button className={styles["signup-button"]} type="submit" disabled={isSignupDisabled}>
+                가입하기
+              </button>
+              <Link className={styles["login-link"]} href="/login">
+                이미 계정이 있습니다.
+              </Link>
+            </div>
+          </form>
+        </section>
+        {isLoading && <Loading />}
 
-      <CommonModal
-        isOpen={modalStatus !== null}
-        mode="error"
-        status={modalStatus}
-        onClose={() => setModalStatus(null)}
-      />
-    </main>
+        <CommonModal
+          isOpen={modalMode !== null}
+          mode={modalMode}
+          status={modalStatus}
+          onClose={() => setModalStatus(null)}
+        />
+      </main>
+    </GuestGuard>
   );
 }

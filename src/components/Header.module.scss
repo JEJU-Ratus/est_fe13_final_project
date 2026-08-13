@@ -197,6 +197,10 @@
 .logout-button {
   color: color.$white;
   background-color: color.$fda-navy;
+  cursor: pointer;
+  &:disabled {
+    cursor: default;
+  }
 }
 
 .menu-list {
@@ -237,7 +241,19 @@
   height: 30px;
   margin-top: auto;
   align-self: center;
+  overflow: hidden;
   border-radius: 50%;
+}
+
+.collapsed-profile-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  &.is-guest {
+    filter: grayscale(100%);
+  }
 }
 
 .footer {
