@@ -64,10 +64,10 @@
 
 ### 사용자 스토리 3 구현
 
-- [ ] T017 [US3] `src/components/AllNotes.jsx`에서 mock `BannerData`를 기존 `Banner`에 전달하고 이미지·목적지 쌍이 유효할 때만 전체 배너를 이동 영역으로 표시하며 별도 CTA를 추가하지 않는다.
-- [ ] T018 [US3] `src/components/AllNotes.jsx`에서 정상 `items.length === 0`일 때만 기존 `EmptyState`에 `학습 노트 리스트가 아직 생성되지 않았습니다.`를 전달하고, 로딩·오류·목록 행과 동시에 표시하지 않는다.
-- [ ] T019 [US3] `src/components/AllNotes.jsx`에서 `completed`·`notStarted`를 기존 `NoteItem`의 컬러·회색 상태 이미지로 매핑하고 작성일을 `YYYY.MM.DD`로 표시하며 퍼센트 필드를 렌더링하지 않는다.
-- [ ] T020 [US3] `src/components/AllNotes.module.scss`에서 Header가 펼쳐진 1440px 데스크톱 프레임의 배치, 표 열 경계, 긴 닉네임·주제 말줄임, 링크·배너 focus-visible 상태를 완성하고 태블릿·모바일 전용 규칙은 추가하지 않는다.
+- [X] T017 [US3] `src/components/AllNotes.jsx`에서 mock `BannerData`를 기존 `Banner`에 전달하고 이미지·목적지 쌍이 유효할 때만 전체 배너를 이동 영역으로 표시하며 별도 CTA를 추가하지 않는다.
+- [X] T018 [US3] `src/components/AllNotes.jsx`에서 정상 `items.length === 0`일 때만 기존 `EmptyState`에 `학습 노트 리스트가 아직 생성되지 않았습니다.`를 전달하고, 로딩·오류·목록 행과 동시에 표시하지 않는다.
+- [X] T019 [US3] `src/components/AllNotes.jsx`에서 `completed`·`notStarted`를 기존 `NoteItem`의 컬러·회색 상태 이미지로 매핑하고 작성일을 `YYYY.MM.DD`로 표시하며 퍼센트 필드를 렌더링하지 않는다.
+- [X] T020 [US3] `src/components/AllNotes.module.scss`에서 Header가 펼쳐진 1440px 데스크톱 프레임의 배치, 표 열 경계, 긴 닉네임·주제 말줄임, 링크·배너 focus-visible 상태를 완성하고 태블릿·모바일 전용 규칙은 추가하지 않는다.
 
 **확인 지점**: 사용자 스토리 3의 상태·배너·빈 화면·오류 및 데스크톱 시각 규칙이 사용자 스토리 1·2의 목록 흐름을 깨뜨리지 않는다.
 

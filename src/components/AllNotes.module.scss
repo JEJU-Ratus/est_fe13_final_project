@@ -22,6 +22,11 @@
   width: 100%;
   max-width: 1322px;
   margin: 0 auto 40px;
+
+  a:focus-visible {
+    outline: 3px solid color.$fda-orange;
+    outline-offset: 3px;
+  }
 }
 
 .all-notes-summary {

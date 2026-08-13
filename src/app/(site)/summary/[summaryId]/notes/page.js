@@ -5,6 +5,7 @@ import AllNotes from "@/components/AllNotes";
 import {
   getMockSummaryNoteAccess,
   loadMockStudyNotePage,
+  MOCK_BANNERS,
 } from "@/mocks/all-notes";
 
 export default function SummaryNotesPage({ params }) {
@@ -17,6 +18,7 @@ export default function SummaryNotesPage({ params }) {
       scope="summary"
       summaryId={summaryId}
       loadPage={loadMockStudyNotePage}
+      banner={MOCK_BANNERS.validInternal}
       accessState={accessState}
     />
   );

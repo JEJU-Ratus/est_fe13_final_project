@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { verifyMockSummaryNotePassword } from "@/mocks/all-notes";
+import Banner from "./Banner";
 import CommonModal from "./CommonModal";
 import EmptyState from "./EmptyState";
 import Loading from "./Loading";
@@ -387,6 +388,16 @@ export default function AllNotes({
     <Loading />
   ) : (
     <>
+      {hasBanner && (
+        <div className={styles["all-notes-banner"]}>
+          <Banner
+            imageSrc={banner.imageSrc}
+            alt={banner.alt}
+            href={banner.destinationUrl}
+          />
+        </div>
+      )}
+
       <div className={styles["all-notes-header"]}>
         <h1 className={styles["all-notes-summary"]}>
           총 {listState.totalCount}개의 학습노트
