@@ -75,11 +75,11 @@
 
 **목적**: DB 연동 전 UI 범위를 고정하고, 후속 데이터 연결이 교체 가능한 경계에 머무는지 확인한다.
 
-- [ ] T021 `specs/003-all-notes/quickstart.md`에 `src/mocks/all-notes.js`를 사용하는 UI-first 실행 순서와 공개·잠금·빈·오류·무한 스크롤 검증 데이터를 반영한다.
-- [ ] T022 `src/components/AllNotes.jsx`, `src/app/(site)/mypage/summaries/page.js`, `src/app/(site)/summary/[summaryId]/notes/page.js`의 입력·경로·mock 로더가 `specs/003-all-notes/contracts/all-notes-contract.md`와 일치하는지 검토한다.
+- [X] T021 `specs/003-all-notes/quickstart.md`에 `src/mocks/all-notes.js`를 사용하는 UI-first 실행 순서와 공개·잠금·빈·오류·무한 스크롤 검증 데이터를 반영한다.
+- [X] T022 `src/components/AllNotes.jsx`, `src/app/(site)/mypage/summaries/page.js`, `src/app/(site)/summary/[summaryId]/notes/page.js`의 입력·경로·mock 로더가 `specs/003-all-notes/contracts/all-notes-contract.md`와 일치하는지 검토한다. 마이페이지 파일은 담당자 범위로 제외되어 복구·수정하지 않는다.
 - [ ] T023 `package.json`의 lint 스크립트를 실행해 UI MVP의 ESLint 오류를 수정한다.
 - [ ] T024 `package.json`의 build 스크립트를 실행해 App Router 경로·SCSS Module·Client Component 경계의 production build를 확인한다.
-- [ ] T025 `specs/003-all-notes/quickstart.md`의 사용자 스토리 1·2·3 수동 시나리오와 `git diff --check`를 실행하고 변경 파일이 승인된 UI·mock 범위에만 있는지 확인한다.
+- [X] T025 `specs/003-all-notes/quickstart.md`의 사용자 스토리 1·2·3 수동 시나리오와 `git diff --check`를 실행하고 변경 파일이 승인된 UI·mock 범위에만 있는지 확인한다. 마이페이지 시나리오는 담당자 연결 후 실행한다.
 
 ## 7단계: 실제 DB·Supabase 연동 (UI MVP 이후)
 

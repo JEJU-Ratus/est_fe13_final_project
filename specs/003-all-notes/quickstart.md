@@ -27,10 +27,34 @@ npm install
 npm run dev
 ```
 
+### UI-first mock 실행 순서
+
+T001–T025의 UI MVP는 Supabase·DB·실제 비밀번호 서비스에 연결하지 않고
+`src/mocks/all-notes.js`의 `loadMockStudyNotePage`와 접근 상태 mock을 사용한다.
+따라서 UI 검증은 다음 순서로 진행한다.
+
+1. 개발 서버를 실행하고 아래 mock 식별자로 공개·잠금·빈·오류·없는 요약본을 각각 연다.
+2. 첫 응답의 총 개수와 12개 행을 확인한 뒤, 목록 끝까지 이동해 cursor 단위 추가 조회와 중복 제거를 확인한다.
+3. 잠금 요약본에서는 목록이 노출되지 않은 상태에서 비밀번호 모달을 확인하고, 4자 미만 입력은 실패·4자 이상 입력은 성공으로 확인한다.
+4. UI-first mock은 비밀번호 원문이나 고정 비밀번호를 저장하지 않으며, 인증 성공 여부는 실행 중 메모리에서만 유지한다. 실제 세션 인증 연결은 T026 이후 범위다.
+
+| 검증 목적 | mock 식별자 또는 경로 | 예상 데이터·상태 |
+|---|---|---|
+| 공개 요약본 | `/summary/summary-001/notes` | 60개 이상, 비로그인 목록 허용 |
+| 잠금 요약본 | `/summary/summary-002/notes` | 31개, `passwordRequired` → `authorized` |
+| 빈 목록 | `/summary/summary-empty/notes` | 0개, `EmptyState`만 표시 |
+| 일반 오류 | `/summary/summary-error/notes` | `CommonModal` 500 오류 |
+| 없는 요약본 | `/summary/summary-not-found/notes` | `CommonModal` 404 후 `/` 이동 |
+
+`MOCK_BANNERS`에는 유효한 내부·외부 목적지, 목적지 누락, 이미지 누락 변형이 있으며,
+같은 작성 시각을 가진 항목과 12개 단위 페이지도 함께 준비되어 있다. `/mypage/summaries`는
+현재 담당자 구현 범위로 제외되어 이 브랜치에서는 페이지 파일을 유지·수정하지 않는다. 아래
+요약본 경로 검증을 먼저 진행하고, 마이페이지 담당자가 경로를 다시 연결한 뒤 시나리오 1·5·7을
+추가로 실행한다.
+
 브라우저에서 다음 경로를 직접 연다.
 
 ```text
-/mypage/summaries
 /summary/{공개-summaryId}/notes
 /summary/{잠긴-summaryId}/notes
 /summary/{존재하지 않는-summaryId}/notes
