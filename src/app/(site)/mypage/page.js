@@ -226,6 +226,8 @@ export default function Mypage() {
       setDraftProfileImage(null);
       setDraftProfileImageUrl('');
       setIsEditingProfile(false);
+      // 저장된 프로필의 헤더 재조회 알림.
+      window.dispatchEvent(new Event("profile-updated"));
     } finally {
       // 성공과 실패에 관계없이 저장 요청이 끝나면 버튼을 다시 사용
       setIsSavingProfile(false);
