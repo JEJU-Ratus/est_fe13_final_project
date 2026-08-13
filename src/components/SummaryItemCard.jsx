@@ -53,6 +53,7 @@ export default function SummaryItemCard({
   async function handleBookmarkToggle(e) {
     e.preventDefault();
     e.stopPropagation();
+
     const supabase = createClient();
 
     const {
@@ -62,7 +63,7 @@ export default function SummaryItemCard({
     if (!user) return;
 
     if (isBookmarked) {
-      const { error } = await supabase.from("bookmarks").delete().eq("user_id", summaryId);
+      const { error } = await supabase.from("bookmarks").delete().eq("user_id", user.id).eq("summary_id", summaryId);
 
       if (error) {
         console.error("북마크 삭제 실패:", error);
@@ -94,7 +95,7 @@ export default function SummaryItemCard({
             aria-label={`${title || "요약 노트"} 비밀번호 입력`}
             aria-haspopup="dialog"
             aria-expanded={isPasswordModalOpen}
-            onClick={handleBookmarkToggle}
+            onClick={handlePasswordModalClose}
           />
         ) : (
           <Link

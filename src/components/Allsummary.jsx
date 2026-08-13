@@ -176,7 +176,7 @@ export default function AllSummary({ title, summaries = [] }) {
               excerpt={summary.excerpt}
               createdAt={summary.created_at}
               isPrivate={summary.is_locked}
-              initialIsBookmarked={false}
+              initialIsBookmarked={summary.isBookmarked ?? false}
             />
           ))}
         </div>
