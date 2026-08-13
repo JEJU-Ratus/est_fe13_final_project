@@ -1,8 +1,9 @@
 "use client";
 import AuthGuard from "@/components/AuthGuard";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/components/AuthProvider";
 import EmptyState from "@/components/EmptyState";
 import NoteItem from "@/components/NoteItem";
 import SummaryItemCard from "@/components/SummaryItemCard";
@@ -40,14 +41,18 @@ const mySummaryCards = [
 ];
 
 const learningNotes = [];
-// 실제 북마크 데이터가 연결되기 전까지 북마크 섹션의 빈 상태만 표현합니다.
+// 실제 북마크 데이터가 연결되기 전까지 북마크 섹션의 빈 상태만 표현.
 const bookmarkCards = [];
 
 export default function Mypage() {
+  // 공통 인증 정보에서 현재 로그인한 사용자와 Supabase 연결 객체를 가져오기.
+  const { supabase, user } = useAuth();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  // TODO: 로그인 사용자와 profiles 데이터를 조회해 프로필 상태에 반영
+  // 저장 요청이 진행되는 동안 수정완료 버튼을 다시 누르지 못하게 하기.
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [nickname, setNickname] = useState('사용자 닉네임');
   const [introduction, setIntroduction] = useState('');
+  const [profileImageUrl, setProfileImageUrl] = useState('/images/프로필.webp');
   const [draftNickname, setDraftNickname] = useState(nickname);
   const [draftIntroduction, setDraftIntroduction] = useState(introduction);
   const summaryListDragRef = useRef({
@@ -57,16 +62,78 @@ export default function Mypage() {
     isDragging: false,
   });
 
+  useEffect(() => {
+    // 로그인 사용자 정보가 준비된 뒤에만 프로필을 조회
+    if (!user) {
+      return undefined;
+    }
+
+    // 사용자가 바뀌거나 페이지를 벗어나면 이전 요청 결과를 화면에 반영x.
+    let isCurrentRequest = true;
+
+    async function fetchProfile() {
+      // 로그인 사용자 ID와 같은 profiles 행에서 화면에 필요한 정보만 가져오기.
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("nickname, profile_image_url, bio")
+        .eq("id", user.id)
+        .single();
+
+      if (!isCurrentRequest || error) {
+        return;
+      }
+
+      // 비어 있는 값은 마이페이지에서 사용하는 기본값으로 바꿔 표시.
+      setNickname(data.nickname ?? "사용자 닉네임");
+      setIntroduction(data.bio?.trim() ?? "");
+      setProfileImageUrl(data.profile_image_url || "/images/프로필.webp");
+    }
+
+    fetchProfile();
+
+    return () => {
+      // 이미 끝난 화면의 조회 결과가 나중에 상태를 바꾸지 못하게 표시.
+      isCurrentRequest = false;
+    };
+  }, [supabase, user]);
+
   function handleStartProfileEdit() {
     setDraftNickname(nickname);
     setDraftIntroduction(introduction);
     setIsEditingProfile(true);
   }
 
-  function handleCompleteProfileEdit() {
-    setNickname(draftNickname);
-    setIntroduction(draftIntroduction.trim());
-    setIsEditingProfile(false);
+  async function handleCompleteProfileEdit() {
+    if (!user || isSavingProfile) {
+      return;
+    }
+
+    const nextNickname = draftNickname.trim();
+    const nextIntroduction = draftIntroduction.trim();
+    setIsSavingProfile(true);
+
+    try {
+      // 현재 로그인한 사용자의 닉네임과 한줄소개를 profiles 테이블에 저장
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          nickname: nextNickname,
+          bio: nextIntroduction,
+        })
+        .eq("id", user.id);
+
+      if (error) {
+        return;
+      }
+
+      // Supabase 저장에 성공한 경우에만 화면 값을 바꾸고 수정 상태를 끝내기.
+      setNickname(nextNickname);
+      setIntroduction(nextIntroduction);
+      setIsEditingProfile(false);
+    } finally {
+      // 성공과 실패에 관계없이 저장 요청이 끝나면 버튼을 다시 사용
+      setIsSavingProfile(false);
+    }
   }
 
   function handleSummaryListPointerDown(event) {
@@ -143,10 +210,11 @@ export default function Mypage() {
             <div className={styles["profile-content"]}>
               <div className={styles["profile-image"]}>
                 <Image
-                  src="/images/프로필.webp"
+                  src={profileImageUrl}
                   alt="사용자 프로필 이미지"
                   width={120}
                   height={120}
+                  unoptimized={profileImageUrl.startsWith("http")}
                 />
               </div>
 
@@ -162,6 +230,7 @@ export default function Mypage() {
                   <label>
                     <input
                       value={draftIntroduction}
+                      placeholder="한줄소개를 입력 해주세요"
                       onChange={event =>
                         setDraftIntroduction(event.target.value)
                       }
@@ -171,7 +240,7 @@ export default function Mypage() {
               ) : (
                 <div className={styles['profile-text']}>
                   <p className={styles.nickname}>{nickname}</p>
-                  <p>{introduction}</p>
+                  <p>{introduction || "한줄소개를 입력 해주세요"}</p>
                 </div>
               )}
 
@@ -179,6 +248,7 @@ export default function Mypage() {
                   className={styles["profile-edit-button"]}
                   type="button"
                   onClick={isEditingProfile ? handleCompleteProfileEdit : handleStartProfileEdit}
+                  disabled={isSavingProfile}
                 >
                   {isEditingProfile ? "수정완료" : "프로필 수정"}
                 </button>
@@ -234,7 +304,7 @@ export default function Mypage() {
               </Link>
             </div>
 
-            {/* 가로 카드 목록을 키보드 사용자도 직접 탐색할 수 있도록 스크롤 영역에 포커스를 허용합니다. */}
+            {/* 가로 카드 목록을 키보드 사용자도 직접 탐색할 수 있도록 스크롤 영역에 포커스를 허용. */}
             <div
               className={styles["summary-list"]}
               aria-label="내 요약 노트 목록"
@@ -265,7 +335,7 @@ export default function Mypage() {
               </Link>
             </div>
 
-            {/* 가로 카드 목록을 키보드 사용자도 직접 탐색할 수 있도록 스크롤 영역에 포커스를 허용합니다. */}
+            {/* 가로 카드 목록을 키보드 사용자도 직접 탐색할 수 있도록 스크롤 영역에 포커스를 허용. */}
             <div
               className={styles["summary-list"]}
               aria-label="북마크 목록"
