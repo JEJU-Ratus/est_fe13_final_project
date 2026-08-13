@@ -1,0 +1,66 @@
+@use "styles/abstracts/colors" as color;
+@use "styles/abstracts/typography" as typography;
+
+.all-notes {
+  width: 100%;
+  max-width: 1322px;
+  margin: 0 auto;
+}
+
+.all-notes-header {
+  min-height: 48px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid color.$gray-light;
+}
+
+.all-notes-content {
+  min-height: 280px;
+  background: color.$white;
+}
+
+.all-notes-banner {
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+.all-notes-summary {
+  @include typography.text-20-semibold;
+
+  color: color.$black;
+}
+
+.all-notes-table {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid color.$gray-light;
+  border-bottom: 0;
+  background: color.$white;
+}
+
+.all-notes-table-header,
+.all-notes-table-body {
+  width: 100%;
+}
+
+.all-notes-table-header {
+  min-height: 52px;
+  background: color.$white-2;
+}
+
+.all-notes-table-body {
+  min-height: 1px;
+}
+
+.all-notes-status {
+  display: flex;
+  min-height: 280px;
+  align-items: center;
+  justify-content: center;
+  color: color.$gray-medium-3;
+  text-align: center;
+}
+
+.all-notes-sentinel {
+  width: 100%;
+  min-height: 1px;
+}

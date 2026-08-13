@@ -18,9 +18,9 @@
 
 **목적**: 실제 DB 없이 두 사용자 스토리를 검증할 수 있는 UI 전용 기반을 만든다.
 
-- [ ] T004 [P] 화면 검증용 25개 이상 학습노트, 동일 작성 시각 항목, 공개·잠금·빈 목록·조회 실패 상태와 배너 변형을 `src/mocks/all-notes.js`에 `StudyNoteListPage`·접근 상태 계약으로 작성한다.
-- [ ] T005 `src/components/AllNotes.jsx`에 `"use client"` 기반의 기능 전용 목록 컴포넌트 골격을 만들고 `scope`, `summaryId`, mock `loadPage`, `initialPage`, `accessState` 입력 경계를 연결한다. 이 단계에서는 Supabase 클라이언트나 DB 요청을 import하지 않는다.
-- [ ] T006 [P] 기존 `src/styles/abstracts` 토큰을 사용하는 데스크톱 목록·표·배너·상태 영역의 기본 SCSS Module 골격을 `src/components/AllNotes.module.scss`에 작성한다.
+- [X] T004 [P] 화면 검증용 25개 이상 학습노트, 동일 작성 시각 항목, 공개·잠금·빈 목록·조회 실패 상태와 배너 변형을 `src/mocks/all-notes.js`에 `StudyNoteListPage`·접근 상태 계약으로 작성한다.
+- [X] T005 `src/components/AllNotes.jsx`에 `"use client"` 기반의 기능 전용 목록 컴포넌트 골격을 만들고 `scope`, `summaryId`, mock `loadPage`, `initialPage`, `accessState` 입력 경계를 연결한다. 이 단계에서는 Supabase 클라이언트나 DB 요청을 import하지 않는다.
+- [X] T006 [P] 기존 `src/styles/abstracts` 토큰을 사용하는 데스크톱 목록·표·배너·상태 영역의 기본 SCSS Module 골격을 `src/components/AllNotes.module.scss`에 작성한다.
 
 **확인 지점**: mock 어댑터와 `AllNotes` 컴포넌트가 실제 인증·DB 없이 렌더링될 준비가 되고, 기존 공통 컴포넌트의 props를 변경하지 않는다.
 
