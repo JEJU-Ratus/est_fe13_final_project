@@ -45,10 +45,9 @@ const bookmarkCards = [];
 
 export default function Mypage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  // TODO: 로그인 사용자와 profiles 데이터를 조회해 프로필 상태에 반영
   const [nickname, setNickname] = useState('사용자 닉네임');
-  const [introduction, setIntroduction] = useState(
-    '프론트엔드 학습을 기록하고 있어요.',
-  );
+  const [introduction, setIntroduction] = useState('');
   const [draftNickname, setDraftNickname] = useState(nickname);
   const [draftIntroduction, setDraftIntroduction] = useState(introduction);
   const summaryListDragRef = useRef({
@@ -66,7 +65,7 @@ export default function Mypage() {
 
   function handleCompleteProfileEdit() {
     setNickname(draftNickname);
-    setIntroduction(draftIntroduction);
+    setIntroduction(draftIntroduction.trim());
     setIsEditingProfile(false);
   }
 
@@ -164,6 +163,7 @@ export default function Mypage() {
                   <label>
                     <input
                       value={draftIntroduction}
+                      placeholder='한줄 소개를 입력해주세요'
                       onChange={event =>
                         setDraftIntroduction(event.target.value)
                       }
@@ -173,7 +173,9 @@ export default function Mypage() {
               ) : (
                 <div className={styles['profile-text']}>
                   <p className={styles.nickname}>{nickname}</p>
-                  <p>{introduction}</p>
+                  <p className={introduction ? styles.introduction : undefined}>
+                    {introduction || '한줄 소개를 입력해주세요'}
+                  </p>
                 </div>
               )}
 
