@@ -86,7 +86,7 @@ export default function Mypage() {
       // 로그인 사용자 ID와 같은 profiles 행에서 화면에 필요한 정보만 가져오기.
       const { data, error } = await supabase
         .from("profiles")
-        .select("nickname, profile_image_url, bio")
+        .select("nickname, profile_image, bio")
         .eq("id", user.id)
         .single();
 
@@ -97,7 +97,7 @@ export default function Mypage() {
       // 비어 있는 값은 마이페이지에서 사용하는 기본값으로 바꿔 표시.
       setNickname(data.nickname ?? "사용자 닉네임");
       setIntroduction(data.bio?.trim() ?? "");
-      setProfileImageUrl(data.profile_image_url || "/images/프로필.webp");
+      setProfileImageUrl(data.profile_image || "/images/프로필.webp");
     }
 
     fetchProfile();
