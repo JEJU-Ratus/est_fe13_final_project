@@ -1,85 +1,97 @@
-# 조사 결과: 요약 및 학습노트 상세 mock read-only 연결
+# 조사 결과: 요약 상세 영속 학습노트·북마크
 
-## 결정 1: 기존 JSON을 유일한 현재 데이터 입력으로 사용
+## 결정 1: 소유권은 Auth 사용자, 표시는 Profile로 분리
 
-**결정**: `src/mocks/summaries.json`, `learning-notes.json`, `users.json`, `bookmarks.json`만 읽고 새 mock 데이터나 원격 데이터 계층을 만들지 않는다.
+**결정**: 콘텐츠와 북마크의 사용자 외래키는 `auth.users.id`를 참조한다. 기존 `profiles`는 수정하지 않고 현재 요청 주체가 접근 가능한 특정 요약본의 학습노트 작성자만 반환하는 security-definer 함수 `public.get_learning_note_author_names(summary_id)`를 추가한다. 함수는 고정 `search_path`와 소유자를 사용하고 `PUBLIC` 실행 권한을 회수한 뒤 필요한 역할에만 EXECUTE를 허용한다.
 
-**근거**: 사용자가 네 파일을 임시 read-only 데이터 소스로 승인했고 원본 변경, API와 Supabase를 명시적으로 제외했다. 현재 데이터에는 요약본 12개, 학습노트 19개, 사용자 6명, 북마크 관계 13개가 있어 목록 있음·빈 목록·관계 불일치·북마크 있음/없음 시나리오를 모두 검증할 수 있다.
+**근거**: Auth 사용자를 소유권 기준으로 삼으면 저장이 프로필 생성 상태에 의존하지 않는다. 제한 함수는 학습노트에 등장하지 않는 회원의 UUID·닉네임도 공개하지 않는다.
 
-**검토한 대안**: 페이지 안에 새 샘플 객체를 작성하면 기존 mock과 다른 사실 원천이 생긴다. Route Handler나 인메모리 저장소는 쓰기와 API 구조를 임의로 추가하므로 제외한다.
+**검토한 대안**: `profiles.id` 직접 FK는 프로필 행 생성이 보장되지 않으면 저장을 막고, 프로필 전체 SELECT 정책 완화는 승인되지 않은 정보 공개 범위를 만든다.
 
-## 결정 2: 공통 순수 어댑터에서 조회와 필드 변환 수행
+## 결정 2: 팀 Supabase를 직접 사용하고 mock은 이관하지 않음
 
-**결정**: 기존 `src/mocks` 폴더에 `summary-detail.js`를 두고 단건 조회, 목록 조회, 사용자 결합, 북마크 판정과 화면 필드 변환을 순수 함수로 제공한다.
+**결정**: 로컬 Supabase·Docker·seed를 추가하지 않는다. 리뷰된 마이그레이션을 팀 DB에 적용하고 기존 Auth 사용자 소유의 임시 공개 요약본 한 건으로 검증한 뒤 관련 테스트 데이터를 삭제한다. 기존 mock JSON은 DB로 이관하지 않는다.
 
-**근거**: 공통 레이아웃, 목록, 상세와 수정 페이지가 동일한 요약본·학습노트 관계를 해석해야 한다. 한 파일에 규칙을 모으면 원본 JSON을 보존하면서 페이지가 화면 렌더링에만 집중할 수 있고, 향후 영속 데이터 서비스가 같은 출력 계약을 제공하기 쉽다.
+**근거**: 사용자는 로컬 DB 운영보다 단순한 팀 DB 검증을 선택했다. 테스트 데이터와 스키마 변경을 분리하면 실제 DB에 mock 전체가 남지 않는다.
 
-**검토한 대안**: 네 경로가 JSON을 직접 import하고 각각 조인하면 사용자 fallback, 정렬과 `summaryId`/`noteId` 관계 검증이 중복된다. 새 `services` 폴더는 현재 프로젝트 구조와 승인 범위를 넓히므로 제외한다.
+**검토한 대안**: 로컬 Docker는 격리와 재현성이 좋지만 현재 팀 작업 흐름에는 추가 설정 부담이 크다. mock 전체 이관은 실제 사용자 UUID와 맞지 않고 운영 DB에 가짜 데이터를 남긴다.
 
-## 결정 3: mock 필드를 기존 화면 계약으로 명시적으로 변환
+## 결정 3: 요약본·학습노트·북마크 관계형 테이블
 
-**결정**:
+**결정**: `summaries`, `learning_notes`, `bookmarks` 세 테이블을 추가한다. 학습노트와 북마크는 요약본을 참조한다.
 
-| mock 입력 | 화면 계약 |
-|---|---|
-| `summary.aiSummary` | 공통 레이아웃의 AI 요약 제목과 섹션 |
-| `note.content` | `learnedSummary` |
-| 존재하지 않는 회고·참고자료 | `reflection=""`, `references=""` |
-| `note.isQuizCompleted=true` | `quizStatus="completed"` |
-| `note.isQuizCompleted=false` | `quizStatus="notStarted"` |
-| `note.authorId` + 사용자 조회 | `authorNickname` |
-| 사용자 조회 실패 | `authorNickname="알 수 없는 사용자"` |
-| `note.createdAt` | 원본 날짜 부분을 사용하는 `YYYY.MM.DD` 표시 문자열 |
-| `user-001` + `summaryId` 북마크 관계 | `isBookmarked` |
+**근거**: 현재 DB에는 `profiles`만 있어 학습노트와 북마크가 참조할 영속 요약본이 없다. 상위 관계를 DB 외부 문자열로만 유지하면 존재 여부, 삭제 정리와 접근 권한을 강제할 수 없다.
 
-**근거**: 현재 JSON과 기존 UI 계약의 이름과 세분화 수준이 다르다. 변환을 문서화해야 수정 화면의 빈 선택 필드와 퀴즈 상태가 임의 값으로 채워지지 않는다. 작성일은 목록 공통 명세의 `YYYY.MM.DD` 형식을 따르고 ISO 문자열의 날짜 부분을 사용해 실행 환경의 시간대 변환을 피한다.
+**검토한 대안**: JSON 안에 상위 데이터를 복제하는 방식은 관계 무결성과 상위 범위 검증을 잃는다.
 
-**검토한 대안**: JSON 파일의 필드명을 직접 바꾸면 이미 사용하는 전체 요약 목록 등 다른 기능에 영향을 주고 원본 변경 금지 조건을 위반한다.
+## 결정 4: 북마크는 유일 관계 행로 표현
 
-## 결정 4: 원본 배열을 복사한 뒤 필터·정렬
+**결정**: `(user_id, summary_id)` 유일 관계의 존재가 북마크 상태다. 저장은 충돌 시 아무것도 변경하지 않은 뒤 관계를 다시 조회해 멱등 성공으로 확정하고, 해제는 DELETE로 처리한다.
 
-**결정**: 학습노트 목록은 `filter()`로 새 배열을 만든 뒤 `createdAt`의 시간값을 기준으로 내림차순 정렬한다.
+**근거**: 반복 클릭과 동시 요청에서도 관계 한 건만 유지해야 한다. 일반 UPSERT는 필요 없는 UPDATE 권한을 요구한다.
 
-**근거**: JavaScript `sort()`는 대상 배열을 변경한다. JSON import 배열에 직접 사용하지 않고 파생 배열만 정렬해야 한 실행 안에서도 원본 순서가 유지된다.
+**검토한 대안**: `is_active` Boolean은 현재 범위에 없는 이력·복원 의미를 추가한다.
 
-**검토한 대안**: 원본에 직접 `sort()`를 적용하면 파일을 쓰지는 않더라도 공유 module 객체가 변해 다른 화면의 결과가 호출 순서에 따라 달라질 수 있다.
+## 결정 5: RLS와 최소 컬럼 권한을 함께 적용
 
-## 결정 5: 동적 식별자는 라우트 경계에서 검증
+**결정**: 신규 테이블에 RLS를 활성화하고 기본 권한을 회수한 뒤 작업별 최소 테이블·컬럼 권한만 부여한다. RLS는 `(select auth.uid())`와 상위 요약본 접근 가능 여부를 사용한다.
 
-**결정**: 공통 레이아웃이 `summaryId` 존재를 검증하고, 학습노트 상세·수정 페이지가 `summaryId`와 `noteId`의 동시 일치를 검증한다. 결과가 없으면 `notFound()`를 호출한다.
+**근거**: Supabase는 노출된 `public` 스키마에 RLS 사용을 권장하며 INSERT의 `with check`, UPDATE의 `using`·`with check`, DELETE의 `using`으로 행 권한을 제한한다. 컬럼 GRANT는 관계·작성자·시각·퀴즈 상태 조작을 막는다. [Supabase Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security)
 
-**근거**: Next.js 16에서 동적 `params`는 Promise이며 레이아웃과 페이지에서 `await`하거나 Client Component에서 React `use`로 해석한다. `notFound()`는 현재 라우트 세그먼트 렌더링을 종료하고 404 처리를 제공한다. 공통 레이아웃의 요약 검증은 모든 하위 경로에 같은 기준을 적용한다. [Next.js 동적 경로](https://nextjs.org/docs/app/api-reference/file-conventions/dynamic-routes), [Next.js `notFound`](https://nextjs.org/docs/app/api-reference/functions/not-found)
+**검토한 대안**: 버튼 숨김과 Server Action 검사만으로는 다른 클라이언트의 직접 요청을 DB에서 차단하지 못한다. 서비스 역할 키는 RLS를 우회하므로 제외한다.
 
-**검토한 대안**: 빈 문자열 fallback으로 정상 페이지를 계속 렌더링하면 잘못된 식별자를 숨긴다. 클라이언트에서 다른 페이지로 이동시키면 404 요구와 직접 URL 검증을 충족하지 못한다.
+## 결정 6: 비공개 요약본은 작성자만 접근
 
-## 결정 6: 북마크는 읽기 상태만 표시
+**결정**: 공개 요약본은 방문자와 로그인 사용자가 조회할 수 있고, 비공개 요약본은 잠금 기능 전까지 작성자만 조회한다. 학습노트 정책에도 같은 상위 접근 조건을 적용한다. 북마크 DELETE는 비공개 전환 후에도 본인 관계를 정리할 수 있도록 사용자 조건만 적용한다.
 
-**결정**: `user-001`의 북마크 관계로 초기 선택 상태를 계산하되 로컬 토글과 저장을 제공하지 않는다.
+**근거**: 이번 범위에는 비밀번호 잠금 인증이 없으므로 비공개 항목을 공개하면 보호 콘텐츠가 노출된다.
 
-**근거**: `bookmarks.json`은 읽기 전용이며 실제 사용자 인증과 변경 서비스가 없다. 로컬 state만 바꾸면 사용자가 저장됐다고 오인하고 새로고침 뒤 원래 상태로 돌아온다.
+**검토한 대안**: `is_private`를 무시하는 방식은 mock 화면 검증에는 가능하지만 실제 데이터 보안 경계로 사용할 수 없다.
 
-**검토한 대안**: React state로 임시 토글하면 원본 JSON은 보존되지만 FR-051의 “변경을 수행하지 않음”과 성공 오인 방지 요구를 충족하지 못한다. JSON 파일 쓰기는 명시적으로 금지됐다.
+## 결정 7: Server Component 조회와 Server Action 변경
 
-## 결정 7: 쓰기·잠금·퀴즈는 현재 조회 성공과 분리
+**결정**: 요약본·목록·상세·수정 초기값과 북마크 초기 상태는 공통 서버 클라이언트로 조회한다. 학습노트 CRUD와 북마크 저장·해제는 Server Action으로 처리한다.
 
-**결정**: 생성·수정·삭제 버튼은 비활성 상태를 유지하고 수정 화면은 기존 값만 표시한다. `isPrivate`는 잠금 인증 완료의 근거로 사용하지 않으며 퀴즈 데이터나 퀴즈 조회 성공을 모사하지 않는다.
+**근거**: 프로젝트는 서버 Supabase 클라이언트와 쿠키 갱신 Proxy를 이미 제공한다. Supabase SSR 안내는 보호된 사용자 식별에 `getClaims()` 사용을 권장한다. [Supabase SSR client](https://supabase.com/docs/guides/auth/server-side/creating-a-client)
 
-**근거**: 실제 인증, 비밀번호와 퀴즈 데이터가 없으므로 이 동작을 구현하면 보안과 영속성을 검증할 수 없다. 현재 증분의 성공 기준은 경로별 조회와 매핑이다.
+**검토한 대안**: 모든 요청을 Client Component에서 수행하면 초기 로딩, 인증, 검증과 오류 정규화가 여러 경로에 반복된다. 별도 Route Handler는 내부 화면 기능에 불필요한 HTTP 계층이다.
 
-**검토한 대안**: `localStorage`, 하드코딩 비밀번호, 임시 퀴즈를 추가하면 사용자가 제외한 범위와 `AGENTS.md`의 임의 인증·통신 금지를 위반한다.
+## 결정 8: Server Action은 공개 호출 경계로 검증
 
-## 결정 8: Server Component 중심으로 단순화
+**결정**: 모든 변경 Action은 `getClaims()`로 사용자를 확인하고 식별자와 입력을 검증한다. `author_id`, `user_id`는 브라우저 입력을 받지 않고 인증 사용자 값으로 강제한다.
 
-**결정**: mock 조회와 404를 소유하는 레이아웃·페이지는 가능한 Server Component로 유지하고, 현재 증분에서 필요 없는 북마크 토글과 퀴즈 modal state는 데이터 조회 경계에서 제거한다.
+**근거**: Next.js는 Server Function도 민감한 작업 전에 인증·권한을 확인하도록 안내한다. [Next.js `use server` security](https://nextjs.org/docs/app/api-reference/directives/use-server)
 
-**근거**: 상태와 이벤트가 없는 조회 화면은 Client Component일 필요가 없다. Next.js는 상호작용이 필요한 최소 부분만 Client Component로 두는 구성을 지원한다. [Next.js `use client`](https://nextjs.org/docs/app/api-reference/directives/use-client)
+**검토한 대안**: 숨겨진 input이나 화면의 `isOwner`만 신뢰하면 요청 조작으로 다른 사용자 ID를 제출할 수 있다.
 
-**검토한 대안**: 레이아웃 전체를 Client Component로 유지하면 read-only 조회에도 pathname 분석과 state가 남고, 404와 데이터 책임이 UI 상호작용에 결합된다.
+## 결정 9: 성공 후 부분 재검증과 확정 경로 이동
 
-## 결정 9: 기존 검증 도구만 사용
+**결정**: 성공한 변경은 관련 요약 상세 경로만 재검증한다. 생성·수정은 학습노트 상세, 삭제는 사용자가 선택한 현재 `/summary/{summaryId}`로 이동한다. `redirect`는 오류 처리 블록 밖에서 실행한다.
 
-**결정**: 새 테스트 패키지 없이 lint, production build, 개발 서버의 경로별 결과와 Git diff로 검증한다.
+**근거**: Next.js는 Server Function 변경 후 `revalidatePath`와 `redirect` 사용을 제공하며 `redirect`는 제어 흐름 예외를 사용한다. [Next.js mutations](https://nextjs.org/docs/app/getting-started/mutating-data), [Next.js redirecting](https://nextjs.org/docs/app/guides/redirecting)
 
-**근거**: 프로젝트에 자동 테스트 스크립트가 없고 새 패키지는 범위 밖이다. 현재 요구는 준비된 fixture와 화면 결과를 직접 비교할 수 있다.
+**검토한 대안**: 로컬 상태만 갱신하면 새로고침 전까지 DB 확정 결과와 화면이 달라질 수 있고 전체 사이트 재검증은 범위가 너무 넓다.
 
-**검토한 대안**: 테스트 프레임워크 추가는 이 증분보다 큰 의존성·설정 변경이다.
+## 결정 10: 제약과 실제 조회 패턴에 맞춘 인덱스
+
+**결정**: 안정적인 최신순 목록을 위해 `(summary_id, created_at desc, id desc)`, 작성자 정책을 위해 `summaries(author_id)`, FK 삭제 검사를 위해 `bookmarks(summary_id)`, 중복 방지를 위해 북마크 유일 인덱스를 둔다.
+
+**근거**: 인덱스는 WHERE·JOIN·ORDER BY 조건을 지원하지만 쓰기 비용도 있으므로 실제 조회와 정책 조건에 맞춰야 한다. [Supabase indexes](https://supabase.com/docs/guides/database/postgres/indexes)
+
+**검토한 대안**: 사용하지 않는 필드의 선제 인덱스는 현재 기능과 무관한 쓰기 비용을 만든다.
+
+## 결정 11: DB 자체도 입력 불변 조건을 강제
+
+**결정**: 텍스트 저장값은 `btrim(value) = value`, 필수·길이 CHECK를 적용한다. `ai_summary`는 JSON object만 허용한다. UUID는 `gen_random_uuid()`, `updated_at`은 안전한 트리거로 갱신한다.
+
+**근거**: 서버 검증만 두면 직접 Data API 요청이 공백·길이·형태 규칙을 우회할 수 있다.
+
+**검토한 대안**: 애플리케이션 검증만 사용하는 방식은 데이터베이스 안의 불변 조건을 보장하지 못한다.
+
+## 결정 12: 계정 삭제는 별도 수명주기 기능으로 유지
+
+**결정**: Auth 사용자 삭제 시 작성 콘텐츠 관계는 `ON DELETE RESTRICT`, 북마크는 `ON DELETE CASCADE`를 사용한다. 콘텐츠 보존·익명화·삭제는 계정 삭제 명세에서 결정한다.
+
+**근거**: 현재 범위에는 계정 삭제 정책이 없어 콘텐츠 자동 삭제를 추정할 수 없다. 북마크는 독립 콘텐츠가 아닌 관계다.
+
+**검토한 대안**: Auth 사용자 삭제 시 모든 콘텐츠를 자동 삭제하면 단순하지만 승인되지 않은 비가역적 수명주기 결정을 포함한다.
