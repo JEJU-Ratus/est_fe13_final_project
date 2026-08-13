@@ -36,7 +36,7 @@ const menuItems = [
 const COLLAPSED_PATHS = ["/login", "/signup", "/signup/complete"];
 
 export default function Header() {
-  const { isAuthenticated, isLoggingOut, signOut } = useAuth();
+  const { isAuthenticated, isLoggingOut, signOut, supabase, user } = useAuth();
   // 최초 헤더 렌더링 시 현재 경로를 기준으로 접힘/펼침 상태 결정
   // useState의 초기값, 페이지 이동 시 사용자가 선택된 상태 유지
   const pathname = usePathname();
@@ -45,6 +45,46 @@ export default function Header() {
   );
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
+  const [profileNickname, setProfileNickname] = useState("user name");
+  const [profileImageUrl, setProfileImageUrl] = useState("/images/main_profile.webp");
+
+  useEffect(() => {
+    if (!user) {
+      setProfileNickname("user name");
+      setProfileImageUrl("/images/main_profile.webp");
+      return undefined;
+    }
+
+    let isCurrentRequest = true;
+
+    async function fetchHeaderProfile() {
+      // profiles 테이블에서 로그인 사용자의 헤더 정보 조회.
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("nickname, profile_image_url")
+        .eq("id", user.id)
+        .single();
+
+      if (!isCurrentRequest || error) {
+        return;
+      }
+
+      setProfileNickname(data.nickname || "user name");
+      setProfileImageUrl(data.profile_image_url || "/images/main_profile.webp");
+    }
+
+    function handleProfileUpdated() {
+      fetchHeaderProfile();
+    }
+
+    fetchHeaderProfile();
+    window.addEventListener("profile-updated", handleProfileUpdated);
+
+    return () => {
+      isCurrentRequest = false;
+      window.removeEventListener("profile-updated", handleProfileUpdated);
+    };
+  }, [supabase, user]);
 
   useEffect(() => {
     const mobileMediaQuery = window.matchMedia("(max-width: 480px)");
@@ -143,12 +183,18 @@ export default function Header() {
           {isAuthenticated ? (
             <div className={styles["logged-in-user"]}>
               <div className={styles["profile-slot"]}>
-                <Image src="/images/main_profile.webp" alt="프로필 이미지" width={48} height={48} />
+                <Image
+                  src={profileImageUrl}
+                  alt="프로필 이미지"
+                  width={48}
+                  height={48}
+                  unoptimized={profileImageUrl.startsWith("http")}
+                />
               </div>
               <div className={styles["profile-content"]}>
-                <p className={styles["user-name"]}>user name</p>
+                <p className={styles["user-name"]}>{profileNickname}</p>
                 <div className={styles["account-buttons"]}>
-                  <Link href="#" className={styles["profile-button"]} type="button">
+                  <Link href="/mypage" className={styles["profile-button"]}>
                     프로필 수정
                   </Link>
                   <button
@@ -223,10 +269,11 @@ export default function Header() {
             className={`${styles["collapsed-profile-image"]} ${
               !isAuthenticated ? styles["is-guest"] : ""
             }`}
-            src="/images/main_profile.webp"
+            src={isAuthenticated ? profileImageUrl : "/images/main_profile.webp"}
             alt={isAuthenticated ? "프로필 이미지" : "비로그인 사용자 프로필 이미지"}
             width={30}
             height={30}
+            unoptimized={isAuthenticated && profileImageUrl.startsWith("http")}
           />
         </div>
       ) : (
