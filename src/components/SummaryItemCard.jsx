@@ -95,7 +95,7 @@ export default function SummaryItemCard({
             aria-label={`${title || "요약 노트"} 비밀번호 입력`}
             aria-haspopup="dialog"
             aria-expanded={isPasswordModalOpen}
-            onClick={handlePasswordModalClose}
+            onClick={handlePasswordModalOpen}
           />
         ) : (
           <Link
