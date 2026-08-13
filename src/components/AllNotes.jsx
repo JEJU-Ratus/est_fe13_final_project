@@ -1,12 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { verifyMockSummaryNotePassword } from "@/mocks/all-notes";
+import CommonModal from "./CommonModal";
 import EmptyState from "./EmptyState";
 import Loading from "./Loading";
 import NoteItem from "./NoteItem";
+import NotePwModal from "./NotePwModal";
 import styles from "./AllNotes.module.scss";
 
 const EMPTY_MESSAGE = "학습 노트 리스트가 아직 생성되지 않았습니다.";
+const PASSWORD_ERROR_MESSAGE = "비밀번호가 일치하지 않습니다.";
 
 function createScope(scope, summaryId) {
   if (scope === "summary") {
@@ -14,6 +19,10 @@ function createScope(scope, summaryId) {
   }
 
   return { type: "mine" };
+}
+
+function canReadList(scope, accessState) {
+  return scope === "mine" || accessState === "public" || accessState === "authorized";
 }
 
 function normalizeCursor(cursor) {
@@ -65,16 +74,20 @@ function getScopeKey(scope, summaryId) {
   return scope === "summary" ? `${scope}:${summaryId ?? ""}` : scope;
 }
 
-function createInitialState(initialPage) {
-  const page = normalizePage(initialPage);
+function createInitialState(initialPage, shouldLoadList) {
+  const page = shouldLoadList ? normalizePage(initialPage) : normalizePage(null);
 
   return {
     ...page,
-    hasLoaded: Boolean(initialPage),
-    isInitialLoading: !initialPage,
+    hasLoaded: shouldLoadList && Boolean(initialPage),
+    isInitialLoading: shouldLoadList && !initialPage,
     isLoadingMore: false,
     error: null,
   };
+}
+
+function getErrorStatus(error) {
+  return error?.code === "NOT_FOUND" || error?.status === 404 ? 404 : 500;
 }
 
 export default function AllNotes({
@@ -85,9 +98,16 @@ export default function AllNotes({
   initialPage,
   accessState = "checking",
 }) {
+  const router = useRouter();
   const normalizedScope = scope === "summary" ? "summary" : "mine";
   const scopeKey = getScopeKey(normalizedScope, summaryId);
-  const [listState, setListState] = useState(() => createInitialState(initialPage));
+  const [resolvedAccessState, setResolvedAccessState] = useState(accessState);
+  const shouldLoadList = canReadList(normalizedScope, resolvedAccessState);
+  const [listState, setListState] = useState(() =>
+    createInitialState(initialPage, shouldLoadList),
+  );
+  const [passwordError, setPasswordError] = useState("");
+  const [isPasswordSubmitting, setIsPasswordSubmitting] = useState(false);
   const sentinelRef = useRef(null);
   const isMountedRef = useRef(false);
   const scopeKeyRef = useRef(scopeKey);
@@ -108,7 +128,7 @@ export default function AllNotes({
   }, []);
 
   useEffect(() => {
-    if (initialPage || typeof loadPage !== "function") {
+    if (!shouldLoadList || initialPage || typeof loadPage !== "function") {
       return undefined;
     }
 
@@ -171,10 +191,11 @@ export default function AllNotes({
     void loadInitialPage();
 
     return undefined;
-  }, [initialPage, loadPage, normalizedScope, scopeKey, summaryId]);
+  }, [initialPage, loadPage, normalizedScope, scopeKey, shouldLoadList, summaryId]);
 
   const handleLoadMore = useCallback(async () => {
     if (
+      !shouldLoadList ||
       typeof loadPage !== "function" ||
       !listState.hasLoaded ||
       listState.isInitialLoading ||
@@ -254,12 +275,13 @@ export default function AllNotes({
         tracker.inFlightCursor = null;
       }
     }
-  }, [listState, loadPage, normalizedScope, scopeKey, summaryId]);
+  }, [listState, loadPage, normalizedScope, scopeKey, shouldLoadList, summaryId]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
 
     if (
+      !shouldLoadList ||
       !sentinel ||
       !listState.hasLoaded ||
       listState.isInitialLoading ||
@@ -286,16 +308,82 @@ export default function AllNotes({
     return () => {
       observer.disconnect();
     };
-  }, [handleLoadMore, listState.hasLoaded, listState.hasMore, listState.isInitialLoading, listState.isLoadingMore]);
+  }, [
+    handleLoadMore,
+    listState.hasLoaded,
+    listState.hasMore,
+    listState.isInitialLoading,
+    listState.isLoadingMore,
+    shouldLoadList,
+  ]);
 
-  const initialItemCount = Array.isArray(initialPage?.items)
+  async function handlePasswordSubmit(password) {
+    if (isPasswordSubmitting || normalizedScope !== "summary") {
+      return;
+    }
+
+    setPasswordError("");
+    setIsPasswordSubmitting(true);
+
+    try {
+      const result = await verifyMockSummaryNotePassword(summaryId, password);
+
+      if (!result?.isValid) {
+        if (result?.code === "NOT_FOUND") {
+          setResolvedAccessState("notFound");
+        } else if (result?.code === "REQUEST_FAILED") {
+          setResolvedAccessState("error");
+        } else {
+          setPasswordError(result?.errorMessage ?? PASSWORD_ERROR_MESSAGE);
+        }
+
+        return;
+      }
+
+      requestTrackerRef.current = {
+        scopeKey,
+        inFlightCursor: null,
+        requestedCursors: new Set(),
+      };
+      setResolvedAccessState("authorized");
+      setListState(createInitialState(null, true));
+    } catch {
+      setResolvedAccessState("error");
+    } finally {
+      setIsPasswordSubmitting(false);
+    }
+  }
+
+  function handlePasswordClose() {
+    router.back();
+  }
+
+  function handleErrorClose() {
+    const isNotFound =
+      resolvedAccessState === "notFound" || listState.error?.code === "NOT_FOUND";
+
+    if (isNotFound) {
+      router.replace("/");
+      return;
+    }
+
+    router.replace(normalizedScope === "summary" ? `/summary/${summaryId}` : "/");
+  }
+
+  const initialItemCount = Array.isArray(initialPage?.items) && shouldLoadList
     ? initialPage.items.length
     : 0;
   const hasPageLoader = typeof loadPage === "function";
   const hasBanner = typeof banner?.imageSrc === "string" && banner.imageSrc.trim() !== "";
   const hasInitialError = Boolean(listState.error && listState.items.length === 0);
+  const isNotFound = resolvedAccessState === "notFound";
+  const isAccessError = resolvedAccessState === "error" || isNotFound;
+  const isErrorModalOpen = isAccessError || Boolean(listState.error);
+  const errorStatus = isNotFound ? 404 : getErrorStatus(listState.error);
 
-  const pageContent = listState.isInitialLoading ? (
+  const pageContent = !shouldLoadList ? (
+    resolvedAccessState === "checking" ? <Loading /> : null
+  ) : listState.isInitialLoading ? (
     <Loading />
   ) : (
     <>
@@ -317,12 +405,9 @@ export default function AllNotes({
 
           <div className={styles["all-notes-table-body"]}>
             {hasInitialError ? (
-              <>
-                {/* 초기 조회 실패는 빈 목록과 구분해 보조기기에 즉시 전달합니다. */}
-                <p className={styles["all-notes-status"]} role="alert">
-                  학습노트를 불러오지 못했습니다.
-                </p>
-              </>
+              <p className={styles["all-notes-status"]} role="alert">
+                학습노트를 불러오지 못했습니다.
+              </p>
             ) : listState.items.length === 0 ? (
               <EmptyState message={EMPTY_MESSAGE} />
             ) : (
@@ -360,13 +445,28 @@ export default function AllNotes({
       className={styles["all-notes"]}
       data-scope={normalizedScope}
       data-summary-id={typeof summaryId === "string" ? summaryId : undefined}
-      data-access-state={accessState}
+      data-access-state={resolvedAccessState}
       data-has-page-loader={hasPageLoader}
       data-initial-item-count={initialItemCount}
       data-has-banner={hasBanner}
       data-loading-more={listState.isLoadingMore}
     >
       {pageContent}
+
+      <NotePwModal
+        isOpen={resolvedAccessState === "passwordRequired"}
+        isSubmitting={isPasswordSubmitting}
+        errorMessage={passwordError}
+        onSubmit={handlePasswordSubmit}
+        onClose={handlePasswordClose}
+      />
+
+      <CommonModal
+        isOpen={isErrorModalOpen}
+        mode="error"
+        status={errorStatus}
+        onClose={handleErrorClose}
+      />
     </main>
   );
 }

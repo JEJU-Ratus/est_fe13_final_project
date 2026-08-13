@@ -48,11 +48,11 @@
 
 ### 사용자 스토리 2 구현
 
-- [ ] T012 [P] [US2] `src/app/(site)/summary/[summaryId]/notes/page.js`를 생성해 동적 `summaryId`를 `AllNotes`의 `scope="summary"`에 전달하고 기존 사이트·요약 상세 레이아웃을 재사용한다.
-- [ ] T013 [US2] `src/components/AllNotes.jsx`에서 mock 접근 상태가 `public`이면 비로그인도 목록을 볼 수 있고 `authorized`이면 목록을 바로 표시하도록 요약본 범위 조회를 연결한다.
-- [ ] T014 [US2] `src/components/AllNotes.jsx`와 `src/mocks/all-notes.js`에 UI 검증 전용 `passwordRequired`·인증 성공·인증 실패 상태를 연결해 기존 `NotePwModal`을 표시한다. 고정 비밀번호나 인증 결과를 production 저장소에 기록하지 않는다.
-- [ ] T015 [US2] `src/components/AllNotes.jsx`에서 mock `notFound`와 일반 조회 실패를 기존 `CommonModal`에 연결하고, 요약본 일반 오류 종료 후 `/summary/[summaryId]`, 없는 `summaryId`의 3초 후 `/` 이동을 구현한다.
-- [ ] T016 [US2] `src/components/AllNotes.module.scss`에서 요약본 전체 목록의 배너·총 개수·표·스크롤 sentinel 배치를 내 목록과 동일한 데스크톱 디자인으로 정리한다.
+- [X] T012 [P] [US2] `src/app/(site)/summary/[summaryId]/notes/page.js`를 생성해 동적 `summaryId`를 `AllNotes`의 `scope="summary"`에 전달하고 기존 사이트·요약 상세 레이아웃을 재사용한다.
+- [X] T013 [US2] `src/components/AllNotes.jsx`에서 mock 접근 상태가 `public`이면 비로그인도 목록을 볼 수 있고 `authorized`이면 목록을 바로 표시하도록 요약본 범위 조회를 연결한다.
+- [X] T014 [US2] `src/components/AllNotes.jsx`와 `src/mocks/all-notes.js`에 UI 검증 전용 `passwordRequired`·인증 성공·인증 실패 상태를 연결해 기존 `NotePwModal`을 표시한다. 고정 비밀번호나 인증 결과를 production 저장소에 기록하지 않는다.
+- [X] T015 [US2] `src/components/AllNotes.jsx`에서 mock `notFound`와 일반 조회 실패를 기존 `CommonModal`에 연결하고, 요약본 일반 오류 종료 후 `/summary/[summaryId]`, 없는 `summaryId`의 3초 후 `/` 이동을 구현한다.
+- [X] T016 [US2] `src/components/AllNotes.module.scss`에서 요약본 전체 목록의 배너·총 개수·표·스크롤 sentinel 배치를 내 목록과 동일한 데스크톱 디자인으로 정리한다.
 
 **확인 지점**: 사용자 스토리 1의 mock 기반 공통 목록 로직을 재사용하면서 공개·잠금·없는 요약본 흐름을 별도로 검증할 수 있다.
 

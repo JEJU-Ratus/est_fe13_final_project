@@ -15,6 +15,7 @@ export const MOCK_SUMMARY_IDS = {
 
 const SAME_TIMESTAMP = "2026-08-15T12:00:00.000Z";
 const MOCK_AUTHORS = ["user-001", "user-002", "user-003", "user-004", "user-005", "user-006"];
+const verifiedSummaryIds = new Set();
 
 const usersById = new Map(users.map(user => [user.userId, user]));
 const summariesById = new Map(summaries.map(summary => [summary.summaryId, summary]));
@@ -199,7 +200,37 @@ export function getMockSummaryNoteAccess(summaryId, { isPasswordVerified = false
     return "public";
   }
 
-  return isPasswordVerified ? "authorized" : "passwordRequired";
+  return isPasswordVerified || verifiedSummaryIds.has(summaryId)
+    ? "authorized"
+    : "passwordRequired";
+}
+
+export async function verifyMockSummaryNotePassword(summaryId, password) {
+  const summary = summariesById.get(summaryId);
+
+  if (!summary) {
+    return { isValid: false, code: "NOT_FOUND" };
+  }
+
+  if (!summary.isPrivate) {
+    return { isValid: true };
+  }
+
+  // 실제 비밀번호 검증 전 UI 흐름만 확인하므로 원문·고정 비밀번호를 저장하지 않습니다.
+  if (typeof password !== "string" || password.trim().length < 4) {
+    return {
+      isValid: false,
+      code: "INVALID_PASSWORD",
+      errorMessage: "비밀번호가 일치하지 않습니다.",
+    };
+  }
+
+  verifiedSummaryIds.add(summaryId);
+  return { isValid: true };
+}
+
+export function resetMockSummaryNoteAccess() {
+  verifiedSummaryIds.clear();
 }
 
 export const MOCK_BANNERS = {
