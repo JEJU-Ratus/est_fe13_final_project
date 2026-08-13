@@ -194,6 +194,15 @@
   font-size: var.$font-size-14;
 }
 
+.profile-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+  text-decoration: none;
+}
+
 .logout-button {
   color: color.$white;
   background-color: color.$fda-navy;
