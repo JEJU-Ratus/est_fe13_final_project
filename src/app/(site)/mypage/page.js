@@ -40,7 +40,18 @@ const mySummaryCards = [
   },
 ];
 
-const learningNotes = [];
+// TODO: 학습노트 테이블 연동 후 로그인 사용자가 작성한 목록으로 교체합니다.
+const learningNotes = [
+  {
+    summaryId: "summary-001",
+    noteId: "note-001",
+    authorNickname: "사용자 닉네임",
+    topic: "JavaScript 비동기 처리 학습노트",
+    createdAt: "2026-08-13",
+    quizStatus: "completed",
+  },
+];
+
 // 실제 북마크 데이터가 연결되기 전까지 북마크 섹션의 빈 상태만 표현.
 const bookmarkCards = [];
 
