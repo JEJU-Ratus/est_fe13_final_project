@@ -32,11 +32,11 @@
 
 ### 사용자 스토리 1 구현
 
-- [ ] T007 [US1] `src/app/(site)/mypage/summaries/page.js`를 생성해 기존 `AuthGuard`로 페이지를 보호하고 `AllNotes`에 `scope="mine"`과 mock 목록 로더를 전달한다. 기존 `src/app/(site)/mypage/mysummaries/page.js`는 삭제하거나 이름을 변경하지 않는다.
-- [ ] T008 [US1] `src/components/AllNotes.jsx`에서 내 목록의 초기 로딩·전체 개수·최대 12개 행·정상 빈 결과 상태를 mock `StudyNoteListPage`와 연결한다. 초기 로딩에는 기존 `Loading`을 재사용한다.
-- [ ] T009 [US1] `src/components/AllNotes.jsx`에 `createdAt DESC, noteId DESC` 정렬 결과를 이어 붙이는 `IntersectionObserver`, 12개 단위 추가 조회, 현재 cursor 잠금, 요청 중복 방지와 `${summaryId}:${noteId}` 중복 제거를 구현한다.
-- [ ] T010 [US1] `src/components/AllNotes.jsx`에서 기존 `NoteItem`에 `summaryId`, `noteId`, 작성자, 주제, `YYYY.MM.DD` 날짜, `quizStatus`를 전달하고 `/summary/[summaryId]/notes/[noteId]` 상세 링크를 유지한다.
-- [ ] T011 [US1] `src/components/AllNotes.module.scss`에 1440px 데스크톱 기준의 목록 헤더·열 너비·행 간격·포커스 상태·긴 텍스트 말줄임 스타일을 완성한다.
+- [X] T007 [US1] `src/app/(site)/mypage/summaries/page.js`를 생성해 기존 `AuthGuard`로 페이지를 보호하고 `AllNotes`에 `scope="mine"`과 mock 목록 로더를 전달한다. 기존 `src/app/(site)/mypage/mysummaries/page.js`는 삭제하거나 이름을 변경하지 않는다.
+- [X] T008 [US1] `src/components/AllNotes.jsx`에서 내 목록의 초기 로딩·전체 개수·최대 12개 행·정상 빈 결과 상태를 mock `StudyNoteListPage`와 연결한다. 초기 로딩에는 기존 `Loading`을 재사용한다.
+- [X] T009 [US1] `src/components/AllNotes.jsx`에 `createdAt DESC, noteId DESC` 정렬 결과를 이어 붙이는 `IntersectionObserver`, 12개 단위 추가 조회, 현재 cursor 잠금, 요청 중복 방지와 `${summaryId}:${noteId}` 중복 제거를 구현한다.
+- [X] T010 [US1] `src/components/AllNotes.jsx`에서 기존 `NoteItem`에 `summaryId`, `noteId`, 작성자, 주제, `YYYY.MM.DD` 날짜, `quizStatus`를 전달하고 `/summary/[summaryId]/notes/[noteId]` 상세 링크를 유지한다.
+- [X] T011 [US1] `src/components/AllNotes.module.scss`에 1440px 데스크톱 기준의 목록 헤더·열 너비·행 간격·포커스 상태·긴 텍스트 말줄임 스타일을 완성한다.
 
 **확인 지점**: 사용자 스토리 1만으로 mock 데이터 기반의 내 목록 MVP를 실행하고 검증할 수 있다. 실제 Supabase 조회는 아직 연결하지 않는다.
 
