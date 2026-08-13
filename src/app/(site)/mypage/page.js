@@ -9,6 +9,15 @@ import NoteItem from "@/components/NoteItem";
 import SummaryItemCard from "@/components/SummaryItemCard";
 import styles from "./page.module.scss";
 
+// 프로필 이미지 Storage 연동: 업로드 이미지 형식과 최대 크기 설정.
+const PROFILE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const PROFILE_IMAGE_MAX_SIZE = 5 * 1024 * 1024;
+const PROFILE_IMAGE_EXTENSIONS = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+
 const mySummaryCards = [
   {
     summaryId: "summary-1",
@@ -40,7 +49,7 @@ const mySummaryCards = [
   },
 ];
 
-// TODO: 학습노트 테이블 연동 후 로그인 사용자가 작성한 목록으로 교체합니다.
+// TODO: 학습노트 테이블 연동 후 로그인 사용자의 작성 목록으로 교체.
 const learningNotes = [
   {
     summaryId: "summary-001",
@@ -64,6 +73,9 @@ export default function Mypage() {
   const [nickname, setNickname] = useState('사용자 닉네임');
   const [introduction, setIntroduction] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('/images/프로필.webp');
+  // 프로필 이미지 Storage 연동: 저장 전 선택 파일과 미리보기 주소 관리.
+  const [draftProfileImage, setDraftProfileImage] = useState(null);
+  const [draftProfileImageUrl, setDraftProfileImageUrl] = useState('');
   const [draftNickname, setDraftNickname] = useState(nickname);
   const [draftIntroduction, setDraftIntroduction] = useState(introduction);
   const summaryListDragRef = useRef({
@@ -72,6 +84,16 @@ export default function Mypage() {
     startScrollLeft: 0,
     isDragging: false,
   });
+
+  // 프로필 이미지 Storage 연동: 미리보기 변경 또는 화면 이탈 시 임시 주소 정리.
+  useEffect(() => {
+    // 사용이 끝난 로컬 이미지 미리보기 주소 해제.
+    return () => {
+      if (draftProfileImageUrl) {
+        URL.revokeObjectURL(draftProfileImageUrl);
+      }
+    };
+  }, [draftProfileImageUrl]);
 
   useEffect(() => {
     // 로그인 사용자 정보가 준비된 뒤에만 프로필을 조회
@@ -111,7 +133,30 @@ export default function Mypage() {
   function handleStartProfileEdit() {
     setDraftNickname(nickname);
     setDraftIntroduction(introduction);
+    setDraftProfileImage(null);
+    setDraftProfileImageUrl('');
     setIsEditingProfile(true);
+  }
+
+  // 프로필 이미지 Storage 연동: 선택 이미지 형식·크기 검증과 미리보기 표시.
+  function handleProfileImageChange(event) {
+    const selectedImage = event.target.files?.[0];
+
+    if (!selectedImage) {
+      return;
+    }
+
+    // JPEG, PNG, WebP 형식과 5MB 이하 파일만 허용.
+    if (
+      !PROFILE_IMAGE_TYPES.includes(selectedImage.type) ||
+      selectedImage.size > PROFILE_IMAGE_MAX_SIZE
+    ) {
+      event.target.value = '';
+      return;
+    }
+
+    setDraftProfileImage(selectedImage);
+    setDraftProfileImageUrl(URL.createObjectURL(selectedImage));
   }
 
   async function handleCompleteProfileEdit() {
@@ -121,16 +166,48 @@ export default function Mypage() {
 
     const nextNickname = draftNickname.trim();
     const nextIntroduction = draftIntroduction.trim();
+    let nextProfileImageUrl = profileImageUrl;
     setIsSavingProfile(true);
 
     try {
-      // 현재 로그인한 사용자의 닉네임과 한줄소개를 profiles 테이블에 저장
+      // 프로필 이미지 Storage 연동: 새 선택 이미지만 Public 버킷에 업로드.
+      if (draftProfileImage) {
+        const fileExtension = PROFILE_IMAGE_EXTENSIONS[draftProfileImage.type];
+        const filePath = `${user.id}/profile.${fileExtension}`;
+
+        // Storage 정책에 맞춰 사용자 ID 폴더에 이미지 저장.
+        const { error: uploadError } = await supabase.storage
+          .from('profile-images')
+          .upload(filePath, draftProfileImage, {
+            cacheControl: '3600',
+            contentType: draftProfileImage.type,
+            upsert: true,
+          });
+
+        if (uploadError) {
+          return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('profile-images')
+          .getPublicUrl(filePath);
+        nextProfileImageUrl = publicUrlData.publicUrl;
+      }
+
+      // 프로필 이미지 Storage 연동: 새 업로드 이미지가 있을 때만 DB 이미지 URL 변경.
+      const profileUpdates = {
+        nickname: nextNickname,
+        bio: nextIntroduction,
+      };
+
+      if (draftProfileImage) {
+        profileUpdates.profile_image_url = nextProfileImageUrl;
+      }
+
+      // 새 이미지의 공개 URL을 profiles 테이블에 저장.
       const { error } = await supabase
         .from("profiles")
-        .update({
-          nickname: nextNickname,
-          bio: nextIntroduction,
-        })
+        .update(profileUpdates)
         .eq("id", user.id);
 
       if (error) {
@@ -140,6 +217,14 @@ export default function Mypage() {
       // Supabase 저장에 성공한 경우에만 화면 값을 바꾸고 수정 상태를 끝내기.
       setNickname(nextNickname);
       setIntroduction(nextIntroduction);
+      // Storage 덮어쓰기 직후 이전 이미지 캐시 사용 방지.
+      setProfileImageUrl(
+        draftProfileImage
+          ? `${nextProfileImageUrl}?updated=${Date.now()}`
+          : nextProfileImageUrl,
+      );
+      setDraftProfileImage(null);
+      setDraftProfileImageUrl('');
       setIsEditingProfile(false);
     } finally {
       // 성공과 실패에 관계없이 저장 요청이 끝나면 버튼을 다시 사용
@@ -219,14 +304,30 @@ export default function Mypage() {
             <h2 id="profile-title">내 프로필</h2>
 
             <div className={styles["profile-content"]}>
+              {/* 프로필 이미지 Storage 연동: 수정 중 이미지 미리보기와 파일 선택 버튼 표시. */}
               <div className={styles["profile-image"]}>
                 <Image
-                  src={profileImageUrl}
+                  src={draftProfileImageUrl || profileImageUrl}
                   alt="사용자 프로필 이미지"
                   width={120}
                   height={120}
-                  unoptimized={profileImageUrl.startsWith("http")}
+                  unoptimized={(draftProfileImageUrl || profileImageUrl).startsWith("http") || Boolean(draftProfileImageUrl)}
                 />
+                {isEditingProfile && (
+                  <label className={styles["profile-image-selector"]}>
+                    {/* 키보드·스크린 리더 사용자를 위한 프로필 이미지 선택 설명. */}
+                    <span className="material-symbols-outlined" aria-hidden="true">
+                      photo_camera
+                    </span>
+                    <span className={styles["visually-hidden"]}>프로필 이미지 선택</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      disabled={isSavingProfile}
+                      onChange={handleProfileImageChange}
+                    />
+                  </label>
+                )}
               </div>
 
             <div className={styles['profile-details']}>
