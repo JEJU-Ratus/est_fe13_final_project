@@ -36,7 +36,7 @@ export default async function Summaries() {
   // profiles 테이블에서 id가 현재 로그인 한 user.id와 같은 사람 찾기
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("nickname, profile_image")
+    .select("nickname, profile_image_url")
     .eq("id", user.id)
     .maybeSingle(); //0개 또는 1개일 거라고 예상할 때
 
@@ -51,18 +51,30 @@ export default async function Summaries() {
     return null;
   }
 
+  const { data: bookmarks, error: bookmarksError } = await supabase
+    .from("bookmarks")
+    .select("summary_id")
+    .eq("user_id", user.id);
+
+  if (bookmarksError) {
+    console.error("북마크 조회 실패:", bookmarksError);
+    return null;
+  }
+
   // 요약본 데이터에 프로필 정보 합치기
   const summaryCards = (summaries ?? []).map(summary => ({
     ...summary,
     nickname: profile?.nickname,
-    profile_image: profile?.profile_image,
+    profile_image: profile?.profile_image_url,
+    isBookmarked: (bookmarks ?? []).some(bookmark => bookmark.summary_id === summary.id),
   }));
 
-  console.log("내 요약 데이터:", summaryCards);
+  console.log("현재 로그인 user.id:", user.id);
+  console.log("내 요약 데이터:", summaries);
 
   return (
     <AuthGuard>
-      <AllSummary title="내 요약 노트" summaries={summaries} />
+      <AllSummary title="내 요약 노트" summaries={summaryCards} />
     </AuthGuard>
   );
 }

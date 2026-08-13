@@ -5,6 +5,7 @@ import Link from "next/link";
 import NotePwModal from "./NotePwModal";
 import styles from "./SummaryItemCard.module.scss";
 import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 function formatCreatedAt(createdAt) {
   if (!createdAt) {
@@ -49,6 +50,39 @@ export default function SummaryItemCard({
     // TODO: 실제 비밀번호 검증 데이터 연결 후 제거/교체
   }
 
+  async function handleBookmarkToggle(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const supabase = createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    if (isBookmarked) {
+      const { error } = await supabase.from("bookmarks").delete().eq("user_id", summaryId);
+
+      if (error) {
+        console.error("북마크 삭제 실패:", error);
+        return;
+      }
+    } else {
+      const { error } = await supabase.from("bookmarks").insert({
+        user_id: user.id,
+        summary_id: summaryId,
+      });
+
+      if (error) {
+        console.error("북마크 추가 실패:", error);
+        return;
+      }
+    }
+
+    setBookmarked(!isBookmarked);
+  }
+
   return (
     <>
       <article className={styles["item-card"]} data-summary-id={summaryId}>
@@ -60,7 +94,7 @@ export default function SummaryItemCard({
             aria-label={`${title || "요약 노트"} 비밀번호 입력`}
             aria-haspopup="dialog"
             aria-expanded={isPasswordModalOpen}
-            onClick={handlePasswordModalOpen}
+            onClick={handleBookmarkToggle}
           />
         ) : (
           <Link
@@ -73,7 +107,13 @@ export default function SummaryItemCard({
         <div className={styles["card-main"]}>
           <div className={styles["card-header"]}>
             <div className={styles["user-info"]}>
-              <Image className={styles["profile-img"]} src={profileImageUrl} alt="사용자 프로필" width={32} height={32} />
+              <Image
+                className={styles["profile-img"]}
+                src={profileImageUrl}
+                alt="사용자 프로필"
+                width={32}
+                height={32}
+              />
 
               <p className={styles["nickname"]}>{nickname}</p>
             </div>
@@ -84,7 +124,7 @@ export default function SummaryItemCard({
               type="button"
               aria-label={isBookmarked ? "북마크 삭제" : "북마크 추가"}
               aria-pressed={isBookmarked}
-              onClick={() => setBookmarked(!isBookmarked)}
+              onClick={handleBookmarkToggle}
             >
               <span
                 className={`material-symbols-outlined ${styles["bookmark-icon"]} ${isBookmarked ? styles["is-active"] : ""}`}
@@ -116,11 +156,7 @@ export default function SummaryItemCard({
         </div>
       </article>
 
-      <NotePwModal
-        isOpen={isPasswordModalOpen}
-        onSubmit={handlePasswordSubmit}
-        onClose={handlePasswordModalClose}
-      />
+      <NotePwModal isOpen={isPasswordModalOpen} onSubmit={handlePasswordSubmit} onClose={handlePasswordModalClose} />
     </>
   );
 }
