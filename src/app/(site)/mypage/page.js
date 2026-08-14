@@ -122,11 +122,28 @@ export default function Mypage() {
         return;
       }
 
-      setIsMySummariesLoading(false); //Supabase 요청이 끝,로딩 상태 false로 변경
-
       if (error) {
+        setIsMySummariesLoading(false);
         return;
       }
+
+      const summaryIds = data.map(summary => summary.id);
+      const { data: bookmarks } = summaryIds.length
+        ? await supabase
+            .from("bookmarks")
+            .select("summary_id")
+            .eq("user_id", user.id)
+            .in("summary_id", summaryIds)
+        : { data: [] };
+
+      if (!isCurrentRequest) {
+        return;
+      }
+
+      const bookmarkedSummaryIds = new Set(
+        (bookmarks ?? []).map(bookmark => bookmark.summary_id),
+      );
+
       //카드 아이템 컴포로 변경 / 렌더
       setMySummaryCards(
         data.map(summary => ({
@@ -135,8 +152,10 @@ export default function Mypage() {
           excerpt: summary.excerpt ?? "",
           isPrivate: summary.is_locked,
           createdAt: summary.created_at,
+          isBookmarked: bookmarkedSummaryIds.has(summary.id),
         })),
       );
+      setIsMySummariesLoading(false);
     }
 
     fetchMySummaries();
@@ -202,6 +221,7 @@ export default function Mypage() {
           excerpt: summary.excerpt ?? "",
           isPrivate: summary.is_locked,
           createdAt: summary.created_at,
+          isBookmarked: true,
         }));
 
       if (isCurrentRequest) {
@@ -225,12 +245,66 @@ export default function Mypage() {
     setIsEditingProfile(true);
   }
 
-  function handleBookmarkChange(isBookmarked, summaryId) {
-    if (isBookmarked) {
+  async function handleBookmarkToggle(summaryId) {
+    if (!user) {
       return;
     }
 
-    // 북마크 삭제가 성공한 카드는 마이페이지 북마크 목록에서 제거
+    const targetSummary =
+      bookmarkCards.find(summary => summary.summaryId === summaryId) ??
+      mySummaryCards.find(summary => summary.summaryId === summaryId);
+
+    if (!targetSummary) {
+      return;
+    }
+
+    const isBookmarked = targetSummary.isBookmarked ?? false;
+
+    if (isBookmarked) {
+      const { error } = await supabase
+        .from("bookmarks")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("summary_id", summaryId);
+
+      if (error) {
+        return;
+      }
+    } else {
+      const { error } = await supabase.from("bookmarks").insert({
+        user_id: user.id,
+        summary_id: summaryId,
+      });
+
+      if (error) {
+        return;
+      }
+    }
+
+    const nextIsBookmarked = !isBookmarked;
+
+    setMySummaryCards(currentCards =>
+      currentCards.map(summary =>
+        summary.summaryId === summaryId
+          ? { ...summary, isBookmarked: nextIsBookmarked }
+          : summary,
+      ),
+    );
+
+    if (nextIsBookmarked) {
+      setBookmarkCards(currentCards => [
+        {
+          ...targetSummary,
+          nickname,
+          profileImageUrl,
+          isBookmarked: true,
+        },
+        ...currentCards.filter(summary => summary.summaryId !== summaryId),
+      ].slice(0, 8));
+      return;
+    }
+
+    // 북마크 삭제가 성공한 카드는 마이페이지 북마크 목록에서 제거합니다.
     setBookmarkCards(currentCards =>
       currentCards.filter(summary => summary.summaryId !== summaryId),
     );
@@ -571,6 +645,7 @@ export default function Mypage() {
                     {...summary}
                     nickname={nickname}
                     profileImageUrl={profileImageUrl}
+                    onBookmarkToggle={handleBookmarkToggle}
                   />
                 ))
               )}
@@ -610,8 +685,7 @@ export default function Mypage() {
                   <SummaryItemCard
                     key={`bookmark-${summary.summaryId}`}
                     {...summary}
-                    initialIsBookmarked
-                    onBookmarkChange={handleBookmarkChange}
+                    onBookmarkToggle={handleBookmarkToggle}
                   />
                 ))
               )}
