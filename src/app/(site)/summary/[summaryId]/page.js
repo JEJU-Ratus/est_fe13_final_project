@@ -1,32 +1,37 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import EmptyState from "@/components/EmptyState";
 import NoteItem from "@/components/NoteItem";
 import {
-  getMockSummary,
-  getMockSummaryNotes,
-} from "@/mocks/summary-detail";
-import { notFound } from "next/navigation";
+  getCurrentUserId,
+  getSummary,
+  getSummaryNotes,
+} from "@/lib/summary-detail";
 import styles from "./page.module.scss";
 
 export default async function SummaryDetailPage({ params }) {
   const { summaryId } = await params;
-  const summary = getMockSummary(summaryId);
+  const [summary, notes, userId] = await Promise.all([
+    getSummary(summaryId),
+    getSummaryNotes(summaryId),
+    getCurrentUserId(),
+  ]);
 
   if (!summary) {
     notFound();
   }
 
-  const notes = getMockSummaryNotes(summaryId);
-
   return (
     <section className={styles["notes-section"]}>
       <div className={styles["action-row"]}>
-        {/* 로그인·소유권 서비스가 연결되기 전에는 변경 동작을 실행할 수 없습니다. */}
-        <button className={styles["create-button"]} type="button" disabled>
-          노트 생성
-        </button>
-        <button className={styles["delete-button"]} type="button" disabled>
-          삭제
-        </button>
+        {userId && (
+          <Link
+            className={styles["create-button"]}
+            href={`/summary/${summaryId}/notes/new`}
+          >
+            노트 생성
+          </Link>
+        )}
       </div>
 
       <div className={styles["section-heading"]}>

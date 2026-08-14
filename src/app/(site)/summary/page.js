@@ -11,16 +11,21 @@ export default async function Summary() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  //현재 사용자의 북마크한 summary_id 조회
-  const { data: bookmarks, error: bookmarksError } = await supabase
-    .from("bookmarks")
-    .select("summary_id")
-    .eq("user_id", user.id);
+  let bookmarks = [];
 
-  // 북마크 조회 실패
-  if (bookmarksError) {
-    console.error("북마크 조회 실패:", bookmarksError);
-    return null;
+  if (user) {
+    // 비로그인 방문자는 북마크 관계를 조회하지 않고 공개 요약본만 표시합니다.
+    const { data, error: bookmarksError } = await supabase
+      .from("bookmarks")
+      .select("summary_id")
+      .eq("user_id", user.id);
+
+    if (bookmarksError) {
+      console.error("북마크 조회 실패:", bookmarksError);
+      return null;
+    }
+
+    bookmarks = data ?? [];
   }
 
   //전체 summaries 조회

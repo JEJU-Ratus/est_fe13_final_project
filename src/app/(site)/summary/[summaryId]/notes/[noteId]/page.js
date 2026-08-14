@@ -1,8 +1,14 @@
-import { getMockStudyNote } from "@/mocks/summary-detail";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import DeleteActionButton from "./DeleteActionButton";
+import {
+  getCurrentUserId,
+  getStudyNote,
+  getSummary,
+} from "@/lib/summary-detail";
 import styles from "./page.module.scss";
 
-const noteSections = [
+const NOTE_SECTIONS = [
   { key: "learnedSummary", label: "오늘 배운 내용 요약" },
   { key: "reflection", label: "오늘의 회고" },
   { key: "references", label: "참고자료" },
@@ -10,11 +16,17 @@ const noteSections = [
 
 export default async function NoteDetailPage({ params }) {
   const { summaryId, noteId } = await params;
-  const note = getMockStudyNote(summaryId, noteId);
+  const [summary, note, userId] = await Promise.all([
+    getSummary(summaryId),
+    getStudyNote(summaryId, noteId),
+    getCurrentUserId(),
+  ]);
 
-  if (!note) {
+  if (!summary || !note) {
     notFound();
   }
+
+  const isOwner = Boolean(userId && userId === note.authorId);
 
   return (
     <section
@@ -28,23 +40,29 @@ export default async function NoteDetailPage({ params }) {
       <div className={styles["accent-line"]} />
 
       <div className={styles["note-content"]}>
-        {noteSections.map(section => (
+        {NOTE_SECTIONS.map(section => (
           <section className={styles["content-section"]} key={section.key}>
             <h3>{section.label}</h3>
-            <p>{note[section.key]}</p>
+            <p>{note[section.key] || "내용이 없습니다."}</p>
           </section>
         ))}
       </div>
 
-      <div className={styles["note-actions"]}>
-        {/* 작성자 판정과 변경 서비스가 연결되기 전에는 두 동작을 실행하지 않습니다. */}
-        <button className={styles["edit-button"]} type="button" disabled>
-          수정
-        </button>
-        <button className={styles["delete-button"]} type="button" disabled>
-          삭제
-        </button>
-      </div>
+      {isOwner && (
+        <div className={styles["note-actions"]}>
+          <Link
+            className={styles["edit-button"]}
+            href={`/summary/${summaryId}/notes/${noteId}/edit`}
+          >
+            수정
+          </Link>
+          <DeleteActionButton
+            className={styles["delete-button"]}
+            summaryId={summaryId}
+            noteId={noteId}
+          />
+        </div>
+      )}
     </section>
   );
 }

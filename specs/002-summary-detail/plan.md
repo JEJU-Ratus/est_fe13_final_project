@@ -78,10 +78,7 @@ src/
 │       ├── server.js                  # 기존, 변경 금지
 │       └── proxy.js                   # 기존, 변경 금지
 ├── components/
-│   ├── SummaryBookmarkButton.jsx
-│   ├── SummaryBookmarkButton.module.scss
-│   ├── StudyNoteForm.jsx
-│   └── StudyNoteForm.module.scss
+│   └── (기존 공통 컴포넌트)
 └── app/
     └── (site)/summary/
         ├── page.js                    # 목록 링크를 영속 요약본 UUID로 전환
@@ -90,13 +87,16 @@ src/
             ├── layout.js
             ├── page.js
             └── notes/
+                ├── StudyNoteForm.jsx
+                ├── StudyNoteForm.module.scss
                 ├── new/page.js
                 └── [noteId]/
+                    ├── DeleteActionButton.jsx
                     ├── page.js
                     └── edit/page.js
 ```
 
-**구조 결정**: 서버 전용 읽기·화면 정규화는 기존 `src/lib`의 단일 `summary-detail.js`, 변경 계약은 상세 기능 경로의 `actions.js`에 제한한다. 폼과 북마크처럼 상태·이벤트가 필요한 최소 UI만 `src/components`의 Client Component로 분리한다. 새 서비스 폴더, Route Handler, 외부 상태 관리 계층은 만들지 않는다.
+**구조 결정**: 서버 전용 읽기·화면 정규화는 기존 `src/lib`의 단일 `summary-detail.js`, 변경 계약은 상세 기능 경로의 `actions.js`에 제한한다. 학습노트 생성·수정에서만 사용하는 폼은 `notes` 경로에, 상세 페이지에서만 사용하는 삭제 버튼은 `[noteId]` 경로에 배치한다. 새 서비스 폴더, Route Handler, 외부 상태 관리 계층은 만들지 않는다.
 
 ## Phase 0: 조사 결과
 
