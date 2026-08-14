@@ -32,6 +32,7 @@ export default function SummaryItemCard({
   createdAt = "",
   isPrivate = false,
   initialIsBookmarked = false,
+  onBookmarkChange, // 북마크 prop 추가
 }) {
   // 북마크 여부와 비밀번호 모달 열림 상태 관리
   const [isBookmarked, setBookmarked] = useState(initialIsBookmarked);
@@ -96,8 +97,10 @@ export default function SummaryItemCard({
       }
     }
 
-    // DB 작업 성공 후 화면의 북마크 상태 변경
-    setBookmarked(!isBookmarked);
+    // DB 작업 성공 후 카드 상태를 변경하고, 콜백을 사용하는 화면에 변경 결과를 전달합니다.
+    const nextIsBookmarked = !isBookmarked;
+    setBookmarked(nextIsBookmarked);
+    onBookmarkChange?.(nextIsBookmarked, summaryId);
   }
 
   return (
