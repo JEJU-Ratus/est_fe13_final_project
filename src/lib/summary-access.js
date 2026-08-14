@@ -1,6 +1,6 @@
 import "server-only";
 
-const ACCESS_DURATION_SECONDS = 30 * 60;
+const ACCESS_DURATION_SECONDS = 12 * 60 * 60;
 const COOKIE_PREFIX = "summary-access-";
 const textEncoder = new TextEncoder();
 

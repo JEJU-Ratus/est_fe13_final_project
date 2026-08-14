@@ -144,7 +144,7 @@ export default function Header() {
           >
             <Image
               className={styles["collapsed-logo-image"]}
-              src="/images/프! 로고.png"
+              src="/images/logo-mini.webp"
               alt=""
               width={40}
               height={36}
@@ -159,7 +159,7 @@ export default function Header() {
           </button>
         ) : (
           <Link href="/" className={styles["logo-button"]} aria-label="홈으로 이동">
-            <Image src="/images/logo.png" alt="로고" width={59} height={25} />
+            <Image src="/images/logo.webp" alt="로고" width={59} height={25} />
           </Link>
         )}
 
