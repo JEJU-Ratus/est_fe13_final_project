@@ -21,9 +21,9 @@
 
 **목적**: 구현 전 명세, 실제 경로와 기존 중복 구현을 확인한다.
 
-- [X] T001 `AGENTS.md`, `docs/specs/AllSummary.md`, `docs/specs/Summary.md`, `docs/specs/Mypage.md`, `specs/008-empty-state/spec.md`, `specs/008-empty-state/plan.md`, `specs/008-empty-state/contracts/EmptyState.md`를 읽고 문구·책임·금지 범위를 재확인한다.
-- [X] T002 `src/components/Allsummary.jsx`, `src/app/(site)/summary/[summaryId]/page.js`, `src/app/(site)/summary/[summaryId]/page.module.scss`, `src/app/(site)/mypage/page.js`의 현재 내용과 Git 상태를 확인해 팀 변경을 덮어쓰지 않을 구현 기준을 기록한다.
-- [X] T003 `public/images/empty-note.png`의 존재 여부와 `src/app/(site)/summary/[summaryId]/page.module.scss`의 기존 `.empty-state`, `.empty-image` 스타일을 확인해 재사용할 이미지·스타일 범위를 확정한다.
+- [x] T001 `AGENTS.md`, `docs/specs/AllSummary.md`, `docs/specs/Summary.md`, `docs/specs/Mypage.md`, `specs/008-empty-state/spec.md`, `specs/008-empty-state/plan.md`, `specs/008-empty-state/contracts/EmptyState.md`를 읽고 문구·책임·금지 범위를 재확인한다.
+- [x] T002 `src/components/Allsummary.jsx`, `src/app/(site)/summary/[summaryId]/page.js`, `src/app/(site)/summary/[summaryId]/page.module.scss`, `src/app/(site)/mypage/page.js`의 현재 내용과 Git 상태를 확인해 팀 변경을 덮어쓰지 않을 구현 기준을 기록한다.
+- [x] T003 `public/images/clear.webp`의 존재 여부와 `src/app/(site)/summary/[summaryId]/page.module.scss`의 기존 `.empty-state`, `.empty-image` 스타일을 확인해 재사용할 이미지·스타일 범위를 확정한다.
 
 ---
 
@@ -33,8 +33,8 @@
 
 **⚠️ 중요**: 이 단계를 완료하기 전에는 사용자 스토리 적용 작업을 시작하지 않는다.
 
-- [X] T004 [P] `src/components/EmptyState.jsx`에 필수 `message` prop, `/images/empty-note.png` 장식 이미지, 안내 문구, `role="status"`와 정중한 live 안내를 구현하고 접근성 속성의 목적을 주석으로 설명한다.
-- [X] T005 [P] `src/components/EmptyState.module.scss`에 `src/app/(site)/summary/[summaryId]/page.module.scss`의 기존 중앙 정렬·이미지 크롭·문구 스타일을 옮기고 일반 부모 너비와 Grid 전체 열을 모두 차지하도록 구현한다.
+- [x] T004 [P] `src/components/EmptyState.jsx`에 필수 `message` prop, `/images/clear.webp` 장식 이미지, 안내 문구, `role="status"`와 정중한 live 안내를 구현하고 접근성 속성의 목적을 주석으로 설명한다.
+- [x] T005 [P] `src/components/EmptyState.module.scss`에 `src/app/(site)/summary/[summaryId]/page.module.scss`의 기존 중앙 정렬·이미지 크롭·문구 스타일을 옮기고 일반 부모 너비와 Grid 전체 열을 모두 차지하도록 구현한다.
 
 **확인 지점**: `EmptyState({ message })`가 내부 상태·이벤트·버튼·링크 없이 공통 표시 구조를 제공하고 각 호출 영역에서 import할 준비가 완료됨
 
@@ -48,8 +48,8 @@
 
 ### 사용자 스토리 1 구현
 
-- [X] T006 [US1] `src/components/Allsummary.jsx`에서 기존 필터·정렬·카드 props를 유지한 채 `summaryCards.length`로 항목 목록과 `EmptyState`를 상호 배타적으로 렌더링하고 `view`별 정확한 문구를 전달한다.
-- [X] T007 [US1] `specs/008-empty-state/quickstart.md`의 전체·나의·북마크 빈 컬렉션 및 항목 존재 시나리오를 `src/components/Allsummary.jsx`에 대해 실행하고 검증용 임시 데이터 변경이 최종 diff에 남지 않았는지 확인한다.
+- [x] T006 [US1] `src/components/Allsummary.jsx`에서 기존 필터·정렬·카드 props를 유지한 채 `summaryCards.length`로 항목 목록과 `EmptyState`를 상호 배타적으로 렌더링하고 `view`별 정확한 문구를 전달한다.
+- [x] T007 [US1] `specs/008-empty-state/quickstart.md`의 전체·나의·북마크 빈 컬렉션 및 항목 존재 시나리오를 `src/components/Allsummary.jsx`에 대해 실행하고 검증용 임시 데이터 변경이 최종 diff에 남지 않았는지 확인한다.
 
 **확인 지점**: 사용자 스토리 1만으로 세 요약본 목록의 빈 상태와 기존 카드 목록을 독립적으로 검증할 수 있음
 
@@ -63,9 +63,9 @@
 
 ### 사용자 스토리 2 구현
 
-- [X] T008 [P] [US2] `src/app/(site)/summary/[summaryId]/page.js`에서 직접 작성된 `next/image` 빈 상태 마크업을 `EmptyState`와 `현재 리스트가 없습니다.` 메시지로 교체하고 불필요해진 `next/image` import만 제거한다.
-- [X] T009 [P] [US2] `src/app/(site)/summary/[summaryId]/page.module.scss`에서 `EmptyState.module.scss`로 이동된 `.empty-state`, `.empty-image` 규칙만 제거하고 버튼·제목·목록 외 레이아웃 스타일과 상대 SCSS import는 유지한다.
-- [X] T010 [US2] `specs/008-empty-state/quickstart.md`의 요약 상세 빈 학습노트 시나리오를 실행해 `src/app/(site)/summary/[summaryId]/page.js`의 문구, 장식 이미지, 접근성 상태와 기존 화면 영역 보존을 확인한다.
+- [x] T008 [P] [US2] `src/app/(site)/summary/[summaryId]/page.js`에서 직접 작성된 `next/image` 빈 상태 마크업을 `EmptyState`와 `현재 리스트가 없습니다.` 메시지로 교체하고 불필요해진 `next/image` import만 제거한다.
+- [x] T009 [P] [US2] `src/app/(site)/summary/[summaryId]/page.module.scss`에서 `EmptyState.module.scss`로 이동된 `.empty-state`, `.empty-image` 규칙만 제거하고 버튼·제목·목록 외 레이아웃 스타일과 상대 SCSS import는 유지한다.
+- [x] T010 [US2] `specs/008-empty-state/quickstart.md`의 요약 상세 빈 학습노트 시나리오를 실행해 `src/app/(site)/summary/[summaryId]/page.js`의 문구, 장식 이미지, 접근성 상태와 기존 화면 영역 보존을 확인한다.
 
 **확인 지점**: 사용자 스토리 2를 사용자 스토리 1·3의 페이지 데이터와 독립적으로 실행하고 검증할 수 있음
 
@@ -79,8 +79,8 @@
 
 ### 사용자 스토리 3 구현
 
-- [X] T011 [US3] `src/app/(site)/mypage/page.js`에서 내 요약 노트와 북마크가 공유하는 정적 placeholder 컬렉션을 분리하고, 실제 데이터 연결 전 범위를 설명하는 임시 주석과 함께 빈 북마크 컬렉션에는 `EmptyState` 및 `북마크한 요약 노트가 없습니다.`를 표시한다.
-- [X] T012 [US3] `specs/008-empty-state/quickstart.md`의 마이페이지 북마크 빈 상태·항목 존재 시나리오를 `src/app/(site)/mypage/page.js`에서 실행해 프로필·학습노트·내 요약 노트 섹션에 회귀 변경이 없는지 확인한다.
+- [x] T011 [US3] `src/app/(site)/mypage/page.js`에서 내 요약 노트와 북마크가 공유하는 정적 placeholder 컬렉션을 분리하고, 실제 데이터 연결 전 범위를 설명하는 임시 주석과 함께 빈 북마크 컬렉션에는 `EmptyState` 및 `북마크한 요약 노트가 없습니다.`를 표시한다.
+- [x] T012 [US3] `specs/008-empty-state/quickstart.md`의 마이페이지 북마크 빈 상태·항목 존재 시나리오를 `src/app/(site)/mypage/page.js`에서 실행해 프로필·학습노트·내 요약 노트 섹션에 회귀 변경이 없는지 확인한다.
 
 **확인 지점**: 사용자 스토리 3을 다른 목록 페이지와 독립적으로 실행하고 검증할 수 있음
 
@@ -90,10 +90,10 @@
 
 **목적**: 다섯 적용 대상의 시각적 일관성, 접근성, 상태 상호 배제와 빌드 품질을 확인한다.
 
-- [X] T013 `specs/008-empty-state/quickstart.md`의 전체 수동 시나리오를 실행해 `src/components/EmptyState.jsx`가 다섯 적용 대상에서 동일한 구조·이미지·간격·타이포그래피를 사용하고 정확한 세 문구만 표시하는지 확인한다.
-- [X] T014 `src/components/EmptyState.jsx`, `src/components/Allsummary.jsx`, `src/app/(site)/summary/[summaryId]/page.js`, `src/app/(site)/mypage/page.js`를 대상으로 `npm run lint`를 실행하고 오류를 해결한다.
-- [X] T015 `src/components/EmptyState.module.scss`, `src/app/(site)/summary/[summaryId]/page.module.scss`를 포함한 제품 경로에 대해 `npm run build`를 실행해 SCSS import와 production build가 성공하는지 확인한다.
-- [X] T016 `specs/008-empty-state/quickstart.md`의 범위 확인 항목에 따라 `git diff --check`와 최종 diff를 검토해 새 패키지·앱 경로·자산·데이터 통신·인증·검색·경로 대소문자 변경이 포함되지 않았는지 확인한다.
+- [x] T013 `specs/008-empty-state/quickstart.md`의 전체 수동 시나리오를 실행해 `src/components/EmptyState.jsx`가 다섯 적용 대상에서 동일한 구조·이미지·간격·타이포그래피를 사용하고 정확한 세 문구만 표시하는지 확인한다.
+- [x] T014 `src/components/EmptyState.jsx`, `src/components/Allsummary.jsx`, `src/app/(site)/summary/[summaryId]/page.js`, `src/app/(site)/mypage/page.js`를 대상으로 `npm run lint`를 실행하고 오류를 해결한다.
+- [x] T015 `src/components/EmptyState.module.scss`, `src/app/(site)/summary/[summaryId]/page.module.scss`를 포함한 제품 경로에 대해 `npm run build`를 실행해 SCSS import와 production build가 성공하는지 확인한다.
+- [x] T016 `specs/008-empty-state/quickstart.md`의 범위 확인 항목에 따라 `git diff --check`와 최종 diff를 검토해 새 패키지·앱 경로·자산·데이터 통신·인증·검색·경로 대소문자 변경이 포함되지 않았는지 확인한다.
 
 ---
 

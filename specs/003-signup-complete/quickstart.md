@@ -3,7 +3,7 @@
 ## 사전 조건
 
 - 프로젝트 의존성이 설치되어 있어야 한다.
-- `public/images/프비메인.webp`가 존재해야 한다.
+- `public/images/fbee.webp`가 존재해야 한다.
 - `/login` 페이지가 접근 가능해야 한다.
 
 ## 실행

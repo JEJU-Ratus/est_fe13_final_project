@@ -30,7 +30,7 @@
 
 ## 헌법 점검
 
-*관문: 0단계 조사 전에 통과했으며 1단계 설계 후 다시 확인했다.*
+_관문: 0단계 조사 전에 통과했으며 1단계 설계 후 다시 확인했다._
 
 - [x] `AGENTS.md`, Constitution, `005`와 기존 공통 모달 관련 명세, 기존 `NotePwModal` 코드를 확인했다.
 - [x] Next.js App Router, JavaScript, SCSS Module, `@/*` 별칭을 유지한다.
@@ -71,7 +71,7 @@
 
 ### 시각 및 상호작용
 
-- `public/images/프비메인.webp`를 `next/image`로 표시하며 현재 한글 파일명을 유지한다.
+- `public/images/fbee.webp`를 `next/image`로 표시하며 현재 한글 파일명을 유지한다.
 - 기존 색상·타이포그래피 토큰을 `@use`하고, CSS 클래스는 kebab-case와 대괄호 접근법을 사용한다.
 - 고정 배경막이 화면 전체를 덮고 콘텐츠를 중앙 정렬한다. 배경막 클릭은 아무 동작도 연결하지 않고 Escape 핸들러도 등록하지 않는다.
 - 닫기는 우측 상단 Material Symbols `close` 버튼으로 제공한다.

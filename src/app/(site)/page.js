@@ -108,7 +108,7 @@ export default function Home() {
         <section className={styles["intro-section"]} aria-labelledby="main-title">
           <div className={styles["mascot-image"]}>
             <Image
-              src="/images/프비메인.webp"
+              src="/images/fbee.webp"
               alt="프다 마스코트 프비"
               width={357}
               height={338}

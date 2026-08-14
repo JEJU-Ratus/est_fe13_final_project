@@ -3,7 +3,7 @@
 ## 사전 조건
 
 - 의존성 설치가 완료되어 있어야 한다.
-- `public/images/프로필.webp`가 존재해야 한다.
+- `public/images/clear.webp`가 존재해야 한다.
 - 개발 확인 경로는 `/dev/loading`이다.
 
 ## 실행
@@ -51,4 +51,3 @@ npm run lint
 ```
 
 Loading 관련 lint 오류 없이 완료되어야 한다. 전체 production build는 페이지 통합 또는 배포 전 검증에서 실행한다.
-

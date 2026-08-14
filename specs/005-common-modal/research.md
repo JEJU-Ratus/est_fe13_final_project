@@ -34,7 +34,7 @@
 
 ## 결정 5: 이미지와 기존 디자인 기반
 
-**결정**: `public/images/프비메인.webp`는 이름을 바꾸지 않고 `/images/프비메인.webp` 경로로 `next/image`에 제공한다. 색상과 타이포그래피는 기존 SCSS abstracts를 재사용한다.
+**결정**: `public/images/fbee.webp`는 이름을 바꾸지 않고 `/images/fbee.webp` 경로로 `next/image`에 제공한다. 색상과 타이포그래피는 기존 SCSS abstracts를 재사용한다.
 
 **근거**: Next.js의 `public` 자산은 사이트 루트 기준 경로로 참조할 수 있고, 기존 프로젝트 규칙은 스타일 토큰 구조 보존을 요구한다.
 

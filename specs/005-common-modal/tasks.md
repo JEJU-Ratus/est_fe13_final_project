@@ -1,5 +1,4 @@
 ---
-
 description: "공통 모달 기능 구현을 위한 작업 목록"
 ---
 
@@ -28,7 +27,7 @@ description: "공통 모달 기능 구현을 위한 작업 목록"
 
 - [x] T001 `AGENTS.md`, `.specify/memory/constitution.md`, `specs/005-common-modal/spec.md`, `specs/005-common-modal/plan.md`를 확인하고 현재 브랜치가 `feature/common-modal`인지 검증한다.
 - [x] T002 `specs/005-common-modal/research.md`, `specs/005-common-modal/data-model.md`, `specs/005-common-modal/contracts/CommonModal.md`, `specs/005-common-modal/quickstart.md`에서 props, 모드, 오류 문구, 검증 기준을 확인한다.
-- [x] T003 기존 `src/components/NotePwModal.jsx`, `src/components/NotePwModal.module.scss`, `src/styles/abstracts/`, `public/images/프비메인.webp`를 확인하고 재사용할 패턴과 자산만 기록한다.
+- [x] T003 기존 `src/components/NotePwModal.jsx`, `src/components/NotePwModal.module.scss`, `src/styles/abstracts/`, `public/images/fbee.webp`를 확인하고 재사용할 패턴과 자산만 기록한다.
 
 **확인 지점**: 생성할 소스 파일 3개와 수정 금지 파일이 확정되고 명세 충돌을 임의로 구현하지 않은 상태
 

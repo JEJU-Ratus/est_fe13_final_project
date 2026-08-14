@@ -63,7 +63,7 @@ export default function SignupCompletePage() {
         <div className={styles["mascot-stage"]}>
           <Image
             className={styles["mascot-image"]}
-            src="/images/프비메인.webp"
+            src="/images/fbee.webp"
             alt="프다 마스코트 프비"
             width={357}
             height={338}
