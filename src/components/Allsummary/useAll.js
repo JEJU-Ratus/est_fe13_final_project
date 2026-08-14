@@ -60,6 +60,12 @@ export default function useAll(summaries = []) {
   // 현재 visibleCount만큼의 카드만 화면에 표시
   const visibleSummaryCards = summaryCards.slice(0, visibleCount);
 
+  // 전체 데이터 자체가 없는 경우
+  const isEmpty = summaryList.length === 0;
+
+  // 검색했는데 결과가 없는 경우
+  const isSearchEmpty = normalizedSearchTerm !== "" && filteredSummaries.length === 0;
+
   // 화면 크기가 변경될 때 한 번에 표시할 카드 개수 조정
   useEffect(() => {
     const mobileMediaQuery = window.matchMedia("(max-width: 480px)");
@@ -194,5 +200,7 @@ export default function useAll(summaries = []) {
     hasMore,
     sentinelRef,
     handleBookmarkToggle,
+    isEmpty,
+    isSearchEmpty,
   };
 }
