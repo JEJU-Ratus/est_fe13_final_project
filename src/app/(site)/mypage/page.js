@@ -18,37 +18,6 @@ const PROFILE_IMAGE_EXTENSIONS = {
   "image/webp": "webp",
 };
 
-const mySummaryCards = [
-  {
-    summaryId: "summary-1",
-    nickname: "프다",
-    title: "React 상태 관리 핵심 정리",
-    excerpt: "컴포넌트 상태와 전역 상태 관리의 차이를 핵심만 정리했어요.",
-    createdAt: "2026-08-10",
-  },
-  {
-    summaryId: "summary-2",
-    nickname: "프다",
-    title: "CSS Flexbox 레이아웃",
-    excerpt: "자주 사용하는 Flexbox 속성과 활용 방법을 정리했어요.",
-    createdAt: "2026-08-08",
-  },
-  {
-    summaryId: "summary-3",
-    nickname: "프다",
-    title: "Next.js App Router 구조",
-    excerpt: "App Router의 페이지와 레이아웃 구성 방식을 알아봐요.",
-    createdAt: "2026-08-05",
-  },
-  {
-    summaryId: "summary-4",
-    nickname: "프다",
-    title: "JavaScript 비동기 처리",
-    excerpt: "Promise와 async/await를 활용하는 방법을 정리했어요.",
-    createdAt: "2026-08-02",
-  },
-];
-
 // TODO: 학습노트 테이블 연동 후 로그인 사용자의 작성 목록으로 교체.
 const learningNotes = [
   {
@@ -73,6 +42,8 @@ export default function Mypage() {
   const [nickname, setNickname] = useState('사용자 닉네임');
   const [introduction, setIntroduction] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('/images/프로필.webp');
+  const [mySummaryCards, setMySummaryCards] = useState([]);
+  const [isMySummariesLoading, setIsMySummariesLoading] = useState(true);
   // 프로필 이미지 Storage 연동: 저장 전 선택 파일과 미리보기 주소 관리.
   const [draftProfileImage, setDraftProfileImage] = useState(null);
   const [draftProfileImageUrl, setDraftProfileImageUrl] = useState('');
@@ -126,6 +97,49 @@ export default function Mypage() {
 
     return () => {
       // 이미 끝난 화면의 조회 결과가 나중에 상태를 바꾸지 못하게 표시.
+      isCurrentRequest = false;
+    };
+  }, [supabase, user]);//로그인 후 user 정보 데이터를 가져오기
+
+  useEffect(() => {
+    if (!user) {
+      return undefined;
+    } //user가 없으면 실행 x
+
+    let isCurrentRequest = true;
+    // 내요약 노트supabase연동
+    async function fetchMySummaries() {
+      const { data, error } = await supabase
+        .from("summaries")
+        .select("id, title, excerpt, is_locked, created_at")
+        .eq("author_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(4);
+
+      if (!isCurrentRequest) {
+        return;
+      }
+
+      setIsMySummariesLoading(false); //Supabase 요청이 끝,로딩 상태 false로 변경
+
+      if (error) {
+        return;
+      }
+      //카드 아이템 컴포로 변경 / 렌더
+      setMySummaryCards(
+        data.map(summary => ({
+          summaryId: summary.id,
+          title: summary.title,
+          excerpt: summary.excerpt ?? "",
+          isPrivate: summary.is_locked,
+          createdAt: summary.created_at,
+        })),
+      );
+    }
+
+    fetchMySummaries();
+
+    return () => {
       isCurrentRequest = false;
     };
   }, [supabase, user]);
@@ -407,7 +421,7 @@ export default function Mypage() {
           <section className={styles["summary-section"]} aria-labelledby="my-summary-title">
             <div className={styles["section-heading"]}>
               <h2 id="my-summary-title">내 요약 노트</h2>
-              <Link href="/mypage/mysummaries" className={styles["more-link"]}>
+              <Link href="/mypage/summaries" className={styles["more-link"]}>
                 <span>더보기</span>
                 <span
                   className={`material-symbols-outlined ${styles["more-icon"]}`}
@@ -429,9 +443,18 @@ export default function Mypage() {
               onPointerCancel={handleSummaryListPointerCancel}
               onClickCapture={handleSummaryListClickCapture}
             >
-              {mySummaryCards.map(summary => (
-                <SummaryItemCard key={summary.summaryId} {...summary} />
-              ))}
+              {!isMySummariesLoading && mySummaryCards.length === 0 ? (
+                <EmptyState message="요약 노트가 아직 생성되지 않았습니다." />
+              ) : (
+                mySummaryCards.map(summary => (
+                  <SummaryItemCard
+                    key={summary.summaryId}
+                    {...summary}
+                    nickname={nickname}
+                    profileImageUrl={profileImageUrl}
+                  />
+                ))
+              )}
             </div>
           </section>
 

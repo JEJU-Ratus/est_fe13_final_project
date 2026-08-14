@@ -264,7 +264,7 @@
     cursor: grabbing;
   }
 
-  > * {
+  > article {
     width: 312px;
     flex: 0 0 312px;
   }
@@ -447,7 +447,7 @@
   }
 
   .summary-list {
-    > * {
+    > article {
       width: 325px;
       flex-basis: 325px;
     }
