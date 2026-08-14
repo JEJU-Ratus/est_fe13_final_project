@@ -25,6 +25,7 @@
 .learning-note-section,
 .summary-section {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   gap: 24px;
 
@@ -247,14 +248,16 @@
 
 .summary-list {
   display: flex;
+  width: 100%;
+  min-width: 0;
   gap: 24px;
   justify-content: flex-start;
   overflow-x: auto;
   overscroll-behavior-inline: contain;
-  scroll-behavior: smooth;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   cursor: grab;
+  user-select: none;
 
   &::-webkit-scrollbar {
     display: none;

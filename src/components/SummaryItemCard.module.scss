@@ -57,7 +57,9 @@
   align-items: center;
   gap: 10px;
 }
-
+.profile-img {
+  border-radius: 50px;
+}
 .nickname {
   @include typography.text-18-semibold;
   color: color.$black;

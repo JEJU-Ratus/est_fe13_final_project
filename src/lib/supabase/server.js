@@ -1,3 +1,4 @@
+// 로그인 사용자의 권한 요청
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 

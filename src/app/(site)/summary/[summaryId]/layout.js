@@ -2,7 +2,7 @@ import styles from "./SummaryId.module.scss";
 import { createClient } from "@/lib/supabase/server";
 import AiSummaryLayoutClient from "./AiSummaryLayoutClient";
 import Link from "next/link";
-
+import SummaryContent from "./SummaryContent";
 export default async function AiSummaryLayout({ children, params }) {
   // URL에서 summaryId 가져오기
   const { summaryId } = await params;
@@ -41,10 +41,10 @@ export default async function AiSummaryLayout({ children, params }) {
             <Link
               className={styles["topic-link"]}
               href={`/summary/${summaryId}`}
-              aria-label={`${summary?.topic ?? "요약 노트"} 요약 상세로 이동`}
+              aria-label={`${summary?.title ?? "요약 노트"} 요약 상세로 이동`}
               data-tooltip="요약 상세로 이동"
             >
-              <h2 className={styles["Ai-title"]}>{summary?.topic ?? ""}</h2>
+              <h2 className={styles["Ai-title"]}>{summary?.title ?? ""}</h2>
             </Link>
 
             {/* 북마크/퀴즈 등 클라이언트 동작 */}
@@ -53,7 +53,7 @@ export default async function AiSummaryLayout({ children, params }) {
 
           {/* TODO: 상세 content 구조 확정 후 Supabase 데이터 연결 */}
           <div className={styles["Ai-content"]}>
-            <h3>{summary?.title ?? ""}</h3>
+            <SummaryContent summaryId={summaryId} />
           </div>
         </section>
 
