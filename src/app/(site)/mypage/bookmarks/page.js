@@ -68,7 +68,7 @@ export default async function Bookmarks() {
   // 가공한 북마크 카드 데이터를 AllSummary에 전달
   return (
     <AuthGuard>
-      <AllSummary title="북마크" summaries={summaryCards} />
+      <AllSummary title="북마크" summaries={summaryCards} isBookmarkPage />
     </AuthGuard>
   );
 }

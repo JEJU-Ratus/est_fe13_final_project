@@ -21,7 +21,7 @@ function getBatchSize(mobileMediaQuery, tabletMediaQuery) {
   return BATCH_SIZE.pc;
 }
 
-export default function useAll(summaries = []) {
+export default function useAll(summaries = [], isBookmarkPage = false) {
   const [summaryList, setSummaryList] = useState(summaries);
   // 검색어 저장
   const [searchTerm, setSearchTerm] = useState("");
@@ -180,17 +180,23 @@ export default function useAll(summaries = []) {
       }
     }
 
-    //DB 작업 성공 후 해당 카드의 북마크 상태 변경
-    setSummaryList(currentSummaries =>
-      currentSummaries.map(summary =>
+    // DB 작업 성공 후 화면의 북마크 상태 변경
+    setSummaryList(currentSummaries => {
+      // 북마크 페이지에서 북마크를 해제한 경우 카드 목록에서도 제거
+      if (isBookmarkPage && isBookmarked) {
+        return currentSummaries.filter(summary => summary.id !== summaryId);
+      }
+
+      // 다른 페이지에서는 카드의 북마크 상태만 변경
+      return currentSummaries.map(summary =>
         summary.id === summaryId
           ? {
               ...summary,
               isBookmarked: !isBookmarked,
             }
           : summary,
-      ),
-    );
+      );
+    });
   }
 
   return {
