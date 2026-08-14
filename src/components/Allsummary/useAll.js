@@ -1,9 +1,5 @@
-"use client";
-
-import styles from "./AllSummary.module.scss";
-import EmptyState from "./EmptyState";
-import SummaryItemCard from "./SummaryItemCard";
 import { useEffect, useRef, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 // 화면 크기별 한 번에 보여줄 카드 개수
 const BATCH_SIZE = {
@@ -25,7 +21,8 @@ function getBatchSize(mobileMediaQuery, tabletMediaQuery) {
   return BATCH_SIZE.pc;
 }
 
-export default function AllSummary({ title, summaries = [] }) {
+export default function useAll(summaries = []) {
+  const [summaryList, setSummaryList] = useState(summaries);
   // 검색어 저장
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -47,8 +44,8 @@ export default function AllSummary({ title, summaries = [] }) {
   // TODO: 추후 검색 데이터가 많아지면 Supabase 검색 쿼리 방식으로 변경
   // topic에 검색어가 포함된 요약 노트만 필터링
   const filteredSummaries = normalizedSearchTerm
-    ? summaries.filter(summary => summary.topic?.toLowerCase().includes(normalizedSearchTerm))
-    : summaries;
+    ? summaryList.filter(summary => summary.topic?.toLowerCase().includes(normalizedSearchTerm))
+    : summaryList;
 
   // 화면에 사용할 요약 카드 목록
   const summaryCards = filteredSummaries;
@@ -136,57 +133,66 @@ export default function AllSummary({ title, summaries = [] }) {
     };
   }, [batchSize, hasMore, summaryCards.length, visibleCount]);
 
-  return (
-    <main className={styles["summary-page"]}>
-      <section className={styles["summary-container"]}>
-        {/* 페이지 제목 및 검색 영역 */}
-        <div className={styles["summary-header"]}>
-          <div className={styles["summary-title-row"]}>
-            <h2 className={styles["summary-title"]}>{title}</h2>
+  // 북마크 추가/삭제 처리
+  async function handleBookmarkToggle(summaryId) {
+    const supabase = createClient();
 
-            {/* 북마크 아이콘 버튼의 용도를 보조 기술 사용자에게 전달 */}
-            <button className={styles["bookmark-btn"]} type="button" aria-label="북마크">
-              <span className={`material-symbols-outlined ${styles["bookmark-icon"]}`} aria-hidden="true">
-                bookmark_add
-              </span>
-            </button>
-          </div>
+    //현재 로그인 사용자 확인
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-          {/* 주제를 기준으로 요약 노트 검색 */}
-          <div className={styles["search-box"]}>
-            <input
-              type="text"
-              placeholder="주제 검색하기"
-              value={searchTerm}
-              onChange={event => setSearchTerm(event.target.value)}
-            />
+    //로그인 사용자가 없으면 동작 중단
+    if (!user) return;
 
-            <span className={`material-symbols-outlined ${styles["search-icon"]}`} aria-hidden="true">
-              search
-            </span>
-          </div>
-        </div>
+    //클릭한 요약 카드 찾기
+    const targetSummary = summaryList.find(summary => summary.id === summaryId);
 
-        {/* 현재 화면에 표시할 요약 카드 목록 */}
-        <div className={styles["summary-content"]}>
-          {visibleSummaryCards.map(summary => (
-            <SummaryItemCard
-              key={summary.id}
-              summaryId={summary.id}
-              nickname={summary.nickname ?? "알 수 없는 사용자"}
-              profileImageUrl={summary.profile_image_url ?? "/images/main_profile.webp"}
-              title={summary.title}
-              excerpt={summary.excerpt}
-              createdAt={summary.created_at}
-              isPrivate={summary.is_locked}
-              initialIsBookmarked={summary.isBookmarked ?? false}
-            />
-          ))}
-        </div>
+    if (!targetSummary) return;
 
-        {/* 다음 카드 묶음을 불러오기 위한 무한 스크롤 감지 지점 */}
-        {hasMore && <div className={styles["scroll-sentinel"]} ref={sentinelRef} aria-hidden="true" />}
-      </section>
-    </main>
-  );
+    //현재 북마크 상태 확인
+    const isBookmarked = targetSummary.isBookmarked ?? false;
+
+    if (isBookmarked) {
+      // 이미 북마크된 경우 bookmarks 테이블에서 삭제
+      const { error } = await supabase.from("bookmarks").delete().eq("user_id", user.id).eq("summary_id", summaryId);
+
+      if (error) {
+        console.error("북마크 삭제 실패:", error);
+        return;
+      }
+    } else {
+      // 북마크되지 않은 경우 bookmarks 테이블에 추가
+      const { error } = await supabase.from("bookmarks").insert({
+        user_id: user.id,
+        summary_id: summaryId,
+      });
+
+      if (error) {
+        console.error("북마크 추가 실패:", error);
+        return;
+      }
+    }
+
+    //DB 작업 성공 후 해당 카드의 북마크 상태 변경
+    setSummaryList(currentSummaries =>
+      currentSummaries.map(summary =>
+        summary.id === summaryId
+          ? {
+              ...summary,
+              isBookmarked: !isBookmarked,
+            }
+          : summary,
+      ),
+    );
+  }
+
+  return {
+    searchTerm,
+    setSearchTerm,
+    visibleSummaryCards,
+    hasMore,
+    sentinelRef,
+    handleBookmarkToggle,
+  };
 }
