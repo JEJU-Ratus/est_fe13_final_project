@@ -7,40 +7,19 @@ import { useAuth } from "@/components/AuthProvider";
 import EmptyState from "@/components/EmptyState";
 import NoteItem from "@/components/NoteItem";
 import SummaryItemCard from "@/components/SummaryItemCard";
+import attachProfilesToSummaries from "@/lib/supabase/summary";
 import styles from "./page.module.scss";
 
-const mySummaryCards = [
-  {
-    summaryId: "summary-1",
-    nickname: "프다",
-    title: "React 상태 관리 핵심 정리",
-    excerpt: "컴포넌트 상태와 전역 상태 관리의 차이를 핵심만 정리했어요.",
-    createdAt: "2026-08-10",
-  },
-  {
-    summaryId: "summary-2",
-    nickname: "프다",
-    title: "CSS Flexbox 레이아웃",
-    excerpt: "자주 사용하는 Flexbox 속성과 활용 방법을 정리했어요.",
-    createdAt: "2026-08-08",
-  },
-  {
-    summaryId: "summary-3",
-    nickname: "프다",
-    title: "Next.js App Router 구조",
-    excerpt: "App Router의 페이지와 레이아웃 구성 방식을 알아봐요.",
-    createdAt: "2026-08-05",
-  },
-  {
-    summaryId: "summary-4",
-    nickname: "프다",
-    title: "JavaScript 비동기 처리",
-    excerpt: "Promise와 async/await를 활용하는 방법을 정리했어요.",
-    createdAt: "2026-08-02",
-  },
-];
+// 프로필 이미지 Storage 연동: 업로드 이미지 형식과 최대 크기 설정.
+const PROFILE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const PROFILE_IMAGE_MAX_SIZE = 5 * 1024 * 1024;
+const PROFILE_IMAGE_EXTENSIONS = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
 
-// TODO: 학습노트 테이블 연동 후 로그인 사용자가 작성한 목록으로 교체합니다.
+// TODO: 학습노트 테이블 연동 후 로그인 사용자의 작성 목록으로 교체.
 const learningNotes = [
   {
     summaryId: "summary-001",
@@ -52,9 +31,6 @@ const learningNotes = [
   },
 ];
 
-// 실제 북마크 데이터가 연결되기 전까지 북마크 섹션의 빈 상태만 표현.
-const bookmarkCards = [];
-
 export default function Mypage() {
   // 공통 인증 정보에서 현재 로그인한 사용자와 Supabase 연결 객체를 가져오기.
   const { supabase, user } = useAuth();
@@ -64,6 +40,13 @@ export default function Mypage() {
   const [nickname, setNickname] = useState('사용자 닉네임');
   const [introduction, setIntroduction] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('/images/프로필.webp');
+  const [mySummaryCards, setMySummaryCards] = useState([]);
+  const [isMySummariesLoading, setIsMySummariesLoading] = useState(true);
+  const [bookmarkCards, setBookmarkCards] = useState([]);
+  const [isBookmarksLoading, setIsBookmarksLoading] = useState(true);
+  // 프로필 이미지 Storage 연동: 저장 전 선택 파일과 미리보기 주소 관리.
+  const [draftProfileImage, setDraftProfileImage] = useState(null);
+  const [draftProfileImageUrl, setDraftProfileImageUrl] = useState('');
   const [draftNickname, setDraftNickname] = useState(nickname);
   const [draftIntroduction, setDraftIntroduction] = useState(introduction);
   const summaryListDragRef = useRef({
@@ -72,6 +55,16 @@ export default function Mypage() {
     startScrollLeft: 0,
     isDragging: false,
   });
+
+  // 프로필 이미지 Storage 연동: 미리보기 변경 또는 화면 이탈 시 임시 주소 정리.
+  useEffect(() => {
+    // 사용이 끝난 로컬 이미지 미리보기 주소 해제.
+    return () => {
+      if (draftProfileImageUrl) {
+        URL.revokeObjectURL(draftProfileImageUrl);
+      }
+    };
+  }, [draftProfileImageUrl]);
 
   useEffect(() => {
     // 로그인 사용자 정보가 준비된 뒤에만 프로필을 조회
@@ -106,12 +99,160 @@ export default function Mypage() {
       // 이미 끝난 화면의 조회 결과가 나중에 상태를 바꾸지 못하게 표시.
       isCurrentRequest = false;
     };
+  }, [supabase, user]);//로그인 후 user 정보 데이터를 가져오기
+
+  useEffect(() => {
+    if (!user) {
+      return undefined;
+    } //user가 없으면 실행 x
+
+    let isCurrentRequest = true;
+    // 내요약 노트supabase연동
+    async function fetchMySummaries() {
+      const { data, error } = await supabase
+        .from("summaries")
+        .select("id, title, excerpt, is_locked, created_at")
+        .eq("author_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(4);
+
+      if (!isCurrentRequest) {
+        return;
+      }
+
+      setIsMySummariesLoading(false); //Supabase 요청이 끝,로딩 상태 false로 변경
+
+      if (error) {
+        return;
+      }
+      //카드 아이템 컴포로 변경 / 렌더
+      setMySummaryCards(
+        data.map(summary => ({
+          summaryId: summary.id,
+          title: summary.title,
+          excerpt: summary.excerpt ?? "",
+          isPrivate: summary.is_locked,
+          createdAt: summary.created_at,
+        })),
+      );
+    }
+
+    fetchMySummaries();
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [supabase, user]);
+
+  useEffect(() => {
+    if (!user) {
+      return undefined;
+    }
+
+    let isCurrentRequest = true;
+
+    async function fetchBookmarks() {
+      // 수정: 현재 사용자가 가장 최근에 추가한 북마크 4개의 요약 ID를 먼저 조회합니다.
+      const { data: bookmarks, error: bookmarksError } = await supabase
+        .from("bookmarks")
+        .select("summary_id, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(4);
+
+      if (!isCurrentRequest) {
+        return;
+      }
+
+      if (bookmarksError || (bookmarks ?? []).length === 0) {
+        setBookmarkCards([]);
+        setIsBookmarksLoading(false);
+        return;
+      }
+
+      const summaryIds = bookmarks.map(bookmark => bookmark.summary_id);
+      const { data: summaries, error: summariesError } = await supabase
+        .from("summaries")
+        .select("id, author_id, title, excerpt, is_locked, created_at")
+        .in("id", summaryIds);
+
+      if (!isCurrentRequest) {
+        return;
+      }
+
+      if (summariesError) {
+        setBookmarkCards([]);
+        setIsBookmarksLoading(false);
+        return;
+      }
+
+      // 수정: 카드에 작성자 정보를 표시하고 북마크 등록 최신순을 유지합니다.
+      const summariesWithProfiles = await attachProfilesToSummaries(supabase, summaries ?? []);
+      const summaryMap = new Map(summariesWithProfiles.map(summary => [summary.id, summary]));
+      const nextBookmarkCards = summaryIds
+        .map(summaryId => summaryMap.get(summaryId))
+        .filter(Boolean)
+        .map(summary => ({
+          summaryId: summary.id,
+          nickname: summary.nickname ?? "알 수 없는 사용자",
+          profileImageUrl: summary.profile_image_url ?? "/images/main_profile.webp",
+          title: summary.title,
+          excerpt: summary.excerpt ?? "",
+          isPrivate: summary.is_locked,
+          createdAt: summary.created_at,
+        }));
+
+      if (isCurrentRequest) {
+        setBookmarkCards(nextBookmarkCards);
+        setIsBookmarksLoading(false);
+      }
+    }
+
+    fetchBookmarks();
+
+    return () => {
+      isCurrentRequest = false;
+    };
   }, [supabase, user]);
 
   function handleStartProfileEdit() {
     setDraftNickname(nickname);
     setDraftIntroduction(introduction);
+    setDraftProfileImage(null);
+    setDraftProfileImageUrl('');
     setIsEditingProfile(true);
+  }
+
+  function handleBookmarkChange(isBookmarked, summaryId) {
+    if (isBookmarked) {
+      return;
+    }
+
+    // 북마크 삭제가 성공한 카드는 마이페이지 북마크 목록에서 제거
+    setBookmarkCards(currentCards =>
+      currentCards.filter(summary => summary.summaryId !== summaryId),
+    );
+  }
+
+  // 프로필 이미지 Storage 연동: 선택 이미지 형식·크기 검증과 미리보기 표시.
+  function handleProfileImageChange(event) {
+    const selectedImage = event.target.files?.[0];
+
+    if (!selectedImage) {
+      return;
+    }
+
+    // JPEG, PNG, WebP 형식과 5MB 이하 파일만 허용.
+    if (
+      !PROFILE_IMAGE_TYPES.includes(selectedImage.type) ||
+      selectedImage.size > PROFILE_IMAGE_MAX_SIZE
+    ) {
+      event.target.value = '';
+      return;
+    }
+
+    setDraftProfileImage(selectedImage);
+    setDraftProfileImageUrl(URL.createObjectURL(selectedImage));
   }
 
   async function handleCompleteProfileEdit() {
@@ -121,16 +262,48 @@ export default function Mypage() {
 
     const nextNickname = draftNickname.trim();
     const nextIntroduction = draftIntroduction.trim();
+    let nextProfileImageUrl = profileImageUrl;
     setIsSavingProfile(true);
 
     try {
-      // 현재 로그인한 사용자의 닉네임과 한줄소개를 profiles 테이블에 저장
+      // 프로필 이미지 Storage 연동: 새 선택 이미지만 Public 버킷에 업로드.
+      if (draftProfileImage) {
+        const fileExtension = PROFILE_IMAGE_EXTENSIONS[draftProfileImage.type];
+        const filePath = `${user.id}/profile.${fileExtension}`;
+
+        // Storage 정책에 맞춰 사용자 ID 폴더에 이미지 저장.
+        const { error: uploadError } = await supabase.storage
+          .from('profile-images')
+          .upload(filePath, draftProfileImage, {
+            cacheControl: '3600',
+            contentType: draftProfileImage.type,
+            upsert: true,
+          });
+
+        if (uploadError) {
+          return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('profile-images')
+          .getPublicUrl(filePath);
+        nextProfileImageUrl = publicUrlData.publicUrl;
+      }
+
+      // 프로필 이미지 Storage 연동: 새 업로드 이미지가 있을 때만 DB 이미지 URL 변경.
+      const profileUpdates = {
+        nickname: nextNickname,
+        bio: nextIntroduction,
+      };
+
+      if (draftProfileImage) {
+        profileUpdates.profile_image_url = nextProfileImageUrl;
+      }
+
+      // 새 이미지의 공개 URL을 profiles 테이블에 저장.
       const { error } = await supabase
         .from("profiles")
-        .update({
-          nickname: nextNickname,
-          bio: nextIntroduction,
-        })
+        .update(profileUpdates)
         .eq("id", user.id);
 
       if (error) {
@@ -140,7 +313,17 @@ export default function Mypage() {
       // Supabase 저장에 성공한 경우에만 화면 값을 바꾸고 수정 상태를 끝내기.
       setNickname(nextNickname);
       setIntroduction(nextIntroduction);
+      // Storage 덮어쓰기 직후 이전 이미지 캐시 사용 방지.
+      setProfileImageUrl(
+        draftProfileImage
+          ? `${nextProfileImageUrl}?updated=${Date.now()}`
+          : nextProfileImageUrl,
+      );
+      setDraftProfileImage(null);
+      setDraftProfileImageUrl('');
       setIsEditingProfile(false);
+      // 저장된 프로필의 헤더 재조회 알림.
+      window.dispatchEvent(new Event("profile-updated"));
     } finally {
       // 성공과 실패에 관계없이 저장 요청이 끝나면 버튼을 다시 사용
       setIsSavingProfile(false);
@@ -149,6 +332,11 @@ export default function Mypage() {
 
   function handleSummaryListPointerDown(event) {
     if (event.pointerType !== "mouse" || event.button !== 0) {
+      return;
+    }
+
+    // 버튼과 링크의 기본 클릭 동작이 가로 드래그용 포인터 캡처에 가로막히지 않게 합니다.
+    if (event.target.closest("button, a")) {
       return;
     }
 
@@ -219,14 +407,30 @@ export default function Mypage() {
             <h2 id="profile-title">내 프로필</h2>
 
             <div className={styles["profile-content"]}>
+              {/* 프로필 이미지 Storage 연동: 수정 중 이미지 미리보기와 파일 선택 버튼 표시. */}
               <div className={styles["profile-image"]}>
                 <Image
-                  src={profileImageUrl}
+                  src={draftProfileImageUrl || profileImageUrl}
                   alt="사용자 프로필 이미지"
                   width={120}
                   height={120}
-                  unoptimized={profileImageUrl.startsWith("http")}
+                  unoptimized={(draftProfileImageUrl || profileImageUrl).startsWith("http") || Boolean(draftProfileImageUrl)}
                 />
+                {isEditingProfile && (
+                  <label className={styles["profile-image-selector"]}>
+                    {/* 키보드·스크린 리더 사용자를 위한 프로필 이미지 선택 설명. */}
+                    <span className="material-symbols-outlined" aria-hidden="true">
+                      photo_camera
+                    </span>
+                    <span className={styles["visually-hidden"]}>프로필 이미지 선택</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      disabled={isSavingProfile}
+                      onChange={handleProfileImageChange}
+                    />
+                  </label>
+                )}
               </div>
 
             <div className={styles['profile-details']}>
@@ -304,7 +508,7 @@ export default function Mypage() {
           <section className={styles["summary-section"]} aria-labelledby="my-summary-title">
             <div className={styles["section-heading"]}>
               <h2 id="my-summary-title">내 요약 노트</h2>
-              <Link href="/mypage/mysummaries" className={styles["more-link"]}>
+              <Link href="/mypage/summaries" className={styles["more-link"]}>
                 <span>더보기</span>
                 <span
                   className={`material-symbols-outlined ${styles["more-icon"]}`}
@@ -326,9 +530,18 @@ export default function Mypage() {
               onPointerCancel={handleSummaryListPointerCancel}
               onClickCapture={handleSummaryListClickCapture}
             >
-              {mySummaryCards.map(summary => (
-                <SummaryItemCard key={summary.summaryId} {...summary} />
-              ))}
+              {!isMySummariesLoading && mySummaryCards.length === 0 ? (
+                <EmptyState message="요약 노트가 아직 생성되지 않았습니다." />
+              ) : (
+                mySummaryCards.map(summary => (
+                  <SummaryItemCard
+                    key={summary.summaryId}
+                    {...summary}
+                    nickname={nickname}
+                    profileImageUrl={profileImageUrl}
+                  />
+                ))
+              )}
             </div>
           </section>
 
@@ -357,13 +570,18 @@ export default function Mypage() {
               onPointerCancel={handleSummaryListPointerCancel}
               onClickCapture={handleSummaryListClickCapture}
             >
-              {bookmarkCards.map(summary => (
-                <SummaryItemCard
-                  key={`bookmark-${summary.summaryId}`}
-                  {...summary}
-                  initialIsBookmarked
-                />
-              ))}
+              {!isBookmarksLoading && bookmarkCards.length === 0 ? (
+                <EmptyState message="북마크한 요약 노트가 없습니다." />
+              ) : (
+                bookmarkCards.map(summary => (
+                  <SummaryItemCard
+                    key={`bookmark-${summary.summaryId}`}
+                    {...summary}
+                    initialIsBookmarked
+                    onBookmarkChange={handleBookmarkChange}
+                  />
+                ))
+              )}
             </div>
           </section>
         </div>
