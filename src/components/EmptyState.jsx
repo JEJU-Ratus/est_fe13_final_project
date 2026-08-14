@@ -7,7 +7,7 @@ export default function EmptyState({ message }) {
     <div className={styles["empty-state"]} role="status" aria-live="polite">
       <span className={styles["empty-image"]}>
         {/* 안내 문구가 상태 의미를 전달하므로 장식 이미지는 중복 낭독에서 제외합니다. */}
-        <Image src="/images/empty-note.png" alt="" fill sizes="171px" />
+        <Image src="/images/clear.webp" alt="" fill sizes="171px" />
       </span>
       <p className={styles["empty-message"]}>{message}</p>
     </div>

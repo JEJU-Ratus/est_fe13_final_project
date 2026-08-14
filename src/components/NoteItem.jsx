@@ -5,11 +5,11 @@ import styles from "./NoteItem.module.scss";
 const QUIZ_STATUS = {
   notStarted: {
     label: "학습 전",
-    imageSrc: "/images/quiz-not-started.png",
+    imageSrc: "/images/none-clear.webp",
   },
   completed: {
     label: "학습 완료",
-    imageSrc: "/images/quiz-completed.png",
+    imageSrc: "/images/clear.webp",
   },
 };
 
@@ -24,10 +24,7 @@ export default function NoteItem({
   const status = QUIZ_STATUS[quizStatus] ?? QUIZ_STATUS.notStarted;
 
   return (
-    <Link
-      className={styles["note-item"]}
-      href={`/summary/${summaryId}/notes/${noteId}`}
-    >
+    <Link className={styles["note-item"]} href={`/summary/${summaryId}/notes/${noteId}`}>
       <span className={styles["status-cell"]}>
         <span className={styles["status-image"]}>
           <Image src={status.imageSrc} alt="" fill sizes="40px" />

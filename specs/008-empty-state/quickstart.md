@@ -21,7 +21,7 @@ src/app/(site)/Summary/[summaryId]/page.module.scss
 src/app/(site)/Mypage/page.js
 ```
 
-기존 `public/images/empty-note.png`는 그대로 재사용한다. `Allsummary.jsx`를 포함한 기존 파일과 폴더 이름은 변경하지 않는다.
+기존 `public/images/clear.webp`는 그대로 재사용한다. `Allsummary.jsx`를 포함한 기존 파일과 폴더 이름은 변경하지 않는다.
 
 ## 실행
 
