@@ -17,8 +17,13 @@
 .delete-button {
   @include typography.text-20-semibold;
 
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 150px;
   height: 50px;
+  color: color.$fda-navy;
+  text-decoration: none;
   border: 0;
   border-radius: 100px;
 
@@ -28,7 +33,6 @@
 }
 
 .create-button {
-  color: color.$fda-navy;
   background: color.$fda-yellow;
 }
 
