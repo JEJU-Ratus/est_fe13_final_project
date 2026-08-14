@@ -53,6 +53,8 @@ export default function Mypage() {
     element: null,
     startX: 0,
     startScrollLeft: 0,
+    targetScrollLeft: 0,
+    animationFrameId: null,
     isDragging: false,
   });
 
@@ -114,7 +116,7 @@ export default function Mypage() {
         .select("id, title, excerpt, is_locked, created_at")
         .eq("author_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(4);
+        .limit(8);
 
       if (!isCurrentRequest) {
         return;
@@ -152,13 +154,13 @@ export default function Mypage() {
     let isCurrentRequest = true;
 
     async function fetchBookmarks() {
-      // 수정: 현재 사용자가 가장 최근에 추가한 북마크 4개의 요약 ID를 먼저 조회합니다.
+      // 수정: 현재 사용자가 가장 최근에 추가한 북마크 8개의 요약 ID를 먼저 조회합니다.
       const { data: bookmarks, error: bookmarksError } = await supabase
         .from("bookmarks")
         .select("summary_id, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(4);
+        .limit(8);
 
       if (!isCurrentRequest) {
         return;
@@ -335,8 +337,8 @@ export default function Mypage() {
       return;
     }
 
-    // 버튼과 링크의 기본 클릭 동작이 가로 드래그용 포인터 캡처에 가로막히지 않게 합니다.
-    if (event.target.closest("button, a")) {
+    // 북마크 버튼 조작은 가로 드래그로 처리하지 않습니다.
+    if (event.target.closest('button[aria-pressed]')) {
       return;
     }
 
@@ -344,15 +346,27 @@ export default function Mypage() {
       element: event.currentTarget,
       startX: event.clientX,
       startScrollLeft: event.currentTarget.scrollLeft,
+      targetScrollLeft: event.currentTarget.scrollLeft,
+      animationFrameId: null,
       isDragging: false,
     };
-    event.currentTarget.setPointerCapture(event.pointerId);
   }
 
   function handleSummaryListPointerMove(event) {
     const dragState = summaryListDragRef.current;
 
     if (dragState.element !== event.currentTarget) {
+      return;
+    }
+
+    if ((event.buttons & 1) !== 1) {
+      if (dragState.animationFrameId !== null) {
+        window.cancelAnimationFrame(dragState.animationFrameId);
+        dragState.animationFrameId = null;
+      }
+
+      dragState.element = null;
+      dragState.isDragging = false;
       return;
     }
 
@@ -364,7 +378,17 @@ export default function Mypage() {
 
     if (dragState.isDragging) {
       event.preventDefault();
-      event.currentTarget.scrollLeft = dragState.startScrollLeft - dragDistance;
+      dragState.targetScrollLeft = dragState.startScrollLeft - dragDistance;
+
+      if (dragState.animationFrameId === null) {
+        dragState.animationFrameId = window.requestAnimationFrame(() => {
+          if (dragState.element) {
+            dragState.element.scrollLeft = dragState.targetScrollLeft;
+          }
+
+          dragState.animationFrameId = null;
+        });
+      }
     }
   }
 
@@ -375,11 +399,18 @@ export default function Mypage() {
       return;
     }
 
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
+    if (dragState.animationFrameId !== null) {
+      window.cancelAnimationFrame(dragState.animationFrameId);
+      dragState.animationFrameId = null;
+      event.currentTarget.scrollLeft = dragState.targetScrollLeft;
     }
 
     dragState.element = null;
+
+    // 드래그 직후 발생하는 click을 먼저 차단한 다음 남은 드래그 상태를 정리합니다.
+    window.setTimeout(() => {
+      dragState.isDragging = false;
+    }, 0);
   }
 
   function handleSummaryListPointerCancel(event) {
@@ -527,6 +558,7 @@ export default function Mypage() {
               onPointerDown={handleSummaryListPointerDown}
               onPointerMove={handleSummaryListPointerMove}
               onPointerUp={handleSummaryListPointerEnd}
+              onPointerLeave={handleSummaryListPointerCancel}
               onPointerCancel={handleSummaryListPointerCancel}
               onClickCapture={handleSummaryListClickCapture}
             >
@@ -567,6 +599,7 @@ export default function Mypage() {
               onPointerDown={handleSummaryListPointerDown}
               onPointerMove={handleSummaryListPointerMove}
               onPointerUp={handleSummaryListPointerEnd}
+              onPointerLeave={handleSummaryListPointerCancel}
               onPointerCancel={handleSummaryListPointerCancel}
               onClickCapture={handleSummaryListClickCapture}
             >
