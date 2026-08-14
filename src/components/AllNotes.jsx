@@ -75,6 +75,14 @@ function getScopeKey(scope, summaryId) {
   return scope === "summary" ? `${scope}:${summaryId ?? ""}` : scope;
 }
 
+function createRequestTracker(scopeKey) {
+  return {
+    scopeKey,
+    inFlightCursor: null,
+    requestedCursors: new Set(),
+  };
+}
+
 function createInitialState(initialPage, shouldLoadList) {
   const page = shouldLoadList ? normalizePage(initialPage) : normalizePage(null);
 
@@ -111,14 +119,8 @@ export default function AllNotes({
   const [isPasswordSubmitting, setIsPasswordSubmitting] = useState(false);
   const sentinelRef = useRef(null);
   const isMountedRef = useRef(false);
-  const scopeKeyRef = useRef(scopeKey);
-  const requestTrackerRef = useRef({
-    scopeKey,
-    inFlightCursor: null,
-    requestedCursors: new Set(),
-  });
-
-  scopeKeyRef.current = scopeKey;
+  const scopeVersionRef = useRef(0);
+  const requestTrackerRef = useRef(createRequestTracker(scopeKey));
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -129,16 +131,20 @@ export default function AllNotes({
   }, []);
 
   useEffect(() => {
+    scopeVersionRef.current += 1;
+    requestTrackerRef.current = createRequestTracker(scopeKey);
+  }, [scopeKey]);
+
+  useEffect(() => {
     if (!shouldLoadList || initialPage || typeof loadPage !== "function") {
       return undefined;
     }
 
     const tracker = requestTrackerRef.current;
+    const requestScopeVersion = scopeVersionRef.current;
 
     if (tracker.scopeKey !== scopeKey) {
-      tracker.scopeKey = scopeKey;
-      tracker.inFlightCursor = null;
-      tracker.requestedCursors = new Set();
+      return undefined;
     }
 
     const cursorKey = getCursorKey(null);
@@ -152,12 +158,18 @@ export default function AllNotes({
 
     tracker.inFlightCursor = cursorKey;
     tracker.requestedCursors.add(cursorKey);
+    let ignore = false;
 
     async function loadInitialPage() {
       try {
         const response = await loadPage(createScope(normalizedScope, summaryId), null);
 
-        if (!isMountedRef.current || scopeKeyRef.current !== scopeKey) {
+        if (
+          ignore ||
+          !isMountedRef.current ||
+          requestTrackerRef.current !== tracker ||
+          scopeVersionRef.current !== requestScopeVersion
+        ) {
           return;
         }
 
@@ -171,7 +183,12 @@ export default function AllNotes({
           error: null,
         }));
       } catch (error) {
-        if (!isMountedRef.current || scopeKeyRef.current !== scopeKey) {
+        if (
+          ignore ||
+          !isMountedRef.current ||
+          requestTrackerRef.current !== tracker ||
+          scopeVersionRef.current !== requestScopeVersion
+        ) {
           return;
         }
 
@@ -183,7 +200,10 @@ export default function AllNotes({
           error,
         }));
       } finally {
-        if (tracker.inFlightCursor === cursorKey) {
+        if (
+          requestTrackerRef.current === tracker &&
+          tracker.inFlightCursor === cursorKey
+        ) {
           tracker.inFlightCursor = null;
         }
       }
@@ -191,7 +211,9 @@ export default function AllNotes({
 
     void loadInitialPage();
 
-    return undefined;
+    return () => {
+      ignore = true;
+    };
   }, [initialPage, loadPage, normalizedScope, scopeKey, shouldLoadList, summaryId]);
 
   const handleLoadMore = useCallback(async () => {
@@ -210,11 +232,10 @@ export default function AllNotes({
     const cursor = listState.nextCursor;
     const cursorKey = getCursorKey(cursor);
     const tracker = requestTrackerRef.current;
+    const requestScopeVersion = scopeVersionRef.current;
 
     if (tracker.scopeKey !== scopeKey) {
-      tracker.scopeKey = scopeKey;
-      tracker.inFlightCursor = null;
-      tracker.requestedCursors = new Set();
+      return;
     }
 
     if (
@@ -235,7 +256,11 @@ export default function AllNotes({
     try {
       const response = await loadPage(createScope(normalizedScope, summaryId), cursor);
 
-      if (!isMountedRef.current || scopeKeyRef.current !== scopeKey) {
+      if (
+        !isMountedRef.current ||
+        requestTrackerRef.current !== tracker ||
+        scopeVersionRef.current !== requestScopeVersion
+      ) {
         return;
       }
 
@@ -261,7 +286,11 @@ export default function AllNotes({
     } catch (error) {
       tracker.requestedCursors.delete(cursorKey);
 
-      if (!isMountedRef.current || scopeKeyRef.current !== scopeKey) {
+      if (
+        !isMountedRef.current ||
+        requestTrackerRef.current !== tracker ||
+        scopeVersionRef.current !== requestScopeVersion
+      ) {
         return;
       }
 
@@ -272,7 +301,10 @@ export default function AllNotes({
         error,
       }));
     } finally {
-      if (tracker.inFlightCursor === cursorKey) {
+      if (
+        requestTrackerRef.current === tracker &&
+        tracker.inFlightCursor === cursorKey
+      ) {
         tracker.inFlightCursor = null;
       }
     }
@@ -341,11 +373,8 @@ export default function AllNotes({
         return;
       }
 
-      requestTrackerRef.current = {
-        scopeKey,
-        inFlightCursor: null,
-        requestedCursors: new Set(),
-      };
+      scopeVersionRef.current += 1;
+      requestTrackerRef.current = createRequestTracker(scopeKey);
       setResolvedAccessState("authorized");
       setListState(createInitialState(null, true));
     } catch {
