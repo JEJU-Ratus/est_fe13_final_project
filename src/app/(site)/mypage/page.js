@@ -44,6 +44,8 @@ export default function Mypage() {
   const [isMySummariesLoading, setIsMySummariesLoading] = useState(true);
   const [bookmarkCards, setBookmarkCards] = useState([]);
   const [isBookmarksLoading, setIsBookmarksLoading] = useState(true);
+  // 토스트방식 오류메세지
+  const [toastMessage, setToastMessage] = useState("");
   // 프로필 이미지 Storage 연동: 저장 전 선택 파일과 미리보기 주소 관리.
   const [draftProfileImage, setDraftProfileImage] = useState(null);
   const [draftProfileImageUrl, setDraftProfileImageUrl] = useState('');
@@ -59,6 +61,20 @@ export default function Mypage() {
   });
 
   // 프로필 이미지 Storage 연동: 미리보기 변경 또는 화면 이탈 시 임시 주소 정리.
+  useEffect(() => {
+    if (!toastMessage) {
+      return undefined;
+    }
+
+    const timerId = window.setTimeout(() => {
+      setToastMessage("");
+    }, 3000);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [toastMessage]);
+
   useEffect(() => {
     // 사용이 끝난 로컬 이미지 미리보기 주소 해제.
     return () => {
@@ -85,7 +101,12 @@ export default function Mypage() {
         .eq("id", user.id)
         .single();
 
-      if (!isCurrentRequest || error) {
+      if (!isCurrentRequest) {
+        return;
+      }
+
+      if (error) {
+        setToastMessage("프로필 정보를 불러오지 못했습니다.");
         return;
       }
 
@@ -124,11 +145,12 @@ export default function Mypage() {
 
       if (error) {
         setIsMySummariesLoading(false);
+        setToastMessage("내 요약 노트를 불러오지 못했습니다.");
         return;
       }
 
       const summaryIds = data.map(summary => summary.id);
-      const { data: bookmarks } = summaryIds.length
+      const { data: bookmarks, error: summaryBookmarksError } = summaryIds.length
         ? await supabase
             .from("bookmarks")
             .select("summary_id")
@@ -138,6 +160,10 @@ export default function Mypage() {
 
       if (!isCurrentRequest) {
         return;
+      }
+
+      if (summaryBookmarksError) {
+        setToastMessage("요약 노트의 북마크 상태를 불러오지 못했습니다.");
       }
 
       const bookmarkedSummaryIds = new Set(
@@ -185,7 +211,13 @@ export default function Mypage() {
         return;
       }
 
-      if (bookmarksError || (bookmarks ?? []).length === 0) {
+      if (bookmarksError) {
+        setIsBookmarksLoading(false);
+        setToastMessage("북마크 목록을 불러오지 못했습니다.");
+        return;
+      }
+
+      if ((bookmarks ?? []).length === 0) {
         setBookmarkCards([]);
         setIsBookmarksLoading(false);
         return;
@@ -204,6 +236,7 @@ export default function Mypage() {
       if (summariesError) {
         setBookmarkCards([]);
         setIsBookmarksLoading(false);
+        setToastMessage("북마크한 요약 노트를 불러오지 못했습니다.");
         return;
       }
 
@@ -268,6 +301,7 @@ export default function Mypage() {
         .eq("summary_id", summaryId);
 
       if (error) {
+        setToastMessage("북마크를 해제하지 못했습니다.");
         return;
       }
     } else {
@@ -277,6 +311,7 @@ export default function Mypage() {
       });
 
       if (error) {
+        setToastMessage("북마크를 추가하지 못했습니다.");
         return;
       }
     }
@@ -357,6 +392,7 @@ export default function Mypage() {
           });
 
         if (uploadError) {
+          setToastMessage("프로필 이미지를 업로드하지 못했습니다.");
           return;
         }
 
@@ -383,6 +419,7 @@ export default function Mypage() {
         .eq("id", user.id);
 
       if (error) {
+        setToastMessage("프로필 정보를 저장하지 못했습니다.");
         return;
       }
 
@@ -692,6 +729,21 @@ export default function Mypage() {
             </div>
           </section>
         </div>
+        {/* 오류 안내를 즉시 읽어 주고 사용자가 자동 종료 전에 직접 닫을 수도 있게 합니다. */}
+        {toastMessage && (
+          <div role="alert" aria-live="assertive">
+            <span>{toastMessage}</span>
+            <button
+              type="button"
+              aria-label="오류 알림 닫기"
+              onClick={() => setToastMessage("")}
+            >
+              <span className="material-symbols-outlined" aria-hidden="true">
+                close
+              </span>
+            </button>
+          </div>
+        )}
       </main>
     </AuthGuard>
   );
