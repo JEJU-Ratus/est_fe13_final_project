@@ -1,6 +1,6 @@
 "use client";
 
-import AllNotes from "./AllNotes";
+import AllNotes from "@/components/AllNotes";
 import { loadMockStudyNotePage, MOCK_BANNERS } from "@/mocks/all-notes";
 
 export default function AllNotePage() {

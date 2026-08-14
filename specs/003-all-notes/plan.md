@@ -105,20 +105,20 @@ src/
 │       │   └── summaries/
 │       │       └── page.js                 # 명세의 정식 내 목록 진입점 추가
 │       ├── allnote/
-│       │   ├── AllNotes.jsx                # 전체 노트 페이지 전용 Client Component
-│       │   ├── AllNotes.module.scss
 │       │   └── page.js                     # 모든 작성자의 공개 노트 진입점 추가
 │       └── summary/
 │           └── [summaryId]/
 │               └── notes/                  # 생성·상세·수정 하위 경로 유지
-├── components/                             # 여러 페이지에서 공유하는 컴포넌트
+├── components/
+│   ├── AllNotes.jsx                         # 여러 목록 페이지에서 공유하는 Client Component
+│   └── AllNotes.module.scss
 └── lib/
     └── supabase/                           # 기존 client/server/proxy 재사용, 변경하지 않음
 ```
 
 기존 `src/app/(site)/mypage/mysummaries/page.js`, 기존 요약 상세 페이지·레이아웃, `NoteItem`, `Banner`, `EmptyState`, `CommonModal`, `AuthGuard`는 이 계획에서 삭제·이름 변경하지 않는다. 데이터 조회 구현은 기존 서비스 영역 또는 `002-summary-detail`에서 승인된 조회 계약을 소비하며, 이 기능은 그 계약을 대체할 별도 모듈을 만들지 않는다.
 
-**구조 결정**: `AllNotes`는 현재 `/allnote`에서만 사용하므로 해당 페이지 폴더에 둔다. `Banner`, `NoteItem`, `EmptyState`, `CommonModal`처럼 여러 화면에서 사용하는 컴포넌트는 `src/components`에 유지한다. 목록 상태와 브라우저 API는 페이지 전용 Client Component에만 둔다.
+**구조 결정**: `AllNotes`는 `/allnote`와 팀에서 추가로 사용하는 목록 페이지의 공통 기능 컴포넌트이므로 `src/components`에 둔다. 페이지 파일은 범위와 라우트 문맥만 연결하고, 목록 상태와 브라우저 API는 `AllNotes`가 공유한다.
 
 ## 준비 단계 점검 결과
 
@@ -164,7 +164,7 @@ src/
 
 1. 구현 시작 전 `feature/all-notes` 브랜치와 현재 `feature/summary-detail`의 작업 범위를 확인하고, `/mypage/mysummaries`를 유지한 채 `/mypage/summaries`를 추가할지 팀에 공유한다.
 2. UI MVP에서는 `src/mocks/all-notes.js`의 목록 범위, 표시 필드, 접근·오류 상태를 계약과 대조한다. UI 리뷰 후 `002-summary-detail`의 DB·RLS 선행 조건을 확인하고 기존 조회 모델·잠금 인증·Supabase 공통 클라이언트의 서비스 계약으로 교체할 때도 새 스키마·API는 만들지 않는다.
-3. `src/app/(site)/allnote/AllNotes.jsx`에 scope·초기/추가 로딩·복합 cursor·중복 키·observer cleanup 상태를 구성한다.
+3. `src/components/AllNotes.jsx`에 scope·초기/추가 로딩·복합 cursor·중복 키·observer cleanup 상태를 구성한다.
 4. `Banner`, 목록 상단 개수, `NoteItem`, `EmptyState`, `CommonModal`을 기존 props와 책임으로 연결하고 데스크톱 SCSS Module을 작성한다.
 5. 두 `page.js`에 각각 `mine`과 `all` scope를 연결하고, 오류 후속 이동과 Header 레이아웃을 확인한다. 기존 `/mypage/mysummaries` 파일은 삭제·이름 변경하지 않는다.
 6. [quickstart.md](./quickstart.md)의 mock 기반 공개·보호·빈·오류·무한 스크롤·배너 시나리오를 검증해 UI MVP를 확정한다.

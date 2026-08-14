@@ -61,11 +61,11 @@ StudyNoteReadError =
 **파일**:
 
 ```text
-src/app/(site)/allnote/AllNotes.jsx
-src/app/(site)/allnote/AllNotes.module.scss
+src/components/AllNotes.jsx
+src/components/AllNotes.module.scss
 ```
 
-`AllNotes`는 `/allnote`에서 사용하는 페이지 전용 Client Component다. 논리 입력은 다음과 같다.
+`AllNotes`는 `/allnote`와 다른 목록 페이지에서 공통으로 사용하는 기능 전용 Client Component다. 논리 입력은 다음과 같다.
 
 | 입력 | 형태 | 설명 |
 |---|---|---|

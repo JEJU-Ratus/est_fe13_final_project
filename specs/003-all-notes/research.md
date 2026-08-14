@@ -9,13 +9,13 @@
 
 ## 결정 1: 두 경로는 하나의 기능 전용 Client Component로 목록 상호작용을 공유한다
 
-**결정**: `/allnote/page.js`와 전용 `AllNotes.jsx`가 목록 상태·추가 로딩·행 렌더링을 담당한다. `IntersectionObserver`, 요청 중복 방지, 오류 모달 상태처럼 브라우저 API와 이벤트가 필요한 부분만 Client Component 경계에 둔다.
+**결정**: `/allnote/page.js`와 다른 목록 페이지가 공용 `src/components/AllNotes.jsx`를 사용해 목록 상태·추가 로딩·행 렌더링을 공유한다. `IntersectionObserver`, 요청 중복 방지, 오류 모달 상태처럼 브라우저 API와 이벤트가 필요한 부분만 Client Component 경계에 둔다.
 
 **근거**:
 
 - Next.js App Router의 페이지와 레이아웃은 기본적으로 Server Component이며, 상태·이벤트·브라우저 API가 필요한 부분만 Client Component로 분리하는 방식이 프로젝트 규칙과 일치한다.
 - 두 경로는 총 개수, 12개 단위 추가, 행 정보, 빈 상태, 오류 처리 규칙이 동일하고 목록 범위만 다르다. 동일 로직을 두 페이지에 복사하면 중복 로딩 방지와 오류 후속 이동이 어긋날 위험이 있다.
-- `AllNotes`는 `/allnote`에서만 사용하는 페이지 전용 컴포넌트로 두며, 범용 목록 프레임워크나 별도 상태 관리 라이브러리는 추가하지 않는다.
+- `AllNotes`는 여러 목록 페이지에서 사용하는 기능 전용 공용 컴포넌트로 두며, 범용 목록 프레임워크나 별도 상태 관리 라이브러리는 추가하지 않는다.
 
 **대안 검토**:
 
