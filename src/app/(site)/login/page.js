@@ -142,7 +142,7 @@ export default function LoginPage() {
           <header className={styles["brand-area"]}>
             <Image
               className={styles["brand-logo"]}
-              src="/images/logo.png"
+              src="/images/logo.webp"
               alt="프다!"
               width={550}
               height={237}
