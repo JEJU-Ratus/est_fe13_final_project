@@ -4,17 +4,16 @@ import { useState } from "react";
 import Image from "next/image";
 import Banner from "@/components/Banner";
 import CommonModal from "@/components/CommonModal";
+import { useAuth } from "@/components/AuthProvider";
 import styles from "./page.module.scss";
 import Link from "next/link";
 
-const loggedInUsers = [];
-
 export default function Home() {
+  const { isAuthenticated, isAuthLoading } = useAuth();
   const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
   const [isSuggestLoginModalOpen, setIsSuggestLoginModalOpen] = useState(false);
   const [isPasswordEnabled, setIsPasswordEnabled] = useState(false);
   const [password, setPassword] = useState("");
-  const isLoggedIn = loggedInUsers.length > 0;
 
   function handlePasswordEnabledChange(event) {
     const isChecked = event.target.checked;
@@ -29,7 +28,7 @@ export default function Home() {
   function handleSummarySubmit(event) {
     event.preventDefault();
 
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       setIsSuggestLoginModalOpen(true);
     }
   }
@@ -72,7 +71,7 @@ export default function Home() {
                   className={styles["submit-button"]}
                   type="submit"
                   aria-label="요약 요청"
-                  formNoValidate={!isLoggedIn}
+                  formNoValidate={!isAuthenticated}
                 >
                   <span className={`material-symbols-outlined ${styles["submit-icon"]}`} aria-hidden="true">
                     arrow_upward
@@ -154,16 +153,28 @@ export default function Home() {
               </span>
               <span>퀴즈</span>
             </button>
-            <button
-              className={styles["quick-menu-card"]}
-              type="button"
-              onClick={() => setIsSuggestLoginModalOpen(true)}
-            >
-              <span className="material-symbols-outlined" aria-hidden="true">
-                person
-              </span>
-              <span>마이페이지</span>
-            </button>
+            {/* 로그인 후 마이페이지 이동 */}
+            {isAuthenticated ? (
+              <Link href="/mypage" className={styles["quick-menu-card"]}>
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  person
+                </span>
+                <span>마이페이지</span>
+              </Link>
+            ) : (
+              //로그아웃하면 마이페이지는 모달, true
+              <button
+                className={styles["quick-menu-card"]}
+                type="button"
+                onClick={() => setIsSuggestLoginModalOpen(true)}
+                disabled={isAuthLoading}
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  person
+                </span>
+                <span>마이페이지</span>
+              </button>
+            )}
           </div>
         </section>
       </div>
