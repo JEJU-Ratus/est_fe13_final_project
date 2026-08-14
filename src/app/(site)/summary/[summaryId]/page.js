@@ -32,6 +32,9 @@ export default async function SummaryDetailPage({ params }) {
             노트 생성
           </Link>
         )}
+        <Link className={styles["more-link"]} href="/allnote">
+          더보기
+        </Link>
       </div>
 
       <div className={styles["section-heading"]}>

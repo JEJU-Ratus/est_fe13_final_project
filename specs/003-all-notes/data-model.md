@@ -7,15 +7,16 @@
 ```text
 사용자 ──작성──▶ 학습노트 ──소속──▶ 요약본
    │                               │
-   └── /mypage/summaries            └── /summary/[summaryId]/notes
+   ├── /mypage/summaries            └── /allnote
+   └── 내 작성 목록                  (공개 요약본 소속 전체 노트)
 
 요약본 ──제공──▶ 광고 배너
 ```
 
 - `학습노트.authorId`는 `/mypage/summaries`에서 현재 인증 사용자와 일치해야 한다.
-- `학습노트.summaryId`는 `/summary/[summaryId]/notes`의 경로 식별자와 일치해야 한다.
+- `/allnote`는 `요약본.isPrivate=false`인 학습노트만 포함하며 작성자와 관계없이 조회한다.
 - 행의 상세 이동은 `summaryId`와 `noteId`를 함께 사용한다.
-- 공개 요약본은 로그인 여부와 관계없이 목록 조회가 가능하다. 잠긴 요약본은 접근 상태가 `authorized`가 된 뒤에만 목록을 조회한다.
+- `/allnote`는 로그인 여부와 관계없이 공개 요약본 노트를 조회한다. 잠긴 요약본 소속 노트는 목록에서 제외한다.
 
 ## 조회 모델
 
@@ -55,20 +56,14 @@
 
 응답의 `items.length`가 12보다 작거나 더 가져올 항목이 없으면 `hasMore=false`, `nextCursor=null`로 종료한다. `totalCount`는 목록 상단의 `총 {count}개의 학습노트` 문구에 사용한다.
 
-## 접근 상태 모델
+## 목록 접근 모델
 
-### `SummaryNoteAccessState`
-
-| 값 | 의미 | 목록 데이터 조회 |
+| 범위 | 접근 조건 | 필터 |
 |---|---|---|
-| `checking` | 경로 요약본과 현재 세션의 접근 여부를 확인 중 | 금지 |
-| `public` | 요약본이 공개되어 누구나 조회 가능 | 허용 |
-| `authorized` | 잠긴 요약본의 현재 브라우저 세션 인증이 완료됨 | 허용 |
-| `passwordRequired` | 잠긴 요약본이며 현재 세션이 인증되지 않음 | 금지; `NotePwModal` 표시 |
-| `notFound` | `summaryId`에 해당하는 요약본이 없음 | 금지; 404 오류 모달 후 `/` 이동 |
-| `error` | 접근 상태 또는 일반 목록 조회에 실패함 | 금지; 공통 오류 모달 표시 |
+| `mine` | 기존 인증 서비스의 현재 사용자 | 현재 사용자가 작성한 노트 |
+| `all` | 로그인 여부와 무관 | 공개 요약본에 소속된 모든 작성자의 노트 |
 
-비밀번호 입력값, 검증 방식, 인증 결과 저장 위치는 이 모델에 포함하지 않는다. 해당 상태는 기존 비밀번호 인증 서비스와 `NotePwModal` 호출 계약이 소유한다.
+`all` 범위는 잠긴 요약본을 반환하지 않는다. 잠금 비밀번호 입력과 세션 인증은 요약본 상세·생성·수정 기능의 책임이며 전체 목록 모델에는 포함하지 않는다.
 
 ## 배너 모델
 
@@ -94,17 +89,14 @@
 | `loadingMore` | `hasMore=true` 상태에서 다음 요청 진행 중 | 기존 행 유지, sentinel 중복 요청 차단 |
 | `readyEnd` | 마지막 묶음 수신 또는 `hasMore=false` | 기존 행 유지, 추가 감시 종료 |
 | `error` | 목록·접근 조회 실패 | `CommonModal` 표시, EmptyState로 대체하지 않음 |
-| `passwordRequired` | 잠긴 요약본 인증 전 | 목록 데이터 없이 `NotePwModal` 표시 |
 
 ## 상태 전이
 
 ```text
 접근 확인
   ├─ 내 목록 + 비로그인 → AuthGuard / requireLogin → /login
-  ├─ 공개 요약본 → initialLoading
-  ├─ 잠금 인증 완료 → initialLoading
-  ├─ 잠금 인증 전 → passwordRequired ── 성공 → initialLoading
-  └─ 없는 summaryId → notFound → 오류 모달 ── 3초 → /
+  ├─ 내 목록 인증 완료 → initialLoading
+  └─ 전체 목록 → 공개 요약본 필터 → initialLoading
 
 initialLoading
   ├─ items > 0 → readyWithItems
@@ -123,8 +115,8 @@ loadingMore
 
 ## 무결성 규칙
 
-1. 목록 범위는 `mine` 또는 `summary` 중 하나이며, `mine`은 서비스가 현재 인증 사용자로 제한한다.
-2. `summary` 범위는 경로의 `summaryId`로 제한한다. 클라이언트가 전달한 다른 사용자 식별자를 조회 조건으로 신뢰하지 않는다.
+1. 목록 범위는 `mine` 또는 `all` 중 하나이며, `mine`은 서비스가 현재 인증 사용자로 제한한다.
+2. `all` 범위는 공개 요약본으로 제한한다. 클라이언트가 전달한 사용자 식별자나 잠금 해제 상태를 조회 조건으로 신뢰하지 않는다.
 3. 항목의 유일 키는 `${summaryId}:${noteId}`이다. 병합 전에 이미 표시된 키를 제거한다.
 4. 한 Client Component에서 동일한 커서에 대한 요청은 동시에 하나만 실행한다.
 5. 표시 순서는 모든 페이지가 `createdAt DESC, noteId DESC`를 유지한다.
