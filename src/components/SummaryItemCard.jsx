@@ -83,6 +83,7 @@ export default function SummaryItemCard({
             className={styles["card-link"]}
             href={`/summary/${summaryId}`}
             aria-label={`${title || "요약 노트"} 상세 보기`}
+            draggable={false}
           />
         )}
 

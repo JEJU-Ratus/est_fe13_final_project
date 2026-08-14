@@ -53,6 +53,8 @@ export default function Mypage() {
     element: null,
     startX: 0,
     startScrollLeft: 0,
+    targetScrollLeft: 0,
+    animationFrameId: null,
     isDragging: false,
   });
 
@@ -114,17 +116,34 @@ export default function Mypage() {
         .select("id, title, excerpt, is_locked, created_at")
         .eq("author_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(4);
+        .limit(8);
 
       if (!isCurrentRequest) {
         return;
       }
 
-      setIsMySummariesLoading(false); //Supabase 요청이 끝,로딩 상태 false로 변경
-
       if (error) {
+        setIsMySummariesLoading(false);
         return;
       }
+
+      const summaryIds = data.map(summary => summary.id);
+      const { data: bookmarks } = summaryIds.length
+        ? await supabase
+            .from("bookmarks")
+            .select("summary_id")
+            .eq("user_id", user.id)
+            .in("summary_id", summaryIds)
+        : { data: [] };
+
+      if (!isCurrentRequest) {
+        return;
+      }
+
+      const bookmarkedSummaryIds = new Set(
+        (bookmarks ?? []).map(bookmark => bookmark.summary_id),
+      );
+
       //카드 아이템 컴포로 변경 / 렌더
       setMySummaryCards(
         data.map(summary => ({
@@ -133,8 +152,10 @@ export default function Mypage() {
           excerpt: summary.excerpt ?? "",
           isPrivate: summary.is_locked,
           createdAt: summary.created_at,
+          isBookmarked: bookmarkedSummaryIds.has(summary.id),
         })),
       );
+      setIsMySummariesLoading(false);
     }
 
     fetchMySummaries();
@@ -152,13 +173,13 @@ export default function Mypage() {
     let isCurrentRequest = true;
 
     async function fetchBookmarks() {
-      // 수정: 현재 사용자가 가장 최근에 추가한 북마크 4개의 요약 ID를 먼저 조회합니다.
+      // 수정: 현재 사용자가 가장 최근에 추가한 북마크 8개의 요약 ID를 먼저 조회합니다.
       const { data: bookmarks, error: bookmarksError } = await supabase
         .from("bookmarks")
         .select("summary_id, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(4);
+        .limit(8);
 
       if (!isCurrentRequest) {
         return;
@@ -200,6 +221,7 @@ export default function Mypage() {
           excerpt: summary.excerpt ?? "",
           isPrivate: summary.is_locked,
           createdAt: summary.created_at,
+          isBookmarked: true,
         }));
 
       if (isCurrentRequest) {
@@ -223,12 +245,66 @@ export default function Mypage() {
     setIsEditingProfile(true);
   }
 
-  function handleBookmarkChange(isBookmarked, summaryId) {
-    if (isBookmarked) {
+  async function handleBookmarkToggle(summaryId) {
+    if (!user) {
       return;
     }
 
-    // 북마크 삭제가 성공한 카드는 마이페이지 북마크 목록에서 제거
+    const targetSummary =
+      bookmarkCards.find(summary => summary.summaryId === summaryId) ??
+      mySummaryCards.find(summary => summary.summaryId === summaryId);
+
+    if (!targetSummary) {
+      return;
+    }
+
+    const isBookmarked = targetSummary.isBookmarked ?? false;
+
+    if (isBookmarked) {
+      const { error } = await supabase
+        .from("bookmarks")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("summary_id", summaryId);
+
+      if (error) {
+        return;
+      }
+    } else {
+      const { error } = await supabase.from("bookmarks").insert({
+        user_id: user.id,
+        summary_id: summaryId,
+      });
+
+      if (error) {
+        return;
+      }
+    }
+
+    const nextIsBookmarked = !isBookmarked;
+
+    setMySummaryCards(currentCards =>
+      currentCards.map(summary =>
+        summary.summaryId === summaryId
+          ? { ...summary, isBookmarked: nextIsBookmarked }
+          : summary,
+      ),
+    );
+
+    if (nextIsBookmarked) {
+      setBookmarkCards(currentCards => [
+        {
+          ...targetSummary,
+          nickname,
+          profileImageUrl,
+          isBookmarked: true,
+        },
+        ...currentCards.filter(summary => summary.summaryId !== summaryId),
+      ].slice(0, 8));
+      return;
+    }
+
+    // 북마크 삭제가 성공한 카드는 마이페이지 북마크 목록에서 제거합니다.
     setBookmarkCards(currentCards =>
       currentCards.filter(summary => summary.summaryId !== summaryId),
     );
@@ -335,8 +411,8 @@ export default function Mypage() {
       return;
     }
 
-    // 버튼과 링크의 기본 클릭 동작이 가로 드래그용 포인터 캡처에 가로막히지 않게 합니다.
-    if (event.target.closest("button, a")) {
+    // 북마크 버튼 조작은 가로 드래그로 처리하지 않습니다.
+    if (event.target.closest('button[aria-pressed]')) {
       return;
     }
 
@@ -344,15 +420,27 @@ export default function Mypage() {
       element: event.currentTarget,
       startX: event.clientX,
       startScrollLeft: event.currentTarget.scrollLeft,
+      targetScrollLeft: event.currentTarget.scrollLeft,
+      animationFrameId: null,
       isDragging: false,
     };
-    event.currentTarget.setPointerCapture(event.pointerId);
   }
 
   function handleSummaryListPointerMove(event) {
     const dragState = summaryListDragRef.current;
 
     if (dragState.element !== event.currentTarget) {
+      return;
+    }
+
+    if ((event.buttons & 1) !== 1) {
+      if (dragState.animationFrameId !== null) {
+        window.cancelAnimationFrame(dragState.animationFrameId);
+        dragState.animationFrameId = null;
+      }
+
+      dragState.element = null;
+      dragState.isDragging = false;
       return;
     }
 
@@ -364,7 +452,17 @@ export default function Mypage() {
 
     if (dragState.isDragging) {
       event.preventDefault();
-      event.currentTarget.scrollLeft = dragState.startScrollLeft - dragDistance;
+      dragState.targetScrollLeft = dragState.startScrollLeft - dragDistance;
+
+      if (dragState.animationFrameId === null) {
+        dragState.animationFrameId = window.requestAnimationFrame(() => {
+          if (dragState.element) {
+            dragState.element.scrollLeft = dragState.targetScrollLeft;
+          }
+
+          dragState.animationFrameId = null;
+        });
+      }
     }
   }
 
@@ -375,11 +473,18 @@ export default function Mypage() {
       return;
     }
 
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
+    if (dragState.animationFrameId !== null) {
+      window.cancelAnimationFrame(dragState.animationFrameId);
+      dragState.animationFrameId = null;
+      event.currentTarget.scrollLeft = dragState.targetScrollLeft;
     }
 
     dragState.element = null;
+
+    // 드래그 직후 발생하는 click을 먼저 차단한 다음 남은 드래그 상태를 정리합니다.
+    window.setTimeout(() => {
+      dragState.isDragging = false;
+    }, 0);
   }
 
   function handleSummaryListPointerCancel(event) {
@@ -527,6 +632,7 @@ export default function Mypage() {
               onPointerDown={handleSummaryListPointerDown}
               onPointerMove={handleSummaryListPointerMove}
               onPointerUp={handleSummaryListPointerEnd}
+              onPointerLeave={handleSummaryListPointerCancel}
               onPointerCancel={handleSummaryListPointerCancel}
               onClickCapture={handleSummaryListClickCapture}
             >
@@ -539,6 +645,7 @@ export default function Mypage() {
                     {...summary}
                     nickname={nickname}
                     profileImageUrl={profileImageUrl}
+                    onBookmarkToggle={handleBookmarkToggle}
                   />
                 ))
               )}
@@ -567,6 +674,7 @@ export default function Mypage() {
               onPointerDown={handleSummaryListPointerDown}
               onPointerMove={handleSummaryListPointerMove}
               onPointerUp={handleSummaryListPointerEnd}
+              onPointerLeave={handleSummaryListPointerCancel}
               onPointerCancel={handleSummaryListPointerCancel}
               onClickCapture={handleSummaryListClickCapture}
             >
@@ -577,8 +685,7 @@ export default function Mypage() {
                   <SummaryItemCard
                     key={`bookmark-${summary.summaryId}`}
                     {...summary}
-                    initialIsBookmarked
-                    onBookmarkChange={handleBookmarkChange}
+                    onBookmarkToggle={handleBookmarkToggle}
                   />
                 ))
               )}
