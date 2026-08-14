@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function isUuid(value) {
   return typeof value === "string" && UUID_PATTERN.test(value);
@@ -37,9 +36,7 @@ function parseSummaryContent(content, fallbackExcerpt) {
   const source = typeof content === "string" ? content.trim() : "";
 
   if (!source) {
-    return fallbackExcerpt
-      ? [{ heading: "요약", content: [fallbackExcerpt] }]
-      : [];
+    return fallbackExcerpt ? [{ heading: "요약", content: [fallbackExcerpt] }] : [];
   }
 
   const sections = [];
@@ -116,9 +113,7 @@ function normalizeStudyNote(row, nickname) {
 }
 
 async function attachNoteAuthors(supabase, rows) {
-  const authorIds = [
-    ...new Set(rows.map(row => row.author_id).filter(Boolean)),
-  ];
+  const authorIds = [...new Set(rows.map(row => row.author_id).filter(Boolean))];
   let profiles = [];
 
   if (authorIds.length > 0) {
@@ -175,18 +170,7 @@ export async function getSummary(summaryId) {
     return null;
   }
 
-  const { data: contentRow, error: contentError } = await supabase
-    .from("summary_contents")
-    .select("summary_id,content")
-    .eq("summary_id", summaryId)
-    .maybeSingle();
-
-  if (contentError) {
-    // summary_contents에는 실제 DB에서 별도 RLS가 적용될 수 있어 excerpt를 안전한 fallback으로 사용합니다.
-    console.error("요약 본문 조회 실패:", contentError);
-  }
-
-  return normalizeSummary(summary, contentRow?.content);
+  return normalizeSummary(summary);
 }
 
 export async function getSummaryNotes(summaryId) {
