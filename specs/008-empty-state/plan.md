@@ -30,7 +30,7 @@
 
 ## 헌법 점검
 
-*관문: 0단계 조사 전과 1단계 설계 후 모두 통과했다.*
+_관문: 0단계 조사 전과 1단계 설계 후 모두 통과했다._
 
 - [x] `AGENTS.md`, Constitution, `docs/specs/AllSummary.md`, `docs/specs/Summary.md`, `docs/specs/Mypage.md`, 관련 Spec Kit 명세와 기존 코드를 확인했다.
 - [x] Next.js App Router, JavaScript, SCSS Module, `@/*` 별칭과 평면 공통 컴포넌트 구조를 유지한다.
@@ -77,10 +77,10 @@ src/
 
 public/
 └── images/
-    └── empty-note.png
+    └── clear.webp
 ```
 
-**구조 결정**: `EmptyState.jsx`와 대응 SCSS Module은 `AGENTS.md`에 정의된 `src/components`의 평면 구조에 생성한다. 기존 `/images/empty-note.png`를 재사용하며 새 자산과 새 앱 경로를 만들지 않는다. 목록 페이지는 이미 공통 진입점인 `Allsummary.jsx`에서 한 번 연결하고, 요약 상세와 마이페이지 북마크는 각 실제 페이지에서 연결한다.
+**구조 결정**: `EmptyState.jsx`와 대응 SCSS Module은 `AGENTS.md`에 정의된 `src/components`의 평면 구조에 생성한다. 기존 `/images/clear.webp`를 재사용하며 새 자산과 새 앱 경로를 만들지 않는다. 목록 페이지는 이미 공통 진입점인 `Allsummary.jsx`에서 한 번 연결하고, 요약 상세와 마이페이지 북마크는 각 실제 페이지에서 연결한다.
 
 ## 구현 설계
 
@@ -104,7 +104,7 @@ public/
 
 - 빈 상태 루트는 상태 의미와 정중한 live 안내를 제공해 검색 또는 목록 갱신 후 나타난 문구를 보조 기술이 인식할 수 있게 한다.
 - 접근성 속성에는 상태 전달 목적과 사용자 영향을 설명하는 주석을 둔다.
-- `/images/empty-note.png`는 문구와 별개의 정보를 전달하지 않는 장식 이미지로 처리해 중복 낭독을 막는다.
+- `/images/clear.webp`는 문구와 별개의 정보를 전달하지 않는 장식 이미지로 처리해 중복 낭독을 막는다.
 - 안내 문구는 호출자가 전달한 문자열을 한 번만 표시하며 별도 숨김 문구를 중복 생성하지 않는다.
 
 ### 기존 코드 정리 범위

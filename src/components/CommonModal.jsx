@@ -111,7 +111,7 @@ export default function CommonModal(props) {
         <div className={styles["mascot-wrapper"]}>
           <Image
             className={styles["mascot-image"]}
-            src="/images/프비메인.webp"
+            src="/images/fbee.webp"
             alt=""
             fill
             sizes="348px"

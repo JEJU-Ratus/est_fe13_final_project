@@ -37,9 +37,9 @@ export default function Mypage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   // 저장 요청이 진행되는 동안 수정완료 버튼을 다시 누르지 못하게 하기.
   const [isSavingProfile, setIsSavingProfile] = useState(false);
-  const [nickname, setNickname] = useState('사용자 닉네임');
-  const [introduction, setIntroduction] = useState('');
-  const [profileImageUrl, setProfileImageUrl] = useState('/images/프로필.webp');
+  const [nickname, setNickname] = useState("사용자 닉네임");
+  const [introduction, setIntroduction] = useState("");
+  const [profileImageUrl, setProfileImageUrl] = useState("/images/clear.webp");
   const [mySummaryCards, setMySummaryCards] = useState([]);
   const [isMySummariesLoading, setIsMySummariesLoading] = useState(true);
   const [bookmarkCards, setBookmarkCards] = useState([]);
@@ -48,7 +48,7 @@ export default function Mypage() {
   const [toastMessage, setToastMessage] = useState("");
   // 프로필 이미지 Storage 연동: 저장 전 선택 파일과 미리보기 주소 관리.
   const [draftProfileImage, setDraftProfileImage] = useState(null);
-  const [draftProfileImageUrl, setDraftProfileImageUrl] = useState('');
+  const [draftProfileImageUrl, setDraftProfileImageUrl] = useState("");
   const [draftNickname, setDraftNickname] = useState(nickname);
   const [draftIntroduction, setDraftIntroduction] = useState(introduction);
   const summaryListDragRef = useRef({
@@ -113,7 +113,7 @@ export default function Mypage() {
       // 비어 있는 값은 마이페이지에서 사용하는 기본값으로 바꿔 표시.
       setNickname(data.nickname ?? "사용자 닉네임");
       setIntroduction(data.bio?.trim() ?? "");
-      setProfileImageUrl(data.profile_image_url || "/images/프로필.webp");
+      setProfileImageUrl(data.profile_image_url || "/images/clear.webp");
     }
 
     fetchProfile();
@@ -122,7 +122,7 @@ export default function Mypage() {
       // 이미 끝난 화면의 조회 결과가 나중에 상태를 바꾸지 못하게 표시.
       isCurrentRequest = false;
     };
-  }, [supabase, user]);//로그인 후 user 정보 데이터를 가져오기
+  }, [supabase, user]); //로그인 후 user 정보 데이터를 가져오기
 
   useEffect(() => {
     if (!user) {
@@ -166,9 +166,7 @@ export default function Mypage() {
         setToastMessage("요약 노트의 북마크 상태를 불러오지 못했습니다.");
       }
 
-      const bookmarkedSummaryIds = new Set(
-        (bookmarks ?? []).map(bookmark => bookmark.summary_id),
-      );
+      const bookmarkedSummaryIds = new Set((bookmarks ?? []).map(bookmark => bookmark.summary_id));
 
       //카드 아이템 컴포로 변경 / 렌더
       setMySummaryCards(
@@ -274,7 +272,7 @@ export default function Mypage() {
     setDraftNickname(nickname);
     setDraftIntroduction(introduction);
     setDraftProfileImage(null);
-    setDraftProfileImageUrl('');
+    setDraftProfileImageUrl("");
     setIsEditingProfile(true);
   }
 
@@ -320,22 +318,22 @@ export default function Mypage() {
 
     setMySummaryCards(currentCards =>
       currentCards.map(summary =>
-        summary.summaryId === summaryId
-          ? { ...summary, isBookmarked: nextIsBookmarked }
-          : summary,
+        summary.summaryId === summaryId ? { ...summary, isBookmarked: nextIsBookmarked } : summary,
       ),
     );
 
     if (nextIsBookmarked) {
-      setBookmarkCards(currentCards => [
-        {
-          ...targetSummary,
-          nickname,
-          profileImageUrl,
-          isBookmarked: true,
-        },
-        ...currentCards.filter(summary => summary.summaryId !== summaryId),
-      ].slice(0, 8));
+      setBookmarkCards(currentCards =>
+        [
+          {
+            ...targetSummary,
+            nickname,
+            profileImageUrl,
+            isBookmarked: true,
+          },
+          ...currentCards.filter(summary => summary.summaryId !== summaryId),
+        ].slice(0, 8),
+      );
       return;
     }
 
@@ -358,7 +356,7 @@ export default function Mypage() {
       !PROFILE_IMAGE_TYPES.includes(selectedImage.type) ||
       selectedImage.size > PROFILE_IMAGE_MAX_SIZE
     ) {
-      event.target.value = '';
+      event.target.value = "";
       return;
     }
 
@@ -384,9 +382,9 @@ export default function Mypage() {
 
         // Storage 정책에 맞춰 사용자 ID 폴더에 이미지 저장.
         const { error: uploadError } = await supabase.storage
-          .from('profile-images')
+          .from("profile-images")
           .upload(filePath, draftProfileImage, {
-            cacheControl: '3600',
+            cacheControl: "3600",
             contentType: draftProfileImage.type,
             upsert: true,
           });
@@ -397,7 +395,7 @@ export default function Mypage() {
         }
 
         const { data: publicUrlData } = supabase.storage
-          .from('profile-images')
+          .from("profile-images")
           .getPublicUrl(filePath);
         nextProfileImageUrl = publicUrlData.publicUrl;
       }
@@ -413,10 +411,7 @@ export default function Mypage() {
       }
 
       // 새 이미지의 공개 URL을 profiles 테이블에 저장.
-      const { error } = await supabase
-        .from("profiles")
-        .update(profileUpdates)
-        .eq("id", user.id);
+      const { error } = await supabase.from("profiles").update(profileUpdates).eq("id", user.id);
 
       if (error) {
         setToastMessage("프로필 정보를 저장하지 못했습니다.");
@@ -428,12 +423,10 @@ export default function Mypage() {
       setIntroduction(nextIntroduction);
       // Storage 덮어쓰기 직후 이전 이미지 캐시 사용 방지.
       setProfileImageUrl(
-        draftProfileImage
-          ? `${nextProfileImageUrl}?updated=${Date.now()}`
-          : nextProfileImageUrl,
+        draftProfileImage ? `${nextProfileImageUrl}?updated=${Date.now()}` : nextProfileImageUrl,
       );
       setDraftProfileImage(null);
-      setDraftProfileImageUrl('');
+      setDraftProfileImageUrl("");
       setIsEditingProfile(false);
       // 저장된 프로필의 헤더 재조회 알림.
       window.dispatchEvent(new Event("profile-updated"));
@@ -449,7 +442,7 @@ export default function Mypage() {
     }
 
     // 북마크 버튼 조작은 가로 드래그로 처리하지 않습니다.
-    if (event.target.closest('button[aria-pressed]')) {
+    if (event.target.closest("button[aria-pressed]")) {
       return;
     }
 
@@ -556,7 +549,10 @@ export default function Mypage() {
                   alt="사용자 프로필 이미지"
                   width={120}
                   height={120}
-                  unoptimized={(draftProfileImageUrl || profileImageUrl).startsWith("http") || Boolean(draftProfileImageUrl)}
+                  unoptimized={
+                    (draftProfileImageUrl || profileImageUrl).startsWith("http") ||
+                    Boolean(draftProfileImageUrl)
+                  }
                 />
                 {isEditingProfile && (
                   <label className={styles["profile-image-selector"]}>
@@ -575,31 +571,29 @@ export default function Mypage() {
                 )}
               </div>
 
-            <div className={styles['profile-details']}>
-              {isEditingProfile ? (
-                <div className={styles['profile-form']}>
-                  <label>
-                    <input
-                      value={draftNickname}
-                      onChange={event => setDraftNickname(event.target.value)}
-                    />
-                  </label>
-                  <label>
-                    <input
-                      value={draftIntroduction}
-                      placeholder="한줄소개를 입력 해주세요"
-                      onChange={event =>
-                        setDraftIntroduction(event.target.value)
-                      }
-                    />
-                  </label>
-                </div>
-              ) : (
-                <div className={styles['profile-text']}>
-                  <p className={styles.nickname}>{nickname}</p>
-                  <p>{introduction || "한줄소개를 입력 해주세요"}</p>
-                </div>
-              )}
+              <div className={styles["profile-details"]}>
+                {isEditingProfile ? (
+                  <div className={styles["profile-form"]}>
+                    <label>
+                      <input
+                        value={draftNickname}
+                        onChange={event => setDraftNickname(event.target.value)}
+                      />
+                    </label>
+                    <label>
+                      <input
+                        value={draftIntroduction}
+                        placeholder="한줄소개를 입력 해주세요"
+                        onChange={event => setDraftIntroduction(event.target.value)}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <div className={styles["profile-text"]}>
+                    <p className={styles.nickname}>{nickname}</p>
+                    <p>{introduction || "한줄소개를 입력 해주세요"}</p>
+                  </div>
+                )}
 
                 <button
                   className={styles["profile-edit-button"]}
@@ -733,11 +727,7 @@ export default function Mypage() {
         {toastMessage && (
           <div role="alert" aria-live="assertive">
             <span>{toastMessage}</span>
-            <button
-              type="button"
-              aria-label="오류 알림 닫기"
-              onClick={() => setToastMessage("")}
-            >
+            <button type="button" aria-label="오류 알림 닫기" onClick={() => setToastMessage("")}>
               <span className="material-symbols-outlined" aria-hidden="true">
                 close
               </span>

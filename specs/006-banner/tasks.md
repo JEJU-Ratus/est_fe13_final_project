@@ -1,5 +1,4 @@
 ---
-
 description: "공통 광고 배너 구현을 위한 작업 목록"
 ---
 
@@ -28,7 +27,7 @@ description: "공통 광고 배너 구현을 위한 작업 목록"
 
 - [x] T001 `AGENTS.md`, `.specify/memory/constitution.md`, `specs/006-banner/spec.md`, `specs/006-banner/plan.md`를 확인하고 현재 브랜치가 `feature/banner`인지 검증한다.
 - [x] T002 `specs/006-banner/research.md`, `specs/006-banner/data-model.md`, `specs/006-banner/contracts/Banner.md`, `specs/006-banner/quickstart.md`에서 입력 계약, 목적지 판별, 크기와 검증 기준을 확인한다.
-- [x] T003 `public/images/이벤트 광고.jpg`, `src/components/`, `src/app/(dev)/dev/`와 `src/styles/abstracts/`를 확인하고 원본 1322×358 자산과 기존 구조를 변경하지 않음을 확정한다.
+- [x] T003 `public/images/banner.jpg`, `src/components/`, `src/app/(dev)/dev/`와 `src/styles/abstracts/`를 확인하고 원본 1322×358 자산과 기존 구조를 변경하지 않음을 확정한다.
 
 **확인 지점**: 생성할 소스 파일 4개, 수정 금지 파일과 범위 제외 항목이 확정됨
 
@@ -39,7 +38,7 @@ description: "공통 광고 배너 구현을 위한 작업 목록"
 **목적**: 모든 사용자 스토리가 공유하는 이미지 배너 골격과 개발 확인 기반 작성
 
 - [x] T004 [P] 부모 너비를 채우는 배너·이미지 기본 클래스와 전체 이미지 표시 기반을 `src/components/Banner.module.scss`에 작성한다.
-- [x] T005 [P] 기본 이미지 `/images/이벤트 광고.jpg`, 원본 치수 1322×358, `imageSrc`, `alt`, `href` 입력을 갖는 서버 컴포넌트 골격을 `src/components/Banner.jsx`에 작성하되 별도 CTA 요소는 추가하지 않는다.
+- [x] T005 [P] 기본 이미지 `/images/banner.jpg`, 원본 치수 1322×358, `imageSrc`, `alt`, `href` 입력을 갖는 서버 컴포넌트 골격을 `src/components/Banner.jsx`에 작성하되 별도 CTA 요소는 추가하지 않는다.
 - [x] T006 서로 다른 배너 사례를 한 화면에 배치할 개발 확인 골격을 `src/app/(dev)/dev/banner/page.js`와 `src/app/(dev)/dev/banner/page.module.scss`에 작성하고 기존 `src/app/(dev)/dev/page.js`는 수정하지 않는다.
 
 **확인 지점**: `/dev/banner`에서 기본 이미지만 표시되고 이후 링크·너비·누락 상태를 추가할 수 있음

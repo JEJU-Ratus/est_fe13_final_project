@@ -14,26 +14,26 @@
 
 ## Props
 
-| prop | 형식 | 필수 조건 | 책임 |
-|---|---|---|---|
-| `isOpen` | Boolean | 항상 | 모달 표시 여부 |
-| `mode` | 허용된 문자열 | `isOpen=true`일 때 | 문구·버튼·이동 규칙 선택 |
-| `status` | Number 또는 `network` | `mode="error"`일 때 선택 | 고정 오류 문구 선택; 미지정·미지원 값은 일반 오류 |
-| `onClose` | Function | `preparing`, `confirmDelete`, `suggestLogin`, `error` | 호출 측 공개 상태 종료 |
-| `onConfirm` | Function | `confirmDelete` | 삭제 승인 의사를 한 번 전달 |
+| prop        | 형식                  | 필수 조건                                             | 책임                                              |
+| ----------- | --------------------- | ----------------------------------------------------- | ------------------------------------------------- |
+| `isOpen`    | Boolean               | 항상                                                  | 모달 표시 여부                                    |
+| `mode`      | 허용된 문자열         | `isOpen=true`일 때                                    | 문구·버튼·이동 규칙 선택                          |
+| `status`    | Number 또는 `network` | `mode="error"`일 때 선택                              | 고정 오류 문구 선택; 미지정·미지원 값은 일반 오류 |
+| `onClose`   | Function              | `preparing`, `confirmDelete`, `suggestLogin`, `error` | 호출 측 공개 상태 종료                            |
+| `onConfirm` | Function              | `confirmDelete`                                       | 삭제 승인 의사를 한 번 전달                       |
 
 호출자는 문구, 버튼명, 자동 이동 시간 또는 고정 경로를 전달하지 않는다. `onConfirm`은 삭제 요청 자체가 아니며 삭제 대상도 인자로 받지 않는다.
 
 ## 모드별 계약
 
-| mode | 버튼 | 닫기 아이콘 | 자동 동작 |
-|---|---|---|---|
-| `preparing` | 없음 | `onClose` | 없음 |
-| `confirmDelete` | 삭제 → `onConfirm`, 취소 → `onClose` | `onClose` | 없음 |
-| `suggestLogin` | 로그인 → `/login`, 전체 요약 노트 → `/summary` | `onClose` | 없음 |
-| `requireLogin` | 없음 | 즉시 `/login` | 3초 후 `/login` |
-| `alreadyLoggedIn` | 없음 | 즉시 `/` | 3초 후 `/` |
-| `error` | 없음 | `onClose`를 호출하고 현재 페이지 유지 | 3초 후 `onClose`를 호출하고 현재 페이지 유지 |
+| mode              | 버튼                                           | 닫기 아이콘                           | 자동 동작                                    |
+| ----------------- | ---------------------------------------------- | ------------------------------------- | -------------------------------------------- |
+| `preparing`       | 없음                                           | `onClose`                             | 없음                                         |
+| `confirmDelete`   | 삭제 → `onConfirm`, 취소 → `onClose`           | `onClose`                             | 없음                                         |
+| `suggestLogin`    | 로그인 → `/login`, 전체 요약 노트 → `/summary` | `onClose`                             | 없음                                         |
+| `requireLogin`    | 없음                                           | 즉시 `/login`                         | 3초 후 `/login`                              |
+| `alreadyLoggedIn` | 없음                                           | 즉시 `/`                              | 3초 후 `/`                                   |
+| `error`           | 없음                                           | `onClose`를 호출하고 현재 페이지 유지 | 3초 후 `onClose`를 호출하고 현재 페이지 유지 |
 
 ## 오류 계약
 
@@ -53,5 +53,5 @@
 ## 표시 계약
 
 - 흰색 둥근 모달, 회색 배경막, 중앙 정렬 문구와 모드별 버튼을 사용한다.
-- 모든 모드에 `public/images/프비메인.webp`를 표시한다.
+- 모든 모드에 `public/images/fbee.webp`를 표시한다.
 - 모달은 보조기술이 대화상자와 안내 문구를 식별할 수 있는 의미 정보를 제공한다.

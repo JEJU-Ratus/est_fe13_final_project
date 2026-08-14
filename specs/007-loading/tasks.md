@@ -21,7 +21,7 @@
 **목적**: 구현 범위, 자산과 기존 프로젝트 규칙 확인
 
 - [x] T001 [P] `AGENTS.md`, `.specify/memory/constitution.md`, `specs/007-loading/spec.md`, `specs/007-loading/plan.md`, `specs/007-loading/contracts/Loading.md`에서 파일 범위·네이밍·공개 계약을 확인한다.
-- [x] T002 [P] `public/images/프로필.webp`, `src/styles/abstracts/_colors.scss`, `src/styles/abstracts/_variables.scss`, `src/styles/abstracts/_typography.scss`, `src/app/(dev)/dev/layout.js`를 확인해 사용할 자산·스타일 토큰·개발 경로 구조를 기록한다.
+- [x] T002 [P] `public/images/clear.webp`, `src/styles/abstracts/_colors.scss`, `src/styles/abstracts/_variables.scss`, `src/styles/abstracts/_typography.scss`, `src/app/(dev)/dev/layout.js`를 확인해 사용할 자산·스타일 토큰·개발 경로 구조를 기록한다.
 
 **확인 지점**: 새 패키지, `loading.js`, 실제 요청, 기존 개발 메인 페이지 수정 없이 승인된 세 파일만 구현할 준비가 완료됨
 
@@ -60,7 +60,7 @@
 
 ### 사용자 스토리 2 구현
 
-- [x] T007 [US2] `next/image`로 `/images/프로필.webp` 장식 이미지를 표시하고, 원형 배치를 위한 흰색 막대 12개와 `잠시만 기다려주세요.`, `로딩중입니다` 두 줄을 `src/components/Loading.jsx`에 추가한다.
+- [x] T007 [US2] `next/image`로 `/images/clear.webp` 장식 이미지를 표시하고, 원형 배치를 위한 흰색 막대 12개와 `잠시만 기다려주세요.`, `로딩중입니다` 두 줄을 `src/components/Loading.jsx`에 추가한다.
 - [x] T008 [US2] 중앙 이미지 크기, 12개 막대의 원형 배치, 순차 투명도 keyframes, 두 줄 문구의 색상·타이포그래피·간격을 첨부 디자인에 맞춰 `src/components/Loading.module.scss`에 작성한다.
 - [x] T009 [US2] `prefers-reduced-motion: reduce`에서 투명도 변화 주기를 현저히 늘리면서 이미지와 문구로 상태를 유지하는 스타일을 `src/components/Loading.module.scss`에 추가하고 기본·모션 감소 양쪽을 `/dev/loading`에서 검증한다.
 
