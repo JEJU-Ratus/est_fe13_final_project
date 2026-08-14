@@ -12,7 +12,7 @@ const BATCH_SIZE = {
   pc: 12,
 };
 
-// 현재 화면이 모바일, resul태블릿, PC인지 판단해 카드 개수를 반환하는 함수
+// 현재 화면이 모바일, 태블릿, PC인지 판단해 카드 개수를 반환
 function getBatchSize(mobileMediaQuery, tabletMediaQuery) {
   if (mobileMediaQuery.matches) {
     return BATCH_SIZE.mobile;
@@ -25,49 +25,51 @@ function getBatchSize(mobileMediaQuery, tabletMediaQuery) {
   return BATCH_SIZE.pc;
 }
 
-// AllSummary 컴포넌트
 export default function AllSummary({ title, summaries = [] }) {
   // 검색어 저장
   const [searchTerm, setSearchTerm] = useState("");
 
-  // batchSize: 스크롤 시 한 번에 추가할 카드 개수
-  // visibleCount: 현재 화면에 보여주고 있는 전체 카드 개수
+  // 무한 스크롤 시 한 번에 추가할 카드 개수
   const [batchSize, setBatchSize] = useState(BATCH_SIZE.mobile);
+
+  // 현재 화면에 표시할 카드 개수
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE.mobile);
 
-  // 현재 화면의 batchSize 값을 저장
+  // 현재 화면 크기의 batchSize 값을 유지
   const batchSizeRef = useRef(BATCH_SIZE.mobile);
 
   // 무한 스크롤의 마지막 지점을 감지하기 위한 ref
   const sentinelRef = useRef(null);
 
-  // 검색어 앞뒤 공백 제거 및 소문자 변환
+  // 검색어의 앞뒤 공백을 제거하고 소문자로 변환
   const normalizedSearchTerm = searchTerm.trim().toLowerCase();
 
-  // TODO: Supabase 연결 시 client-side 검색 필터를 DB 검색 쿼리로 교체
-  // topic을 기준으로 검색어가 포함된 요약만 필터링
+  // TODO: 추후 검색 데이터가 많아지면 Supabase 검색 쿼리 방식으로 변경
+  // topic에 검색어가 포함된 요약 노트만 필터링
   const filteredSummaries = normalizedSearchTerm
     ? summaries.filter(summary => summary.topic?.toLowerCase().includes(normalizedSearchTerm))
     : summaries;
 
+  // 화면에 사용할 요약 카드 목록
   const summaryCards = filteredSummaries;
 
-  // 검색 또는 필터 결과가 변경됐는지 확인하기 위한 값
+  // 검색 결과가 변경됐는지 확인하기 위한 id 조합
   const resultKey = summaryCards.map(summary => summary.id).join("|");
 
-  // 아직 추가로 보여줄 카드가 남아 있는지 확인
+  // 추가로 보여줄 카드가 남아 있는지 확인
   const hasMore = visibleCount < summaryCards.length;
 
-  // TODO: Supabase 연결 시 client-side slice 방식에서 DB pagination 조회·append 방식으로 교체
-  // 현재 visibleCount만큼의 카드만 화면에 렌더링
+  // TODO: 추후 데이터가 많아지면 Supabase pagination 방식으로 변경
+  // 현재 visibleCount만큼의 카드만 화면에 표시
   const visibleSummaryCards = summaryCards.slice(0, visibleCount);
 
-  // 화면 크기에 따라 batchSize 변경
+  // 화면 크기가 변경될 때 한 번에 표시할 카드 개수 조정
   useEffect(() => {
     const mobileMediaQuery = window.matchMedia("(max-width: 480px)");
     const tabletMediaQuery = window.matchMedia("(min-width: 481px) and (max-width: 1024px)");
 
     function handleBreakpointChange() {
+      // 현재 화면 크기에 맞는 카드 개수 계산
       const nextBatchSize = getBatchSize(mobileMediaQuery, tabletMediaQuery);
 
       batchSizeRef.current = nextBatchSize;
@@ -80,7 +82,7 @@ export default function AllSummary({ title, summaries = [] }) {
     // 처음 렌더링될 때 현재 화면 크기 확인
     handleBreakpointChange();
 
-    // 화면 크기가 breakpoint를 넘을 때마다 실행
+    // 화면 크기가 breakpoint를 넘을 때마다 카드 개수 다시 계산
     mobileMediaQuery.addEventListener("change", handleBreakpointChange);
     tabletMediaQuery.addEventListener("change", handleBreakpointChange);
 
@@ -91,12 +93,12 @@ export default function AllSummary({ title, summaries = [] }) {
     };
   }, []);
 
-  // view나 검색 결과가 바뀌면 현재 화면 크기의 초기 카드 개수로 reset
+  // 검색 결과가 바뀌면 현재 화면 크기의 초기 카드 개수로 reset
   useEffect(() => {
     setVisibleCount(batchSizeRef.current);
   }, [normalizedSearchTerm, resultKey]);
 
-  // 무한 스크롤 동작
+  // 화면 하단 감지 지점을 이용한 무한 스크롤 처리
   useEffect(() => {
     const sentinel = sentinelRef.current;
 
@@ -137,11 +139,12 @@ export default function AllSummary({ title, summaries = [] }) {
   return (
     <main className={styles["summary-page"]}>
       <section className={styles["summary-container"]}>
+        {/* 페이지 제목 및 검색 영역 */}
         <div className={styles["summary-header"]}>
           <div className={styles["summary-title-row"]}>
             <h2 className={styles["summary-title"]}>{title}</h2>
 
-            {/* 아이콘 버튼의 용도를 스크린 리더 사용자에게 전달 */}
+            {/* 북마크 아이콘 버튼의 용도를 보조 기술 사용자에게 전달 */}
             <button className={styles["bookmark-btn"]} type="button" aria-label="북마크">
               <span className={`material-symbols-outlined ${styles["bookmark-icon"]}`} aria-hidden="true">
                 bookmark_add
@@ -149,8 +152,8 @@ export default function AllSummary({ title, summaries = [] }) {
             </button>
           </div>
 
+          {/* 주제를 기준으로 요약 노트 검색 */}
           <div className={styles["search-box"]}>
-            {/* 주제 검색 */}
             <input
               type="text"
               placeholder="주제 검색하기"
@@ -164,14 +167,14 @@ export default function AllSummary({ title, summaries = [] }) {
           </div>
         </div>
 
+        {/* 현재 화면에 표시할 요약 카드 목록 */}
         <div className={styles["summary-content"]}>
-          {/* 현재 화면에 보여줄 카드 개수만 렌더링 */}
           {visibleSummaryCards.map(summary => (
             <SummaryItemCard
               key={summary.id}
               summaryId={summary.id}
               nickname={summary.nickname ?? "알 수 없는 사용자"}
-              profileImageUrl={summary.profile_image ?? "/images/main_profile.webp"}
+              profileImageUrl={summary.profile_image_url ?? "/images/main_profile.webp"}
               title={summary.title}
               excerpt={summary.excerpt}
               createdAt={summary.created_at}
