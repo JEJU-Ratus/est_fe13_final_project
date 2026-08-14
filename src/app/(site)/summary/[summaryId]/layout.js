@@ -19,7 +19,6 @@ export default async function AiSummaryLayout({ children, params }) {
       author_id,
       topic,
       title,
-      excerpt,
       is_locked,
       created_at
     `,
