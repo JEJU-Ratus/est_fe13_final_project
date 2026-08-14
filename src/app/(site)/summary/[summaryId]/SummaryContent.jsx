@@ -64,7 +64,7 @@ export default function SummaryContent({ summaryId }) {
       setContent(summaryContent);
       setIsPasswordOpen(false);
     } catch (error) {
-      if (error.code === "INVALID_PASSWORD") {
+      if (error.code === "INVALID_PASSWORD" || error.status === 403) {
         setPasswordError("비밀번호가 일치하지 않습니다.");
         return;
       }
