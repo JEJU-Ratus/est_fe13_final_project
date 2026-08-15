@@ -23,7 +23,7 @@
 
 - [x] T001 `AGENTS.md`, `.specify/memory/constitution.md`, `specs/003-signup-complete/spec.md`, `specs/003-signup-complete/plan.md`에서 구현 범위와 금지 사항을 확인한다.
 - [x] T002 `specs/003-signup-complete/research.md`, `specs/003-signup-complete/data-model.md`, `specs/003-signup-complete/contracts/SignupCompletePage.md`, `specs/003-signup-complete/quickstart.md`에서 확정 문구·경로·검증 기준을 확인한다.
-- [x] T003 `public/images/프비메인.webp`, `src/app/(site)/layout.js`, `src/styles/abstracts/_colors.scss`, `src/styles/abstracts/_typography.scss`를 확인하고 자산과 공통 스타일만 재사용하며 Header와 레이아웃은 수정하지 않음을 기록한다.
+- [x] T003 `public/images/fbee.webp`, `src/app/(site)/layout.js`, `src/styles/abstracts/_colors.scss`, `src/styles/abstracts/_typography.scss`를 확인하고 자산과 공통 스타일만 재사용하며 Header와 레이아웃은 수정하지 않음을 기록한다.
 
 **확인 지점**: 구현 대상이 `src/app/(site)/signup/complete/page.js`와 `src/app/(site)/signup/complete/page.module.scss`로 제한되고, 새 패키지·공통 컴포넌트·인증 구조가 필요하지 않음을 확인한다.
 
@@ -46,7 +46,7 @@
 ### 사용자 스토리 1 구현
 
 - [x] T004 [US1] `src/app/(site)/signup/complete/page.js`에 상태 없는 Server Component를 만들고 `h1`, 프비 이미지, 두 줄 안내와 `/login` Link를 의미 순서대로 작성한다.
-- [x] T005 [US1] `src/app/(site)/signup/complete/page.js`에서 `next/image`로 `/images/프비메인.webp`를 의미 있는 대체 텍스트와 기준 크기로 표시하고 `next/link`로 현재 탭 내부 이동을 구성한다.
+- [x] T005 [US1] `src/app/(site)/signup/complete/page.js`에서 `next/image`로 `/images/fbee.webp`를 의미 있는 대체 텍스트와 기준 크기로 표시하고 `next/link`로 현재 탭 내부 이동을 구성한다.
 - [x] T006 [US1] `src/app/(site)/signup/complete/page.module.scss`에 데스크톱 중앙 배치, 화면 배경, 제목·안내 타이포그래피, `radial-gradient`, 이미지 비율 보존과 56px 로그인 이동 영역 스타일을 작성한다.
 - [x] T007 [US1] `src/app/(site)/signup/complete/page.module.scss`에서 프비 이미지에만 `transform` 기반으로 `0`에서 `-18px` 사이를 이동하는 약 2.8초의 느린 무한 왕복 애니메이션을 적용하고 `prefers-reduced-motion: reduce`에서는 중지한다.
 - [x] T008 [US1] `src/app/(site)/signup/complete/page.module.scss`에 로그인 Link의 식별 가능한 키보드 포커스 스타일을 추가한 뒤 `src/app/(site)/signup/complete/page.js`와 함께 실행해 원형 배경·문구·Link는 고정되고 프비만 움직이는지, 모션 감소 시 정지하는지와 `/login` 이동을 수동 검증한다.

@@ -27,14 +27,7 @@ function createGeneratedNotes({ prefix, summaryId, count, authorIds = MOCK_AUTHO
       index < 4
         ? SAME_TIMESTAMP
         : new Date(
-            Date.UTC(
-              2026,
-              7,
-              14 - Math.floor((index - 4) / 4),
-              12 - ((index - 4) % 4),
-              0,
-              0,
-            ),
+            Date.UTC(2026, 7, 14 - Math.floor((index - 4) / 4), 12 - ((index - 4) % 4), 0, 0),
           ).toISOString();
 
     return {
@@ -95,8 +88,7 @@ function normalizeStudyNote(note) {
 }
 
 function compareNotes(firstNote, secondNote) {
-  const createdAtDifference =
-    Date.parse(secondNote.createdAt) - Date.parse(firstNote.createdAt);
+  const createdAtDifference = Date.parse(secondNote.createdAt) - Date.parse(firstNote.createdAt);
 
   if (createdAtDifference !== 0) {
     return createdAtDifference;
@@ -185,9 +177,7 @@ export async function loadMockStudyNotePage(scope, cursor = null) {
   return {
     totalCount: notes.length,
     items: pageItems.map(normalizeStudyNote),
-    nextCursor: hasMore
-      ? { createdAt: lastItem.createdAt, noteId: lastItem.noteId }
-      : null,
+    nextCursor: hasMore ? { createdAt: lastItem.createdAt, noteId: lastItem.noteId } : null,
     hasMore,
   };
 }
@@ -246,17 +236,17 @@ export function resetMockSummaryNoteAccess() {
 
 export const MOCK_BANNERS = {
   validInternal: {
-    imageSrc: "/images/이벤트 광고.jpg",
+    imageSrc: "/images/banner.jpg",
     destinationUrl: "/summary",
     alt: "전체 요약 노트로 이동하는 이벤트 광고",
   },
   validExternal: {
-    imageSrc: "/images/이벤트 광고.jpg",
+    imageSrc: "/images/banner.jpg",
     destinationUrl: "https://example.com",
     alt: "외부 이벤트 페이지로 이동하는 이벤트 광고",
   },
   missingDestination: {
-    imageSrc: "/images/이벤트 광고.jpg",
+    imageSrc: "/images/banner.jpg",
     destinationUrl: null,
     alt: "목적지가 없는 이벤트 광고",
   },

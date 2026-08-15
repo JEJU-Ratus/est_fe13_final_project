@@ -1,10 +1,13 @@
 "use client";
-
+import { getSummaryContent } from "@/lib/api/summary";
+import CommonModal from "./CommonModal";
+import Loading from "./Loading";
 import Image from "next/image";
 import Link from "next/link";
 import NotePwModal from "./NotePwModal";
 import styles from "./SummaryItemCard.module.scss";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 // 작성일을 "YYYY년 MM월 DD일" 형식으로 변환
 function formatCreatedAt(createdAt) {
@@ -33,6 +36,12 @@ export default function SummaryItemCard({
   isBookmarked = false,
   onBookmarkToggle, // 북마크 prop 추가
 }) {
+  const router = useRouter();
+
+  const [isCheckingAccess, setIsCheckingAccess] = useState(false);
+  const [isPasswordSubmitting, setIsPasswordSubmitting] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [errorStatus, setErrorStatus] = useState(null);
   // 비밀번호 모달 열림 상태 관리
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
 
@@ -40,20 +49,61 @@ export default function SummaryItemCard({
   const formattedCreatedAt = formatCreatedAt(createdAt);
 
   // 비공개 요약 노트 비밀번호 모달 열기
-  function handlePasswordModalOpen() {
-    setPasswordModalOpen(true);
+  async function handlePasswordModalOpen() {
+    if (isCheckingAccess) {
+      return;
+    }
+
+    setIsCheckingAccess(true);
+    setPasswordError("");
+
+    try {
+      await getSummaryContent(summaryId);
+
+      router.push(`/summary/${summaryId}`);
+    } catch (error) {
+      if (error.code === "PASSWORD_REQUIRED") {
+        setPasswordModalOpen(true);
+        return;
+      }
+
+      setErrorStatus(error.status ?? "network");
+    } finally {
+      setIsCheckingAccess(false);
+    }
   }
 
   // 비밀번호 모달 닫기
   function handlePasswordModalClose() {
     setPasswordModalOpen(false);
+    setPasswordError("");
   }
 
   // 비공개 요약 노트 비밀번호 검증
-  function handlePasswordSubmit() {
-    // TODO: Supabase/서버 연결 시 실제 비밀번호 검증 요청으로 교체
-    // TODO: 비밀번호 검증 성공 시 /summary/${summaryId}로 이동
-    // TODO: 비밀번호 검증 실패 시 서버 응답에 따라 errorMessage 설정
+  async function handlePasswordSubmit(password) {
+    if (isPasswordSubmitting) {
+      return;
+    }
+
+    setIsPasswordSubmitting(true);
+    setPasswordError("");
+
+    try {
+      await getSummaryContent(summaryId, password);
+
+      setPasswordModalOpen(false);
+      router.push(`/summary/${summaryId}`);
+    } catch (error) {
+      if (error.code === "INVALID_PASSWORD" || error.status === 403) {
+        setPasswordError("비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      setPasswordModalOpen(false);
+      setErrorStatus(error.status ?? "network");
+    } finally {
+      setIsPasswordSubmitting(false);
+    }
   }
 
   // 북마크 추가/삭제 처리
@@ -77,6 +127,8 @@ export default function SummaryItemCard({
             aria-haspopup="dialog"
             aria-expanded={isPasswordModalOpen}
             onClick={handlePasswordModalOpen}
+            disabled={isCheckingAccess}
+            aria-busy={isCheckingAccess}
           />
         ) : (
           <Link
@@ -135,7 +187,10 @@ export default function SummaryItemCard({
 
           {/* 비공개 요약 노트인 경우 잠금 아이콘 표시 */}
           {isPrivate && (
-            <span className={`material-symbols-outlined ${styles["lock-icon"]}`} aria-label="비공개 게시물">
+            <span
+              className={`material-symbols-outlined ${styles["lock-icon"]}`}
+              aria-label="비공개 게시물"
+            >
               lock
             </span>
           )}
@@ -143,7 +198,21 @@ export default function SummaryItemCard({
       </article>
 
       {/* 비공개 요약 노트 비밀번호 입력 모달 */}
-      <NotePwModal isOpen={isPasswordModalOpen} onSubmit={handlePasswordSubmit} onClose={handlePasswordModalClose} />
+      <NotePwModal
+        isOpen={isPasswordModalOpen}
+        isSubmitting={isPasswordSubmitting}
+        errorMessage={passwordError}
+        onSubmit={handlePasswordSubmit}
+        onClose={handlePasswordModalClose}
+      />
+      {isCheckingAccess && <Loading />}
+
+      <CommonModal
+        isOpen={errorStatus !== null}
+        mode="error"
+        status={errorStatus}
+        onClose={() => setErrorStatus(null)}
+      />
     </>
   );
 }

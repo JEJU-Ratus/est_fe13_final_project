@@ -29,7 +29,7 @@ export default function Loading() {
           {/* 로딩 상태의 의미는 주변 문구로 제공하므로 중복 낭독을 막기 위해 빈 대체 텍스트를 사용합니다. */}
           <Image
             className={styles["profile-image"]}
-            src="/images/프로필.webp"
+            src="/images/clear.webp"
             alt=""
             width={48}
             height={48}

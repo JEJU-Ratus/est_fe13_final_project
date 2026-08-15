@@ -117,10 +117,11 @@
   }
 }
 
-.error-message {
+.password-form .error-message {
   @include typography.text-14-regular;
 
   margin: 8px 0 0;
+  padding-left: 0;
   color: color.$fda-orange;
 }
 

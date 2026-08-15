@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./Banner.module.scss";
 
-const DEFAULT_IMAGE_SRC = "/images/이벤트 광고.jpg";
+const DEFAULT_IMAGE_SRC = "/images/banner.jpg";
 const DEFAULT_ALT = "프론트엔드 스킬업 이벤트";
 
 function getDestinationType(href) {
