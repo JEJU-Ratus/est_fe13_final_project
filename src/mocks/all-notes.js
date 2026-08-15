@@ -104,6 +104,10 @@ function createMockError(code) {
 }
 
 function normalizeScope(scope) {
+  if (scope?.type === "all") {
+    return { type: "all" };
+  }
+
   if (scope?.type === "mine") {
     return { type: "mine" };
   }
@@ -116,6 +120,13 @@ function normalizeScope(scope) {
 }
 
 function getScopedNotes(scope) {
+  if (scope.type === "all") {
+    return noteFixtures.filter(note => {
+      const summary = summariesById.get(note.summaryId);
+      return summary && !summary.isPrivate;
+    });
+  }
+
   if (scope.type === "mine") {
     return noteFixtures.filter(note => note.authorId === MOCK_CURRENT_USER_ID);
   }

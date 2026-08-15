@@ -3,18 +3,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { verifyMockSummaryNotePassword } from "@/mocks/all-notes";
-import Banner from "./Banner";
-import CommonModal from "./CommonModal";
-import EmptyState from "./EmptyState";
-import Loading from "./Loading";
-import NoteItem from "./NoteItem";
-import NotePwModal from "./NotePwModal";
+import Banner from "@/components/Banner";
+import CommonModal from "@/components/CommonModal";
+import EmptyState from "@/components/EmptyState";
+import Loading from "@/components/Loading";
+import NoteItem from "@/components/NoteItem";
+import NotePwModal from "@/components/NotePwModal";
 import styles from "./AllNotes.module.scss";
 
 const EMPTY_MESSAGE = "학습 노트 리스트가 아직 생성되지 않았습니다.";
 const PASSWORD_ERROR_MESSAGE = "비밀번호가 일치하지 않습니다.";
 
 function createScope(scope, summaryId) {
+  if (scope === "all") {
+    return { type: "all" };
+  }
+
   if (scope === "summary") {
     return { type: "summary", summaryId };
   }
@@ -23,7 +27,12 @@ function createScope(scope, summaryId) {
 }
 
 function canReadList(scope, accessState) {
-  return scope === "mine" || accessState === "public" || accessState === "authorized";
+  return (
+    scope === "mine" ||
+    scope === "all" ||
+    accessState === "public" ||
+    accessState === "authorized"
+  );
 }
 
 function normalizeCursor(cursor) {
@@ -108,7 +117,11 @@ export default function AllNotes({
   accessState = "checking",
 }) {
   const router = useRouter();
-  const normalizedScope = scope === "summary" ? "summary" : "mine";
+  const normalizedScope = scope === "summary"
+    ? "summary"
+    : scope === "all"
+      ? "all"
+      : "mine";
   const scopeKey = getScopeKey(normalizedScope, summaryId);
   const [resolvedAccessState, setResolvedAccessState] = useState(accessState);
   const shouldLoadList = canReadList(normalizedScope, resolvedAccessState);
@@ -397,7 +410,12 @@ export default function AllNotes({
       return;
     }
 
-    router.replace(normalizedScope === "summary" ? `/summary/${summaryId}` : "/");
+    if (normalizedScope === "summary") {
+      router.replace(`/summary/${summaryId}`);
+      return;
+    }
+
+    router.replace(normalizedScope === "mine" ? "/mypage" : "/");
   }
 
   const initialItemCount = Array.isArray(initialPage?.items) && shouldLoadList

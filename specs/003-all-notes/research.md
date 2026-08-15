@@ -4,23 +4,23 @@
 
 - 대상 기능: `specs/003-all-notes/spec.md`
 - 관련 원본 명세: `docs/specs/All-notes.md`, `docs/specs/AllSummary.md`, `docs/specs/Mypage.md`, `docs/specs/Summary.md`, `docs/specs/Header.md`
-- 재사용 대상: `NoteItem`, `Banner`, `EmptyState`, `CommonModal`, `NotePwModal`, `AuthGuard`, 사이트 `layout.js`
+- 재사용 대상: `NoteItem`, `Banner`, `EmptyState`, `CommonModal`, `AuthGuard`, 사이트 `layout.js`
 - 기존 설계 의존성: `specs/002-summary-detail`의 학습노트 조회 모델과 Supabase 인증·RLS 경계
 
 ## 결정 1: 두 경로는 하나의 기능 전용 Client Component로 목록 상호작용을 공유한다
 
-**결정**: 두 라우트의 `page.js`는 경로 문맥과 접근 상태를 연결하고, `src/components/AllNotes.jsx`가 목록 상태·추가 로딩·행 렌더링을 공유한다. `IntersectionObserver`, 요청 중복 방지, 오류 모달 상태처럼 브라우저 API와 이벤트가 필요한 부분에만 Client Component 경계를 둔다.
+**결정**: `/allnote/page.js`와 다른 목록 페이지가 공용 `src/components/AllNotes.jsx`를 사용해 목록 상태·추가 로딩·행 렌더링을 공유한다. `IntersectionObserver`, 요청 중복 방지, 오류 모달 상태처럼 브라우저 API와 이벤트가 필요한 부분만 Client Component 경계에 둔다.
 
 **근거**:
 
 - Next.js App Router의 페이지와 레이아웃은 기본적으로 Server Component이며, 상태·이벤트·브라우저 API가 필요한 부분만 Client Component로 분리하는 방식이 프로젝트 규칙과 일치한다.
 - 두 경로는 총 개수, 12개 단위 추가, 행 정보, 빈 상태, 오류 처리 규칙이 동일하고 목록 범위만 다르다. 동일 로직을 두 페이지에 복사하면 중복 로딩 방지와 오류 후속 이동이 어긋날 위험이 있다.
-- `AllNotes`는 이번 기능의 두 화면에서만 사용하는 기능 전용 컴포넌트로 두며, 범용 목록 프레임워크나 별도 상태 관리 라이브러리는 추가하지 않는다.
+- `AllNotes`는 여러 목록 페이지에서 사용하는 기능 전용 공용 컴포넌트로 두며, 범용 목록 프레임워크나 별도 상태 관리 라이브러리는 추가하지 않는다.
 
 **대안 검토**:
 
 - 페이지마다 목록 로직을 직접 작성하는 방법은 새 공통 컴포넌트를 만들지 않는 장점이 있지만, 두 경로의 커서·중복 방지·상태 전이를 중복 구현하게 되어 제외했다.
-- 전체 페이지를 Client Component로 만들고 라우트·데이터 문맥까지 한 파일에서 처리하는 방법은 가능하지만, 동적 `summaryId` 문맥과 접근 상태의 책임이 페이지에 섞인다. 페이지는 얇은 라우트 어댑터로 유지한다.
+- 전체 페이지를 Client Component로 만들고 라우트·데이터 문맥까지 한 파일에서 처리하는 방법은 가능하지만, 범위와 데이터 책임이 페이지에 섞인다. 페이지는 얇은 라우트 어댑터로 유지한다.
 
 참고: [Next.js `use client` 지시어](https://nextjs.org/docs/app/api-reference/directives/use-client), [Next.js Server 및 Client Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
 
@@ -49,7 +49,7 @@
 
 - 프로젝트 규칙은 Supabase 인증·데이터베이스·서버 통신 구조가 명세로 확정되지 않은 경우 임의로 결정하지 않도록 한다.
 - 현재 프로젝트에는 브라우저·서버 Supabase 클라이언트와 인증 Proxy가 이미 있고, 요약 상세 계획이 `summaries`·`learning_notes` 관계와 표시용 학습노트 모델을 정의한다.
-- 이 기능의 가정도 로그인 상태, 사용자 식별, 요약본 잠금 정보와 비밀번호 세션 인증이 기존 서비스 영역에서 제공된다고 명시한다.
+- 이 기능의 가정도 로그인 상태, 사용자 식별과 요약본 공개 여부가 기존 서비스 영역에서 제공된다고 명시한다.
 - Supabase는 2026년 5월부터 새 public 스키마 객체를 Data API에 자동 노출하지 않는 방향으로 변경했으므로, 향후 스키마 변경이 필요하더라도 별도 승인·GRANT·RLS 검토가 필요한 범위다. 이 기능은 그 변경을 만들지 않는다.
 
 **대안 검토**:
@@ -65,19 +65,17 @@
 **결정**:
 
 - `/mypage/summaries`는 기존 `AuthGuard`로 감싼다. 비로그인 사용자는 자식 목록을 보지 않고 `CommonModal`의 `requireLogin` 동작을 통해 3초 후 `/login`으로 이동한다.
-- `/summary/[summaryId]/notes`는 공개 요약본이면 비로그인 조회를 허용한다. 잠긴 요약본은 기존 `NotePwModal`과 서비스 영역의 비밀번호 검증·동일 브라우저 세션 인증 결과를 사용하며, 인증 완료 전에는 목록 데이터를 렌더링하지 않는다.
-- 일반 조회 실패는 `CommonModal`의 `error` 모드로 표현하고, 모달 종료 시 호출 경로에 따라 `/mypage` 또는 `/summary/[summaryId]`로 이동한다.
-- 존재하지 않는 `summaryId`는 동일한 공통 오류 모달을 사용하되 3초 후 `/`로 이동한다.
+- `/allnote`는 공개 요약본이면 비로그인 조회를 허용하고 잠긴 요약본 소속 노트는 조회 단계에서 제외한다.
+- 일반 조회 실패는 `CommonModal`의 `error` 모드로 표현하고, 모달 종료 시 호출 경로에 따라 `/mypage` 또는 `/`로 이동한다.
 
 **근거**:
 
-- 기존 `AuthGuard`, `CommonModal`, `NotePwModal`의 책임과 모드가 각각 명세화되어 있다.
-- `NotePwModal`은 입력과 표시를 담당하고 비밀번호 검증·세션 유지·성공 이동은 호출 측 서비스가 담당하므로, 이번 기능에서 저장 위치나 암호화 방식을 추측하지 않는다.
+- 기존 `AuthGuard`와 `CommonModal`의 책임과 모드가 각각 명세화되어 있다.
 
 **대안 검토**:
 
-- 목록 페이지에서 로그인·비밀번호·오류 모달을 각각 새로 구현하면 공통 문구와 타이머가 분산된다.
-- 잠긴 요약본의 비밀번호를 `localStorage`에 직접 저장하는 방법은 기존 계약에 없는 인증 저장 방식을 만들고 보안 책임을 잘못 가져오므로 제외했다.
+- 목록 페이지에서 로그인·오류 모달을 각각 새로 구현하면 공통 문구와 타이머가 분산된다.
+- 전체 목록에서 잠긴 요약본의 노트를 먼저 제외하므로 별도 비밀번호 저장·세션 인증 방식을 추가하지 않는다.
 
 ## 결정 5: 표시 데이터는 어댑터에서 정규화하고 기존 UI 컴포넌트를 변경하지 않는다
 
@@ -96,7 +94,7 @@
 
 ## 결정 6: 현재 경로 충돌은 삭제·이름 변경 없이 정식 경로를 기준으로 기록한다
 
-**결정**: 기능의 정식 경로는 명세와 프로젝트 구조에 맞는 `/mypage/summaries`로 계획한다. 현재 소스의 `/mypage/mysummaries`는 이 계획에서 삭제·이름 변경하지 않으며, 구현 전에 기존 경로를 유지할지 정식 경로의 호환 진입점으로 둘지 별도 영향 검토를 한다. 정식 경로 파일을 추가하는 경우에도 기존 파일을 덮어쓰지 않는다.
+**결정**: 내 목록의 정식 경로는 `/mypage/summaries`, 모든 노트 목록의 정식 경로는 `/allnote`로 계획한다. 현재 소스의 `/mypage/mysummaries`는 이 계획에서 삭제·이름 변경하지 않으며, `/summary/[summaryId]/notes` 목록 페이지도 추가하지 않는다. 노트 생성·상세·수정 하위 경로는 기존 위치를 유지한다.
 
 **근거**:
 
@@ -110,4 +108,4 @@
 
 ## 조사 결론
 
-기술적 미확정 사항은 새 기술 선택으로 확장하지 않고 기존 공통 컴포넌트·Supabase 인증 경계·요약 상세 데이터 계약으로 해소했다. 구현 시에는 목록 화면과 두 라우트, 복합 커서 페이지네이션, 잠금 접근 전환, 오류 후속 이동만 다루며 스키마·인증 저장 방식·북마크 동작은 범위에서 제외한다.
+기술적 미확정 사항은 새 기술 선택으로 확장하지 않고 기존 공통 컴포넌트·Supabase 인증 경계·요약 상세 데이터 계약으로 해소했다. 구현 시에는 목록 화면과 두 라우트, 복합 커서 페이지네이션, 공개 요약본 필터, 오류 후속 이동만 다루며 스키마·비밀번호 저장 방식·북마크 동작은 범위에서 제외한다.
