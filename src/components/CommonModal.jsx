@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import styles from "./CommonModal.module.scss";
 
 const AUTO_DESTINATIONS = {
@@ -36,10 +36,12 @@ function getErrorMessage(status) {
 }
 
 export default function CommonModal(props) {
-  const { isOpen, mode, status, onClose, onConfirm } = props;
+  const { isOpen, mode, status, onClose, onConfirm, loginHref } = props;
+  const pathname = usePathname();
+  const resolvedLoginHref = loginHref ?? `/login?returnTo=${encodeURIComponent(pathname || "/")}`;
   const router = useRouter();
   const timerRef = useRef(null);
-  const autoDestination = AUTO_DESTINATIONS[mode];
+  const autoDestination = mode === "requireLogin" ? resolvedLoginHref : AUTO_DESTINATIONS[mode];
   const message = mode === "error" ? getErrorMessage(status) : (MODE_MESSAGES[mode] ?? "");
 
   useEffect(() => {
@@ -125,7 +127,7 @@ export default function CommonModal(props) {
 
         {mode === "suggestLogin" && (
           <div className={styles["button-group"]}>
-            <Link className={styles["link-button"]} href="/login" onClick={handleClose}>
+            <Link className={styles["link-button"]} href={resolvedLoginHref} onClick={handleClose}>
               로그인 하러가기
             </Link>
             <Link className={styles["secondary-link"]} href="/summary" onClick={handleClose}>

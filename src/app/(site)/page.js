@@ -282,6 +282,7 @@ export default function Home() {
         isOpen={modalState !== null && !isGenerating}
         mode={modalState?.mode}
         status={modalState?.status}
+        loginHref={modalState?.mode === "suggestLogin" ? "/login?returnTo=%2Fmypage" : undefined}
         onClose={() => setModalState(null)}
       />
     </main>

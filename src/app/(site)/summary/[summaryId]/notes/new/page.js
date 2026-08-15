@@ -19,7 +19,7 @@ export default async function NewNotePage({ params }) {
   }
 
   if (!userId) {
-    redirect("/login");
+    redirect(`/login?returnTo=${encodeURIComponent(`/summary/${summaryId}/notes/new`)}`);
   }
 
   return (
