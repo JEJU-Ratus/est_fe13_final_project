@@ -15,11 +15,14 @@
   input {
     @include typography.text-36-bold;
 
+    box-sizing: border-box;
     width: 100%;
-    padding: 0;
+    min-height: 64px;
+    padding: 10px 16px;
     color: color.$black;
-    background: transparent;
+    background: rgba(color.$black, 0.02);
     border: 0;
+    border-radius: 10px;
     outline: 0;
 
     &::placeholder {
@@ -28,7 +31,7 @@
 
     &:focus-visible {
       outline: 2px solid color.$fda-orange;
-      outline-offset: 4px;
+      outline-offset: 2px;
     }
   }
 }
@@ -36,7 +39,8 @@
 .accent-line {
   width: 60px;
   height: 4px;
-  background: color.$fda-orange;
+  margin-top: 16px;
+  background: color.$fda-navy;
 }
 
 .body-fields {
@@ -74,14 +78,16 @@
   textarea {
     @include typography.text-14-regular;
 
+    box-sizing: border-box;
     width: calc(100% - 40px);
-    min-height: 48px;
+    min-height: 96px;
     margin-left: 40px;
-    padding: 0;
+    padding: 14px 16px;
     resize: vertical;
     color: color.$black;
-    background: transparent;
+    background: rgba(color.$black, 0.02);
     border: 0;
+    border-radius: 10px;
     outline: 0;
 
     &::placeholder {
@@ -90,7 +96,7 @@
 
     &:focus-visible {
       outline: 2px solid color.$fda-orange;
-      outline-offset: 4px;
+      outline-offset: 2px;
     }
   }
 }

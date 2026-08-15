@@ -210,7 +210,11 @@ export default function Header() {
             </div>
           ) : (
             <div className={styles["guest-buttons"]}>
-              <Link href="/login" className={styles["login-button"]} type="button">
+                  <Link
+                    href={`/login?returnTo=${encodeURIComponent(pathname || "/")}`}
+                    className={styles["login-button"]}
+                    type="button"
+                  >
                 로그인
               </Link>
               <Link href="/signup" className={styles["signup-button"]} type="button">
@@ -288,6 +292,7 @@ export default function Header() {
       <CommonModal
         isOpen={isLoginModalOpen}
         mode="suggestLogin"
+        loginHref="/login?returnTo=%2Fmypage"
         onClose={() => setIsLoginModalOpen(false)}
       />
       <CommonModal

@@ -1,7 +1,7 @@
 "use client";
 // 함수 호출
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 // 컴포넌트 호출
@@ -35,6 +35,9 @@ function validatePassword(password) {
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
+  const destination = returnTo?.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/";
 
   // 사용자가 입력한 이메일 값을 제어하고 이메일 검증에 사용합니다.
   const [email, setEmail] = useState("");
@@ -121,7 +124,7 @@ export default function LoginPage() {
         setAuthError("로그인에 실패 했습니다. 다시 시도해 주세요.");
         return;
       }
-      router.replace("/");
+      router.replace(destination);
       router.refresh();
     } catch {
       setPassword("");

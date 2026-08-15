@@ -19,7 +19,7 @@ export async function verifySummaryPassword(summaryId, password) {
 
   return data.isValid;
 }
-
+// 요약 노트
 export async function getSummaryContent(summaryId, password = null) {
   const response = await fetch(`/api/summaries/${summaryId}/content`, {
     method: "POST",
@@ -32,7 +32,7 @@ export async function getSummaryContent(summaryId, password = null) {
   const data = await response.json();
 
   if (!response.ok) {
-    const error = new Error(data.message ?? "요약본 본문을 불러오지 못했습니다.");
+    const error = new Error(data.message ?? "요약노트 본문을 불러오지 못했습니다.");
 
     error.code = data.code;
     error.status = response.status;
@@ -41,4 +41,30 @@ export async function getSummaryContent(summaryId, password = null) {
   }
 
   return data.content;
+}
+
+// 학습노트
+export async function getStudyNoteDetail(summaryId, noteId) {
+  const response = await fetch(
+    `/api/summaries/${summaryId}/notes/${noteId}`,
+    {
+      method: "GET",
+      cache: "no-store",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    const error = new Error(
+      data.message ?? "학습노트를 불러오지 못했습니다.",
+    );
+
+    error.code = data.code;
+    error.status = response.status;
+
+    throw error;
+  }
+
+  return data.note;
 }
