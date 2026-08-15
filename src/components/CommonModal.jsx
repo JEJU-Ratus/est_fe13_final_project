@@ -125,10 +125,10 @@ export default function CommonModal(props) {
 
         {mode === "suggestLogin" && (
           <div className={styles["button-group"]}>
-            <Link className={styles["link-button"]} href="/login">
+            <Link className={styles["link-button"]} href="/login" onClick={handleClose}>
               로그인 하러가기
             </Link>
-            <Link className={styles["secondary-link"]} href="/summary">
+            <Link className={styles["secondary-link"]} href="/summary" onClick={handleClose}>
               전체 요약 노트
             </Link>
           </div>

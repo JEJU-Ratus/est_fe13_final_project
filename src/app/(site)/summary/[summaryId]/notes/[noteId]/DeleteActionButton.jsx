@@ -3,6 +3,7 @@
 import CommonModal from "@/components/CommonModal";
 import { deleteStudyNote } from "@/app/(site)/summary/[summaryId]/actions";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 function getErrorStatus(errorCode) {
   if (errorCode === "UNAUTHENTICATED") {
@@ -21,6 +22,7 @@ function getErrorStatus(errorCode) {
 }
 
 export default function DeleteActionButton({ className, summaryId, noteId }) {
+  const router = useRouter();
   const [isConfirmOpen, setConfirmOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorStatus, setErrorStatus] = useState(null);
@@ -38,12 +40,17 @@ export default function DeleteActionButton({ className, summaryId, noteId }) {
       if (result?.status === "error") {
         setConfirmOpen(false);
         setErrorStatus(getErrorStatus(result.errorCode));
-        setIsSubmitting(false);
+        return;
       }
+
+      setConfirmOpen(false);
+      router.replace(`/summary/${summaryId}`);
+      router.refresh();
     } catch (error) {
       console.error("학습노트 삭제 요청 실패:", error);
       setConfirmOpen(false);
       setErrorStatus(500);
+    } finally {
       setIsSubmitting(false);
     }
   }

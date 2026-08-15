@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/summary-detail";
+import { cookies } from "next/headers";
+import { getSummaryAccessCookieName, verifySummaryAccessToken } from "@/lib/summary-access";
 
 const INITIAL_ACTION_STATE = {
   status: "idle",
@@ -72,10 +74,10 @@ async function getAuthenticatedContext() {
   return { supabase, userId };
 }
 
-async function getAccessibleSummary(supabase, summaryId, userId) {
+async function getAccessibleSummary(supabase, summaryId) {
   const { data, error } = await supabase
     .from("summaries")
-    .select("id,author_id,is_locked")
+    .select("id,is_locked")
     .eq("id", summaryId)
     .maybeSingle();
 
@@ -88,8 +90,15 @@ async function getAccessibleSummary(supabase, summaryId, userId) {
     return { code: "NOT_FOUND" };
   }
 
-  if (data.is_locked && data.author_id !== userId) {
-    return { code: "FORBIDDEN" };
+  if (data.is_locked) {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get(getSummaryAccessCookieName(summaryId))?.value;
+
+    const hasSummaryAccess = await verifySummaryAccessToken(accessToken, summaryId);
+
+    if (!hasSummaryAccess) {
+      return { code: "FORBIDDEN" };
+    }
   }
 
   return { summary: data };
@@ -125,14 +134,15 @@ export async function createStudyNote(summaryId, _previousState, formData) {
     return createErrorState("로그인이 필요합니다.", "UNAUTHENTICATED");
   }
 
-  const summaryResult = await getAccessibleSummary(supabase, summaryId, userId);
+  const summaryResult = await getAccessibleSummary(supabase, summaryId);
 
   if (!summaryResult.summary) {
-    const message = summaryResult.code === "FORBIDDEN"
-      ? "이 요약본에 학습노트를 작성할 권한이 없습니다."
-      : summaryResult.code === "REQUEST_FAILED"
-        ? "요약본을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요."
-        : "요약본을 찾을 수 없습니다.";
+    const message =
+      summaryResult.code === "FORBIDDEN"
+        ? "이 요약본에 학습노트를 작성할 권한이 없습니다."
+        : summaryResult.code === "REQUEST_FAILED"
+          ? "요약본을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요."
+          : "요약본을 찾을 수 없습니다.";
     return createErrorState(message, summaryResult.code);
   }
 
@@ -174,17 +184,6 @@ export async function updateStudyNote(summaryId, noteId, _previousState, formDat
 
   if (!userId) {
     return createErrorState("로그인이 필요합니다.", "UNAUTHENTICATED");
-  }
-
-  const summaryResult = await getAccessibleSummary(supabase, summaryId, userId);
-
-  if (!summaryResult.summary) {
-    const message = summaryResult.code === "FORBIDDEN"
-      ? "이 요약본에 접근할 권한이 없습니다."
-      : summaryResult.code === "REQUEST_FAILED"
-        ? "요약본을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요."
-        : "요약본을 찾을 수 없습니다.";
-    return createErrorState(message, summaryResult.code);
   }
 
   const { data, error } = await supabase
@@ -246,7 +245,8 @@ export async function deleteStudyNote(summaryId, noteId) {
   }
 
   revalidatePath(`/summary/${summaryId}`);
-  redirect(`/summary/${summaryId}`);
+  return {
+    ...INITIAL_ACTION_STATE,
+    status: "success",
+  };
 }
-
-export { INITIAL_ACTION_STATE };
