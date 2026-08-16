@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import AiSummaryLayoutClient from "./AiSummaryLayoutClient";
 import Link from "next/link";
 import SummaryContent from "./SummaryContent";
+
 export default async function AiSummaryLayout({ children, params }) {
   // URL에서 summaryId 가져오기
   const { summaryId } = await params;
@@ -47,9 +48,12 @@ export default async function AiSummaryLayout({ children, params }) {
               <h2 className={styles["Ai-title"]}>{summary?.title ?? ""}</h2>
             </Link>
 
-            {/* 북마크/퀴즈 등 클라이언트 동작 */}
-            <AiSummaryLayoutClient summaryId={summaryId} />
+            {/* 제목 옆 북마크 버튼 */}
+            <AiSummaryLayoutClient summaryId={summaryId} type="bookmark" />
           </div>
+
+          {/* 퀴즈 생성 버튼 */}
+          <AiSummaryLayoutClient summaryId={summaryId} type="quiz" />
 
           {/* TODO: 상세 content 구조 확정 후 Supabase 데이터 연결 */}
           <div className={styles["Ai-content"]}>

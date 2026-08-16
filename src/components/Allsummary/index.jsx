@@ -25,6 +25,7 @@ export default function AllSummary({ title, summaries = [], isBookmarkPage = fal
               placeholder="주제 검색하기"
               value={allSummary.searchTerm}
               onChange={event => allSummary.setSearchTerm(event.target.value)}
+              onBlur={() => allSummary.setSearchTerm("")}
             />
 
             <span className={`material-symbols-outlined ${styles["search-icon"]}`} aria-hidden="true">
