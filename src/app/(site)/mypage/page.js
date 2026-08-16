@@ -19,17 +19,22 @@ const PROFILE_IMAGE_EXTENSIONS = {
   "image/webp": "webp",
 };
 
-// TODO: 학습노트 테이블 연동 후 로그인 사용자의 작성 목록으로 교체.
-const learningNotes = [
-  {
-    summaryId: "summary-001",
-    noteId: "note-001",
-    authorNickname: "사용자 닉네임",
-    topic: "JavaScript 비동기 처리 학습노트",
-    createdAt: "2026-08-13",
-    quizStatus: "completed",
-  },
-];
+function formatLearningNoteDate(createdAt) {
+  const date = new Date(createdAt);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+    .format(date)
+    .replaceAll(". ", ".")
+    .replace(/\.$/, "");
+}
 
 export default function Mypage() {
   // 공통 인증 정보에서 현재 로그인한 사용자와 Supabase 연결 객체를 가져오기.
@@ -40,6 +45,8 @@ export default function Mypage() {
   const [nickname, setNickname] = useState("사용자 닉네임");
   const [introduction, setIntroduction] = useState("");
   const [profileImageUrl, setProfileImageUrl] = useState("/images/clear.webp");
+  const [learningNotes, setLearningNotes] = useState([]);
+  const [isLearningNotesLoading, setIsLearningNotesLoading] = useState(true);
   const [mySummaryCards, setMySummaryCards] = useState([]);
   const [isMySummariesLoading, setIsMySummariesLoading] = useState(true);
   const [bookmarkCards, setBookmarkCards] = useState([]);
@@ -123,6 +130,52 @@ export default function Mypage() {
       isCurrentRequest = false;
     };
   }, [supabase, user]); //로그인 후 user 정보 데이터를 가져오기
+
+  useEffect(() => {
+    if (!user) {
+      return undefined;
+    }
+
+    let isCurrentRequest = true;
+
+    async function fetchLearningNotes() {
+      setIsLearningNotesLoading(true);
+
+      const { data, error } = await supabase
+        .from("learning_notes")
+        .select("id, summary_id, title, is_quiz_completed, created_at")
+        .eq("author_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (!isCurrentRequest) {
+        return;
+      }
+
+      if (error) {
+        setLearningNotes([]);
+        setIsLearningNotesLoading(false);
+        setToastMessage("내 학습노트를 불러오지 못했습니다.");
+        return;
+      }
+
+      setLearningNotes(
+        (data ?? []).map(note => ({
+          summaryId: note.summary_id,
+          noteId: note.id,
+          topic: note.title,
+          createdAt: formatLearningNoteDate(note.created_at),
+          quizStatus: note.is_quiz_completed ? "completed" : "notStarted",
+        })),
+      );
+      setIsLearningNotesLoading(false);
+    }
+
+    void fetchLearningNotes();
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [supabase, user]);
 
   useEffect(() => {
     if (!user) {
@@ -633,10 +686,16 @@ export default function Mypage() {
                 <span className={styles["table-topic"]}>주제</span>
                 <span>작성일</span>
               </div>
-              {learningNotes.length === 0 ? (
+              {isLearningNotesLoading ? null : learningNotes.length === 0 ? (
                 <p className={styles["empty-message"]}>현재 리스트가 없습니다.</p>
               ) : (
-                learningNotes.map(note => <NoteItem key={note.noteId} {...note} />)
+                learningNotes.map(note => (
+                  <NoteItem
+                    key={note.noteId}
+                    {...note}
+                    authorNickname={nickname}
+                  />
+                ))
               )}
             </div>
           </section>
