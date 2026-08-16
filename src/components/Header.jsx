@@ -40,6 +40,9 @@ export default function Header() {
   // 최초 헤더 렌더링 시 현재 경로를 기준으로 접힘/펼침 상태 결정
   // useState의 초기값, 페이지 이동 시 사용자가 선택된 상태 유지
   const pathname = usePathname();
+  const loginHref = ["/signup", "/signup/complete"].includes(pathname)
+    ? "/login"
+    : `/login?returnTo=${encodeURIComponent(pathname || "/")}`;
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(() =>
     COLLAPSED_PATHS.includes(pathname),
   );
@@ -211,7 +214,7 @@ export default function Header() {
           ) : (
             <div className={styles["guest-buttons"]}>
                   <Link
-                    href={`/login?returnTo=${encodeURIComponent(pathname || "/")}`}
+                    href={loginHref}
                     className={styles["login-button"]}
                     type="button"
                   >
