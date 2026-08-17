@@ -20,6 +20,11 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
   //퀴즈 생성 버튼 표시 여부
   const [canCreateQuiz, setCanCreateQuiz] = useState(false);
 
+  const [quizSubmission, setQuizSubmission] = useState({
+    isCompleted: false,
+    selectedOptionId: null,
+  });
+
   //퀴즈 모달 열림 상태 관리
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
 
@@ -64,6 +69,7 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
       //noteId가 없거나 새 학습노트 작성 페이지면 퀴즈 버튼 숨김
       if (!noteId || noteId === "new") {
         setCanCreateQuiz(false);
+        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
         return;
       }
       const supabase = createClient();
@@ -76,13 +82,14 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
       //로그인 사용자가 없으면 동작 중단
       if (!user) {
         setCanCreateQuiz(false);
+        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
         return;
       }
 
       //현재 학습노트 작성자 확인
       const { data: learningNote, error } = await supabase
         .from("learning_notes")
-        .select("author_id")
+        .select("author_id, is_quiz_completed, selected_option_index")
         .eq("id", noteId)
         .eq("summary_id", summaryId)
         .maybeSingle();
@@ -90,11 +97,19 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
       if (error) {
         console.error("학습노트 작성자 조회 실패:", error);
         setCanCreateQuiz(false);
+        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
         return;
       }
 
       //현재 로그인 사용자와 작성자가 같을 때만 버튼 표시
       setCanCreateQuiz(learningNote?.author_id === user.id);
+      setQuizSubmission({
+        isCompleted: Boolean(learningNote?.is_quiz_completed),
+        selectedOptionId:
+          learningNote?.selected_option_index === null || learningNote?.selected_option_index === undefined
+            ? null
+            : String(learningNote.selected_option_index),
+      });
     }
 
     checkQuizPermission();
@@ -187,6 +202,37 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
     setQuizModalOpen(false);
   }
 
+  async function handleQuizSubmit(selectedOptionId) {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user || !noteId || noteId === "new") {
+      return false;
+    }
+
+    const { data, error } = await supabase
+      .from("learning_notes")
+      .update({
+        is_quiz_completed: true,
+        selected_option_index: Number(selectedOptionId),
+      })
+      .eq("id", noteId)
+      .eq("summary_id", summaryId)
+      .eq("author_id", user.id)
+      .select("id")
+      .maybeSingle();
+
+    if (error || !data) {
+      console.error("?댁쫰 寃곌낵 ???ㅽ뙣:", error);
+      return false;
+    }
+
+    setQuizSubmission({ isCompleted: true, selectedOptionId });
+    return true;
+  }
+
   if (type === "bookmark") {
     if (isBookmarked === null) {
       return null;
@@ -223,6 +269,9 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
           isOpen={isQuizModalOpen}
           quiz={quiz}
           isUnavailable={isQuizUnavailable}
+          hasSubmitted={quizSubmission.isCompleted}
+          submittedOptionId={quizSubmission.selectedOptionId}
+          onSubmit={handleQuizSubmit}
           onClose={handleQuizModalClose}
         />
       </>
