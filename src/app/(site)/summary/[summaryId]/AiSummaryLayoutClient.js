@@ -1,25 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { useParams } from "next/navigation";
-import styles from "./SummaryId.module.scss";
+import { useEffect, useState } from "react";
+import { useParams, usePathname } from "next/navigation";
+
+import CommonModal from "@/components/CommonModal";
 import QuizModal from "@/components/QuizModal";
+import { createClient } from "@/lib/supabase/client";
+
+import styles from "./SummaryId.module.scss";
 
 export default function AiSummaryLayoutClient({ summaryId, type }) {
-  //서버에서 실제 북마크 상태를 받아오도록 변경
-  const [isBookmarked, setBookmarked] = useState(null);
-
-  // 현재 북마크 상태에 따라 버튼 안내 문구 설정
-  const bookmarkLabel = isBookmarked ? "북마크 삭제" : "북마크 담기";
-
-  //현재 URL에 noteId가 있는지 확인
+  // 현재 페이지 정보
   const params = useParams();
   const noteId = params.noteId;
 
-  //퀴즈 생성 버튼 표시 여부
-  const [canCreateQuiz, setCanCreateQuiz] = useState(false);
+  const pathname = usePathname();
+  const isEditPage = pathname.endsWith("/edit");
 
+  // 상태 관리
+  const [isBookmarked, setBookmarked] = useState(null);
+  const [canCreateQuiz, setCanCreateQuiz] = useState(false);
   const [quizSubmission, setQuizSubmission] = useState({
     isCompleted: false,
     selectedOptionId: null,
@@ -27,12 +27,13 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
 
   //퀴즈 모달 열림 상태 관리
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
-
-  // 퀴즈
   const [quiz, setQuiz] = useState(null);
   const [isQuizUnavailable, setQuizUnavailable] = useState(true);
+  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
 
-  // 현재 사용자의 북마크 상태 조회
+  const bookmarkLabel = isBookmarked ? "북마크 삭제" : "북마크 담기";
+
+  // 북마크 상태 조회
   useEffect(() => {
     async function checkBookmarkStatus() {
       const supabase = createClient();
@@ -64,29 +65,46 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
     checkBookmarkStatus();
   }, [summaryId]);
 
+  // 학습노트 직접 접근 시 로그인 확인
   useEffect(() => {
-    async function checkQuizPermission() {
-      //noteId가 없거나 새 학습노트 작성 페이지면 퀴즈 버튼 숨김
-      if (!noteId || noteId === "new") {
-        setCanCreateQuiz(false);
-        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
-        return;
-      }
+    async function checkNoteLogin() {
+      if (type !== "auth" || !noteId) return;
+
       const supabase = createClient();
 
-      //현재 로그인 사용자 확인
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      //로그인 사용자가 없으면 동작 중단
+      if (!user) {
+        setLoginModalOpen(true);
+      }
+    }
+
+    checkNoteLogin();
+  }, [type, noteId]);
+
+  // 퀴즈 풀기 버튼 노출 여부 확인
+  useEffect(() => {
+    async function checkQuizPermission() {
+      if (!noteId || noteId === "new" || isEditPage) {
+        setCanCreateQuiz(false);
+        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
+        return;
+      }
+
+      const supabase = createClient();
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) {
         setCanCreateQuiz(false);
         setQuizSubmission({ isCompleted: false, selectedOptionId: null });
         return;
       }
 
-      //현재 학습노트 작성자 확인
       const { data: learningNote, error } = await supabase
         .from("learning_notes")
         .select("author_id, is_quiz_completed, selected_option_index")
@@ -101,7 +119,6 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
         return;
       }
 
-      //현재 로그인 사용자와 작성자가 같을 때만 버튼 표시
       setCanCreateQuiz(learningNote?.author_id === user.id);
       setQuizSubmission({
         isCompleted: Boolean(learningNote?.is_quiz_completed),
@@ -113,8 +130,9 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
     }
 
     checkQuizPermission();
-  }, [noteId, summaryId]);
+  }, [noteId, summaryId, isEditPage]);
 
+  // 퀴즈 데이터 조회
   useEffect(() => {
     async function fetchQuiz() {
       if (!summaryId) return;
@@ -158,7 +176,7 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
     fetchQuiz();
   }, [summaryId]);
 
-  //북마크 추가/삭제 처리
+  // 북마크 추가 / 삭제
   async function handleBookmarkToggle() {
     const supabase = createClient();
 
@@ -168,7 +186,6 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
 
     if (!user) return;
 
-    // 이미 북마크 되어 있으면 삭제
     if (isBookmarked) {
       const { error } = await supabase.from("bookmarks").delete().eq("user_id", user.id).eq("summary_id", summaryId);
 
@@ -177,7 +194,6 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
         return;
       }
     } else {
-      // 북마크 되어 있지 않으면 추가
       const { error } = await supabase.from("bookmarks").insert({
         user_id: user.id,
         summary_id: summaryId,
@@ -188,16 +204,15 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
         return;
       }
     }
-    //DB 작업 성공 후 화면 상태 변경
+
     setBookmarked(current => !current);
   }
 
-  //퀴즈 모달 열기
+  // 퀴즈 모달
   function handleQuizModalOpen() {
     setQuizModalOpen(true);
   }
 
-  //퀴즈 모달 닫기
   function handleQuizModalClose() {
     setQuizModalOpen(false);
   }
@@ -234,9 +249,8 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
   }
 
   if (type === "bookmark") {
-    if (isBookmarked === null) {
-      return null;
-    }
+    if (isBookmarked === null) return null;
+
     return (
       <button
         className={styles["bookmark-btn"]}
@@ -276,6 +290,10 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
         />
       </>
     );
+  }
+
+  if (type === "auth") {
+    return <CommonModal isOpen={isLoginModalOpen} mode="suggestLogin" onClose={() => setLoginModalOpen(false)} />;
   }
 
   return null;
