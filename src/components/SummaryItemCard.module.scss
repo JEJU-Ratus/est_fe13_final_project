@@ -11,6 +11,8 @@
   min-height: 229px;
   padding: 16px 20px;
 
+  box-sizing: border-box;
+
   background: color.$card-color;
   border-radius: 15px;
 
@@ -125,4 +127,10 @@
 
 .lock-icon {
   color: color.$fda-navy;
+}
+
+@media (max-width: 480px) {
+  .item-card {
+    width: 100%;
+  }
 }
