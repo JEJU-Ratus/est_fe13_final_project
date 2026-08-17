@@ -223,7 +223,7 @@ export default function Home() {
 
         <section className={styles["content-section"]} aria-label="주요 콘텐츠">
           <div className={styles["wide-parent"]}>
-            <Banner href="/dev" alt="넓은 영역의 프론트엔드 스킬업 이벤트" />
+            <Banner href="/" alt="넓은 영역의 프론트엔드 스킬업 이벤트" />
           </div>
 
           <div className={styles["quick-menu"]}>
