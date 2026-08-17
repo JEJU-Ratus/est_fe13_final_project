@@ -79,7 +79,6 @@ export default function SignupCompletePage() {
         <Link className={styles["login-link"]} href="/login">
           로그인 하러 가기
         </Link>
-        <Link href="/">메인으로 - 테스트용 추후 제거</Link>
       </div>
       <CommonModal
         isOpen={modalMode !== null}
