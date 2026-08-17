@@ -8,7 +8,7 @@ import QuizModal from "@/components/QuizModal";
 
 export default function AiSummaryLayoutClient({ summaryId, type }) {
   //서버에서 실제 북마크 상태를 받아오도록 변경
-  const [isBookmarked, setBookmarked] = useState(false);
+  const [isBookmarked, setBookmarked] = useState(null);
 
   // 현재 북마크 상태에 따라 버튼 안내 문구 설정
   const bookmarkLabel = isBookmarked ? "북마크 삭제" : "북마크 담기";
@@ -20,20 +20,56 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
   //퀴즈 생성 버튼 표시 여부
   const [canCreateQuiz, setCanCreateQuiz] = useState(false);
 
+  const [quizSubmission, setQuizSubmission] = useState({
+    isCompleted: false,
+    selectedOptionId: null,
+  });
+
   //퀴즈 모달 열림 상태 관리
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
 
-  //TODO: 실제 퀴즈 데이터 연결 시 교체
-  const quiz = null;
-  const isQuizUnavailable = true;
+  // 퀴즈
+  const [quiz, setQuiz] = useState(null);
+  const [isQuizUnavailable, setQuizUnavailable] = useState(true);
+
+  // 현재 사용자의 북마크 상태 조회
+  useEffect(() => {
+    async function checkBookmarkStatus() {
+      const supabase = createClient();
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setBookmarked(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("bookmarks")
+        .select("summary_id")
+        .eq("user_id", user.id)
+        .eq("summary_id", summaryId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("북마크 상태 조회 실패:", error);
+        return;
+      }
+
+      setBookmarked(!!data);
+    }
+
+    checkBookmarkStatus();
+  }, [summaryId]);
 
   useEffect(() => {
     async function checkQuizPermission() {
-      console.log("params 전체:", params);
-
       //noteId가 없거나 새 학습노트 작성 페이지면 퀴즈 버튼 숨김
       if (!noteId || noteId === "new") {
         setCanCreateQuiz(false);
+        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
         return;
       }
       const supabase = createClient();
@@ -46,15 +82,14 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
       //로그인 사용자가 없으면 동작 중단
       if (!user) {
         setCanCreateQuiz(false);
+        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
         return;
       }
-
-      console.log("현재 사용자:", user.id);
 
       //현재 학습노트 작성자 확인
       const { data: learningNote, error } = await supabase
         .from("learning_notes")
-        .select("author_id")
+        .select("author_id, is_quiz_completed, selected_option_index")
         .eq("id", noteId)
         .eq("summary_id", summaryId)
         .maybeSingle();
@@ -62,18 +97,66 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
       if (error) {
         console.error("학습노트 작성자 조회 실패:", error);
         setCanCreateQuiz(false);
+        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
         return;
       }
 
-      console.log("학습노트:", learningNote);
-      console.log("학습노트 작성자:", learningNote?.author_id);
-
       //현재 로그인 사용자와 작성자가 같을 때만 버튼 표시
       setCanCreateQuiz(learningNote?.author_id === user.id);
+      setQuizSubmission({
+        isCompleted: Boolean(learningNote?.is_quiz_completed),
+        selectedOptionId:
+          learningNote?.selected_option_index === null || learningNote?.selected_option_index === undefined
+            ? null
+            : String(learningNote.selected_option_index),
+      });
     }
 
     checkQuizPermission();
   }, [noteId, summaryId]);
+
+  useEffect(() => {
+    async function fetchQuiz() {
+      if (!summaryId) return;
+
+      const supabase = createClient();
+
+      const { data, error } = await supabase
+        .from("quizzes")
+        .select("id, question, options, answer_index, explanation")
+        .eq("summary_id", summaryId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("퀴즈 조회 실패:", error);
+        setQuiz(null);
+        setQuizUnavailable(true);
+        return;
+      }
+
+      if (!data) {
+        setQuiz(null);
+        setQuizUnavailable(true);
+        return;
+      }
+
+      const formattedQuiz = {
+        id: data.id,
+        question: data.question,
+        options: data.options.map((option, index) => ({
+          optionId: String(index),
+          label: option,
+        })),
+        correctOptionId: String(data.answer_index),
+        explanation: data.explanation,
+      };
+
+      setQuiz(formattedQuiz);
+      setQuizUnavailable(false);
+    }
+
+    fetchQuiz();
+  }, [summaryId]);
 
   //북마크 추가/삭제 처리
   async function handleBookmarkToggle() {
@@ -119,7 +202,41 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
     setQuizModalOpen(false);
   }
 
+  async function handleQuizSubmit(selectedOptionId) {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user || !noteId || noteId === "new") {
+      return false;
+    }
+
+    const { data, error } = await supabase
+      .from("learning_notes")
+      .update({
+        is_quiz_completed: true,
+        selected_option_index: Number(selectedOptionId),
+      })
+      .eq("id", noteId)
+      .eq("summary_id", summaryId)
+      .eq("author_id", user.id)
+      .select("id")
+      .maybeSingle();
+
+    if (error || !data) {
+      console.error("?댁쫰 寃곌낵 ???ㅽ뙣:", error);
+      return false;
+    }
+
+    setQuizSubmission({ isCompleted: true, selectedOptionId });
+    return true;
+  }
+
   if (type === "bookmark") {
+    if (isBookmarked === null) {
+      return null;
+    }
     return (
       <button
         className={styles["bookmark-btn"]}
@@ -144,7 +261,7 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
       <>
         <div className={styles["quiz-action"]}>
           <button type="button" onClick={handleQuizModalOpen}>
-            퀴즈 생성
+            퀴즈 풀기
           </button>
         </div>
 
@@ -152,6 +269,9 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
           isOpen={isQuizModalOpen}
           quiz={quiz}
           isUnavailable={isQuizUnavailable}
+          hasSubmitted={quizSubmission.isCompleted}
+          submittedOptionId={quizSubmission.selectedOptionId}
+          onSubmit={handleQuizSubmit}
           onClose={handleQuizModalClose}
         />
       </>

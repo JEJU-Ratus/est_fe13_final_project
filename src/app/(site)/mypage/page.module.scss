@@ -120,7 +120,7 @@
       display: flex;
       max-width: 600px;
       flex-direction: column;
-      gap: 12px;
+        gap: 12px;
 
       label {
         display: flex;
@@ -146,6 +146,12 @@
             outline-offset: -1px;
           }
         }
+      }
+
+      .nickname-error {
+        margin-top: -4px;
+        color: #d64545;
+        font-size: 12px;
       }
     }
   }
