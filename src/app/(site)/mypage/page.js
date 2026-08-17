@@ -58,6 +58,12 @@ export default function Mypage() {
   const [draftProfileImageUrl, setDraftProfileImageUrl] = useState("");
   const [draftNickname, setDraftNickname] = useState(nickname);
   const [draftIntroduction, setDraftIntroduction] = useState(introduction);
+  const draftNicknameValue = draftNickname.trim();
+  const draftNicknameError = !draftNicknameValue
+    ? "닉네임을 입력해 주세요."
+    : draftNicknameValue.length < 2 || draftNicknameValue.length > 16
+      ? "닉네임은 2~16자로 입력해 주세요."
+      : "";
   const summaryListDragRef = useRef({
     element: null,
     startX: 0,
@@ -424,6 +430,12 @@ export default function Mypage() {
 
     const nextNickname = draftNickname.trim();
     const nextIntroduction = draftIntroduction.trim();
+
+    if (draftNicknameError) {
+      setToastMessage(draftNicknameError);
+      return;
+    }
+
     let nextProfileImageUrl = profileImageUrl;
     setIsSavingProfile(true);
 
@@ -630,9 +642,17 @@ export default function Mypage() {
                     <label>
                       <input
                         value={draftNickname}
+                        minLength={2}
+                        maxLength={16}
+                        aria-invalid={Boolean(draftNicknameError)}
                         onChange={event => setDraftNickname(event.target.value)}
                       />
                     </label>
+                      {draftNicknameError && (
+                        <span className={styles["nickname-error"]} role="alert">
+                          {draftNicknameError}
+                        </span>
+                      )}
                     <label>
                       <input
                         value={draftIntroduction}
