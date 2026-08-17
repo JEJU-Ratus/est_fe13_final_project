@@ -23,9 +23,9 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
   //퀴즈 모달 열림 상태 관리
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
 
-  //TODO: 실제 퀴즈 데이터 연결 시 교체
-  const quiz = null;
-  const isQuizUnavailable = true;
+  // 퀴즈
+  const [quiz, setQuiz] = useState(null);
+  const [isQuizUnavailable, setQuizUnavailable] = useState(true);
 
   // 현재 사용자의 북마크 상태 조회
   useEffect(() => {
@@ -99,6 +99,49 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
 
     checkQuizPermission();
   }, [noteId, summaryId]);
+
+  useEffect(() => {
+    async function fetchQuiz() {
+      if (!summaryId) return;
+
+      const supabase = createClient();
+
+      const { data, error } = await supabase
+        .from("quizzes")
+        .select("id, question, options, answer_index, explanation")
+        .eq("summary_id", summaryId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("퀴즈 조회 실패:", error);
+        setQuiz(null);
+        setQuizUnavailable(true);
+        return;
+      }
+
+      if (!data) {
+        setQuiz(null);
+        setQuizUnavailable(true);
+        return;
+      }
+
+      const formattedQuiz = {
+        id: data.id,
+        question: data.question,
+        options: data.options.map((option, index) => ({
+          optionId: String(index),
+          label: option,
+        })),
+        correctOptionId: String(data.answer_index),
+        explanation: data.explanation,
+      };
+
+      setQuiz(formattedQuiz);
+      setQuizUnavailable(false);
+    }
+
+    fetchQuiz();
+  }, [summaryId]);
 
   //북마크 추가/삭제 처리
   async function handleBookmarkToggle() {
