@@ -82,7 +82,8 @@
   flex-direction: column;
   gap: 8px;
   margin: 0;
-  padding-left: 24px;
+  list-style: none;
+  padding-left: 0;
 }
 
 .option-label {
@@ -94,6 +95,14 @@
   input {
     accent-color: color.$fda-orange;
   }
+}
+
+.option-label.is-correct {
+  color: #16834f;
+}
+
+.option-label.is-incorrect {
+  color: #d64545;
 }
 
 .unavailable-state {
@@ -110,7 +119,28 @@
   color: color.$fda-navy;
   text-align: center;
 }
+.explanation {
+  margin-top: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: #f7f7f7;
+  border-radius: 8px;
+}
 
+.explanation h3 {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.explanation p {
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.explanation .answer {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
 .submit-button {
   @include typography.text-16-medium;
 

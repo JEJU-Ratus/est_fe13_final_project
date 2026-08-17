@@ -64,7 +64,12 @@ export default function SignupPage() {
   const nicknameCheckIdRef = useRef(0); // 늦게 도착한 이전 중복 확인 결과가 최신 입력을 덮지 않게 구분합니다.
 
   const isAllTermsAccepted = isServiceTermsAccepted && isAiTermsAccepted;
-  const nicknameError = nickname.trim() ? "" : "닉네임을 입력해 주세요.";
+  const nicknameValue = nickname.trim();
+  const nicknameError = !nicknameValue
+    ? "닉네임을 입력해 주세요."
+    : nicknameValue.length < 2 || nicknameValue.length > 16
+      ? "닉네임은 2~16자로 입력해 주세요."
+      : "";
   const emailError = validateEmail(email);
   const passwordError = validatePassword(password);
   const passwordConfirmError = !passwordConfirm
@@ -368,6 +373,8 @@ export default function SignupPage() {
                     id="signup-nickname"
                     name="nickname"
                     type="text"
+                    minLength={2}
+                    maxLength={16}
                     value={nickname}
                     placeholder="닉네임"
                     autoComplete="nickname"
