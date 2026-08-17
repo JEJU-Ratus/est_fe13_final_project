@@ -20,6 +20,12 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
   // 상태 관리
   const [isBookmarked, setBookmarked] = useState(null);
   const [canCreateQuiz, setCanCreateQuiz] = useState(false);
+  const [quizSubmission, setQuizSubmission] = useState({
+    isCompleted: false,
+    selectedOptionId: null,
+  });
+
+  //퀴즈 모달 열림 상태 관리
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
   const [quiz, setQuiz] = useState(null);
   const [isQuizUnavailable, setQuizUnavailable] = useState(true);
@@ -83,6 +89,7 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
     async function checkQuizPermission() {
       if (!noteId || noteId === "new" || isEditPage) {
         setCanCreateQuiz(false);
+        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
         return;
       }
 
@@ -94,12 +101,13 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
 
       if (!user) {
         setCanCreateQuiz(false);
+        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
         return;
       }
 
       const { data: learningNote, error } = await supabase
         .from("learning_notes")
-        .select("author_id")
+        .select("author_id, is_quiz_completed, selected_option_index")
         .eq("id", noteId)
         .eq("summary_id", summaryId)
         .maybeSingle();
@@ -107,10 +115,18 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
       if (error) {
         console.error("학습노트 작성자 조회 실패:", error);
         setCanCreateQuiz(false);
+        setQuizSubmission({ isCompleted: false, selectedOptionId: null });
         return;
       }
 
       setCanCreateQuiz(learningNote?.author_id === user.id);
+      setQuizSubmission({
+        isCompleted: Boolean(learningNote?.is_quiz_completed),
+        selectedOptionId:
+          learningNote?.selected_option_index === null || learningNote?.selected_option_index === undefined
+            ? null
+            : String(learningNote.selected_option_index),
+      });
     }
 
     checkQuizPermission();
@@ -201,6 +217,37 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
     setQuizModalOpen(false);
   }
 
+  async function handleQuizSubmit(selectedOptionId) {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user || !noteId || noteId === "new") {
+      return false;
+    }
+
+    const { data, error } = await supabase
+      .from("learning_notes")
+      .update({
+        is_quiz_completed: true,
+        selected_option_index: Number(selectedOptionId),
+      })
+      .eq("id", noteId)
+      .eq("summary_id", summaryId)
+      .eq("author_id", user.id)
+      .select("id")
+      .maybeSingle();
+
+    if (error || !data) {
+      console.error("?댁쫰 寃곌낵 ???ㅽ뙣:", error);
+      return false;
+    }
+
+    setQuizSubmission({ isCompleted: true, selectedOptionId });
+    return true;
+  }
+
   if (type === "bookmark") {
     if (isBookmarked === null) return null;
 
@@ -236,6 +283,9 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
           isOpen={isQuizModalOpen}
           quiz={quiz}
           isUnavailable={isQuizUnavailable}
+          hasSubmitted={quizSubmission.isCompleted}
+          submittedOptionId={quizSubmission.selectedOptionId}
+          onSubmit={handleQuizSubmit}
           onClose={handleQuizModalClose}
         />
       </>

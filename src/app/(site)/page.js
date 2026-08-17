@@ -133,9 +133,6 @@ export default function Home() {
               onSubmit={handleSummarySubmit}
             >
               <div className={styles["topic-input"]}>
-                <span className="material-symbols-outlined" aria-hidden="true">
-                  add
-                </span>
                 <input
                   type="text"
                   aria-label="요약할 내용"
@@ -223,7 +220,7 @@ export default function Home() {
 
         <section className={styles["content-section"]} aria-label="주요 콘텐츠">
           <div className={styles["wide-parent"]}>
-            <Banner href="/dev" alt="넓은 영역의 프론트엔드 스킬업 이벤트" />
+            <Banner href="/" alt="넓은 영역의 프론트엔드 스킬업 이벤트" />
           </div>
 
           <div className={styles["quick-menu"]}>
