@@ -134,6 +134,31 @@ export default function LoginPage() {
     }
   }
 
+  async function handleSocialLogin(provider) {
+    setIsLoading(true);
+    setModalStatus(null);
+
+    try {
+      const supabase = createClient();
+      const callbackUrl = new URL("/auth/callback", window.location.origin);
+      callbackUrl.searchParams.set("returnTo", destination);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: callbackUrl.toString(),
+        },
+      });
+
+      if (error) {
+        setModalStatus("network");
+        setIsLoading(false);
+      }
+    } catch {
+      setModalStatus("network");
+      setIsLoading(false);
+    }
+  }
+
   return (
     <GuestGuard>
       <main className={styles["login-page"]}>
@@ -253,6 +278,7 @@ export default function LoginPage() {
                 type="button"
                 disabled={isLoading}
                 aria-label="카카오로 로그인"
+                onClick={() => handleSocialLogin("kakao")}
               >
                 {/* 접근 가능한 이름은 버튼이 제공하므로 아이콘의 중복 낭독을 막습니다. */}
                 <Image src="/images/kakao-icon.svg" alt="" width={56} height={56} />
@@ -262,6 +288,7 @@ export default function LoginPage() {
                 type="button"
                 disabled={isLoading}
                 aria-label="구글로 로그인"
+                onClick={() => handleSocialLogin("google")}
               >
                 {/* 접근 가능한 이름은 버튼이 제공하므로 아이콘의 중복 낭독을 막습니다. */}
                 <Image src="/images/google-icon.svg" alt="" width={56} height={56} />
