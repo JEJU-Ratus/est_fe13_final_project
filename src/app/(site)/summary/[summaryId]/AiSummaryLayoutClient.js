@@ -8,7 +8,7 @@ import QuizModal from "@/components/QuizModal";
 
 export default function AiSummaryLayoutClient({ summaryId, type }) {
   //서버에서 실제 북마크 상태를 받아오도록 변경
-  const [isBookmarked, setBookmarked] = useState(false);
+  const [isBookmarked, setBookmarked] = useState(null);
 
   // 현재 북마크 상태에 따라 버튼 안내 문구 설정
   const bookmarkLabel = isBookmarked ? "북마크 삭제" : "북마크 담기";
@@ -27,10 +27,40 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
   const quiz = null;
   const isQuizUnavailable = true;
 
+  // 현재 사용자의 북마크 상태 조회
+  useEffect(() => {
+    async function checkBookmarkStatus() {
+      const supabase = createClient();
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setBookmarked(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("bookmarks")
+        .select("summary_id")
+        .eq("user_id", user.id)
+        .eq("summary_id", summaryId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("북마크 상태 조회 실패:", error);
+        return;
+      }
+
+      setBookmarked(!!data);
+    }
+
+    checkBookmarkStatus();
+  }, [summaryId]);
+
   useEffect(() => {
     async function checkQuizPermission() {
-      console.log("params 전체:", params);
-
       //noteId가 없거나 새 학습노트 작성 페이지면 퀴즈 버튼 숨김
       if (!noteId || noteId === "new") {
         setCanCreateQuiz(false);
@@ -49,8 +79,6 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
         return;
       }
 
-      console.log("현재 사용자:", user.id);
-
       //현재 학습노트 작성자 확인
       const { data: learningNote, error } = await supabase
         .from("learning_notes")
@@ -64,9 +92,6 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
         setCanCreateQuiz(false);
         return;
       }
-
-      console.log("학습노트:", learningNote);
-      console.log("학습노트 작성자:", learningNote?.author_id);
 
       //현재 로그인 사용자와 작성자가 같을 때만 버튼 표시
       setCanCreateQuiz(learningNote?.author_id === user.id);
@@ -120,6 +145,9 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
   }
 
   if (type === "bookmark") {
+    if (isBookmarked === null) {
+      return null;
+    }
     return (
       <button
         className={styles["bookmark-btn"]}
@@ -144,7 +172,7 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
       <>
         <div className={styles["quiz-action"]}>
           <button type="button" onClick={handleQuizModalOpen}>
-            퀴즈 생성
+            퀴즈 풀기
           </button>
         </div>
 
