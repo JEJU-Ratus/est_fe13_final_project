@@ -80,6 +80,7 @@ function normalizeStudyNote(note) {
     noteId: note.noteId,
     summaryId: note.summaryId,
     authorNickname: author?.nickname ?? "알 수 없는 사용자",
+    title: note.title ?? "",
     topic: summary?.topic ?? "알 수 없는 주제",
     createdAt: note.createdAt,
     createdAtDisplay: formatDate(note.createdAt),
