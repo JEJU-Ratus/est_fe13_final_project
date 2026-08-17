@@ -4,6 +4,31 @@ import AiSummaryLayoutClient from "./AiSummaryLayoutClient";
 import Link from "next/link";
 import SummaryContent from "./SummaryContent";
 
+export async function generateMetadata({ params }) {
+  const { summaryId } = await params;
+  const supabase = await createClient();
+  const { data: summary } = await supabase
+    .from("summaries")
+    .select("title, topic, excerpt, is_locked")
+    .eq("id", summaryId)
+    .maybeSingle();
+
+  if (!summary) {
+    return {
+      title: "요약 노트 | 프다!",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  return {
+    title: `${summary.title} | 프다!`,
+    description: summary.excerpt || `${summary.topic} 요약 노트`,
+    robots: summary.is_locked
+      ? { index: false, follow: false }
+      : { index: true, follow: true },
+  };
+}
+
 export default async function AiSummaryLayout({ children, params }) {
   // URL에서 summaryId 가져오기
   const { summaryId } = await params;
