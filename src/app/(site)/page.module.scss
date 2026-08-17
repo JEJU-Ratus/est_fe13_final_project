@@ -34,6 +34,7 @@
   .intro-content {
     display: flex;
     width: 760px;
+    min-width: 0;
     flex-direction: column;
     gap: 40px;
 
@@ -68,7 +69,7 @@
 
     .summary-form {
       display: flex;
-      width: 673px;
+      width: min(100%, 673px);
       flex-direction: column;
       gap: 20px;
 
