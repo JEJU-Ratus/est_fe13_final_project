@@ -34,6 +34,7 @@ const menuItems = [
 
 //헤더가 접힌 페이지
 const COLLAPSED_PATHS = ["/login", "/signup", "/signup/complete"];
+const HEADER_STATE_STORAGE_KEY = "isHeaderCollapsed";
 
 export default function Header() {
   const { isAuthenticated, isLoggingOut, signOut, supabase, user } = useAuth();
@@ -93,6 +94,13 @@ export default function Header() {
     const mobileMediaQuery = window.matchMedia("(max-width: 480px)");
 
     function handleMobileViewportChange(event) {
+      const savedHeaderState = window.localStorage.getItem(HEADER_STATE_STORAGE_KEY);
+
+      if (savedHeaderState !== null) {
+        setIsHeaderCollapsed(savedHeaderState === "true");
+        return;
+      }
+
       setIsHeaderCollapsed(event.matches || COLLAPSED_PATHS.includes(pathname));
     }
 
@@ -106,10 +114,12 @@ export default function Header() {
 
   function handleCollapse() {
     setIsHeaderCollapsed(true);
+    window.localStorage.setItem(HEADER_STATE_STORAGE_KEY, "true");
   }
 
   function handleExpand() {
     setIsHeaderCollapsed(false);
+    window.localStorage.setItem(HEADER_STATE_STORAGE_KEY, "false");
   }
 
   function handleMypageClick() {
