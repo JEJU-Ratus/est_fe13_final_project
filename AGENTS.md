@@ -37,6 +37,23 @@ page.js
 page.module.scss
 ```
 
+- SCSS Module 파일은 대상 JavaScript 파일에서 상대 경로로 import한다.
+
+```js
+import styles from "./page.module.scss";
+```
+
+- SCSS 내부에서 `src/styles`의 공통 파일을 불러올 때는 `styles/` 기준 경로를 사용한다.
+
+```scss
+@use "styles/abstracts/colors" as color;
+@use "styles/abstracts/variables" as var;
+@use "styles/abstracts/typography" as typography;
+@use "styles/abstracts/mixins" as mixin;
+```
+
+- 공통 SCSS 파일을 불러올 때 `@/styles/...` 또는 긴 상대 경로를 혼용하지 않는다.
+
 - 전역 스타일은 `src/app/globals.scss`에서 관리한다.
 - 공통 색상, 변수, 믹스인, 타이포그래피는 `src/styles/abstracts`에서 관리한다.
 - CSS Reset은 `src/styles/base/_reset.scss`에서 관리한다.
@@ -55,49 +72,62 @@ page.module.scss
 ├── docs/
 │   └── specs/
 │
+├── public/
+│   └── images/
+│
+├── specs/
+│
 ├── src/
 │   ├── app/
 │   │   ├── favicon.ico
 │   │   ├── globals.scss
 │   │   ├── layout.js
-│   │   ├── page.js
 │   │   │
-│   │   ├── login/
-│   │   │   └── page.js
-│   │   │
-│   │   ├── signup/
-│   │   │   ├── page.js
-│   │   │   └── complete/
+│   │   ├── (dev)/
+│   │   │   └── dev/
+│   │   │       ├── layout.js
 │   │   │       └── page.js
 │   │   │
-│   │   ├── summary/
-│   │   │   ├── page.js
-│   │   │   └── [summaryId]/
-│   │   │       ├── layout.js
-│   │   │       ├── page.js
-│   │   │       └── notes/
-│   │   │           ├── new/
-│   │   │           │   └── page.js
-│   │   │           └── [noteId]/
-│   │   │               ├── page.js
-│   │   │               └── edit/
-│   │   │                   └── page.js
-│   │   │
-│   │   ├── allnote/
-│   │   │   └── page.js
-│   │   │
-│   │   └── mypage/
+│   │   └── (site)/
+│   │       ├── layout.js
 │   │       ├── page.js
-│   │       ├── summaries/
+│   │       │
+│   │       ├── login/
 │   │       │   └── page.js
-│   │       └── bookmarks/
-│   │           └── page.js
+│   │       │
+│   │       ├── signup/
+│   │       │   ├── page.js
+│   │       │   └── complete/
+│   │       │       └── page.js
+│   │       │
+│   │       ├── summary/
+│   │       │   ├── page.js
+│   │       │   └── [summaryId]/
+│   │       │       ├── layout.js
+│   │       │       ├── page.js
+│   │       │       └── notes/
+│   │       │           ├── new/
+│   │       │           │   └── page.js
+│   │       │           └── [noteId]/
+│   │       │               ├── page.js
+│   │       │               └── edit/
+│   │       │                   └── page.js
+│   │       │
+│   │       ├── allnote/
+│   │       │   └── page.js
+│   │       │
+│   │       └── mypage/
+│   │           ├── page.js
+│   │           ├── summaries/
+│   │           │   └── page.js
+│   │           └── bookmarks/
+│   │               └── page.js
 │   │
 │   ├── components/
 │   │   ├── Header.jsx
 │   │   ├── Banner.jsx
 │   │   ├── CommonModal.jsx
-│   │   ├── NotePasswordModal.jsx
+│   │   ├── NotePwModal.jsx
 │   │   ├── QuizModal.jsx
 │   │   ├── NoteItem.jsx
 │   │   ├── SummaryItemCard.jsx
@@ -176,6 +206,18 @@ SCSS Module에서 kebab-case 클래스에 접근할 때는 대괄호 표기법�
 ```jsx
 <div className={styles["summary-item-card"]} />
 ```
+
+---
+
+## 주석 규칙
+
+- 코드만 읽어도 동작과 의미를 명확하게 알 수 있는 주석은 작성하지 않는다.
+- 코드가 무엇을 하는지 그대로 반복하는 주석은 작성하지 않는다.
+- 구현 이유, 상태의 책임, 예외 처리, 접근성 속성, cleanup과 같이 코드만으로 의도를 파악하기 어려운 내용에 주석을 작성한다.
+- `role`, `aria-*`, `tabIndex`, `inert`와 포커스·키보드 제어처럼 접근성과 관련된 속성이나 로직에는 목적과 사용자 영향을 설명하는 주석을 반드시 작성한다.
+- 임시 구현에는 이후 변경될 내용과 범위를 주석으로 명확히 표시한다.
+- 임시 코드가 제거되거나 최종 구현으로 변경되면 관련 주석도 함께 제거하거나 수정한다.
+- 주석은 현재 코드와 일치하도록 유지하며, 동작과 맞지 않는 오래된 주석을 남기지 않는다.
 
 ---
 
