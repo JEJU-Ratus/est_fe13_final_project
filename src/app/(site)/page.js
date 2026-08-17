@@ -133,9 +133,6 @@ export default function Home() {
               onSubmit={handleSummarySubmit}
             >
               <div className={styles["topic-input"]}>
-                <span className="material-symbols-outlined" aria-hidden="true">
-                  add
-                </span>
                 <input
                   type="text"
                   aria-label="요약할 내용"
