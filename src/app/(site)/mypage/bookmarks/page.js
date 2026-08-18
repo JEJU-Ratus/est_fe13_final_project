@@ -37,17 +37,7 @@ export default async function Bookmarks() {
   // 북마크한 summary_id에 해당하는 요약본 조회
   const { data: summaries, error: summariesError } = await supabase
     .from("summaries")
-    .select(
-      `
-      id,
-      author_id,
-      topic,
-      title,
-      excerpt,
-      is_locked,
-      created_at
-      `,
-    )
+    .select(`id,author_id,topic,title,excerpt,is_locked,created_at`)
     .in("id", summaryIds);
 
   // 북마크한 요약본 조회 실패

@@ -240,7 +240,7 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
       .maybeSingle();
 
     if (error || !data) {
-      console.error("?댁쫰 寃곌낵 ???ㅽ뙣:", error);
+      console.error("퀴즈 결과 저장 실패:", error);
       return false;
     }
 
