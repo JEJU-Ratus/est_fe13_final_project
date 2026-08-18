@@ -32,23 +32,11 @@ export default async function MyAllNotesPage() {
   }
 
   const learningNotes = notes ?? [];
-  const summaryIds = [...new Set(learningNotes.map(note => note.summary_id))];
-  const { data: summaries, error: summariesError } = summaryIds.length
-    ? await supabase.from("summaries").select("id, topic").in("id", summaryIds)
-    : { data: [], error: null };
-
-  if (summariesError) {
-    throw summariesError;
-  }
-
-  const topicsBySummaryId = new Map(
-    (summaries ?? []).map(summary => [summary.id, summary.topic]),
-  );
   const items = learningNotes.map(note => ({
     noteId: note.id,
     summaryId: note.summary_id,
     authorNickname: profileResult.data?.nickname ?? "알 수 없는 사용자",
-    topic: topicsBySummaryId.get(note.summary_id) ?? note.title,
+    title: note.title,
     createdAt: note.created_at,
     createdAtDisplay: formatDate(note.created_at),
     quizStatus: note.is_quiz_completed ? "completed" : "notStarted",
