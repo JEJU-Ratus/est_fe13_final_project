@@ -174,23 +174,20 @@ export default function SummaryItemCard({
 
           {/* 요약 노트 제목과 미리보기 내용 */}
           <div className={styles["card-content"]}>
-            <h4 className={styles["card-title"]}>{title}</h4>
+            <h3 className={styles["card-title"]}>{title}</h3>
             <p className={styles["card-desc"]}>{excerpt}</p>
           </div>
         </div>
 
         {/* 작성일과 비공개 여부 표시 */}
         <div className={styles["card-footer"]}>
-          <time className={styles["created-date"]} dateTime={createdAt}>
+          <time className={styles["created-date"]} dateTime={new Date(createdAt).toISOString()}>
             {formattedCreatedAt}
           </time>
 
           {/* 비공개 요약 노트인 경우 잠금 아이콘 표시 */}
           {isPrivate && (
-            <span
-              className={`material-symbols-outlined ${styles["lock-icon"]}`}
-              aria-label="비공개 게시물"
-            >
+            <span className={`material-symbols-outlined ${styles["lock-icon"]}`} aria-hidden="true">
               lock
             </span>
           )}
