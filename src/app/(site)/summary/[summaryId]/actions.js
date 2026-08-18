@@ -113,6 +113,10 @@ function getDatabaseErrorCode(error) {
     return "FORBIDDEN";
   }
 
+  if (error?.code === "23503") {
+    return "CONFLICT";
+  }
+
   return "REQUEST_FAILED";
 }
 
@@ -245,6 +249,54 @@ export async function deleteStudyNote(summaryId, noteId) {
   }
 
   revalidatePath(`/summary/${summaryId}`);
+  return {
+    ...INITIAL_ACTION_STATE,
+    status: "success",
+  };
+}
+
+export async function deleteSummary(summaryId) {
+  if (!isUuid(summaryId)) {
+    return createErrorState("요약본을 찾을 수 없습니다.", "NOT_FOUND");
+  }
+
+  const { supabase, userId } = await getAuthenticatedContext();
+
+  if (!userId) {
+    return createErrorState("로그인이 필요합니다.", "UNAUTHENTICATED");
+  }
+
+  const { data, error } = await supabase
+    .from("summaries")
+    .delete()
+    .eq("id", summaryId)
+    .eq("author_id", userId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    console.error("요약본 삭제 실패:", error);
+
+    if (error.code === "23503") {
+      return createErrorState(
+        "학습노트가 있는 요약본은 삭제할 수 없습니다.",
+        "CONFLICT",
+      );
+    }
+
+    return createErrorState("요약본을 삭제하지 못했습니다.", getDatabaseErrorCode(error));
+  }
+
+  if (!data) {
+    return createErrorState("요약본을 삭제할 권한이 없습니다.", "FORBIDDEN");
+  }
+
+  revalidatePath("/summary");
+  revalidatePath("/allnote");
+  revalidatePath("/mypage/summaries");
+  revalidatePath("/mypage/bookmarks");
+  revalidatePath(`/summary/${summaryId}`);
+
   return {
     ...INITIAL_ACTION_STATE,
     status: "success",
