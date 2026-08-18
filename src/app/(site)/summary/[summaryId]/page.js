@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import EmptyState from '@/components/EmptyState';
 import NoteItem from '@/components/NoteItem';
+import SummaryDeleteButton from './SummaryDeleteButton';
 import {
   getCurrentUserId,
   getSummary,
@@ -30,6 +31,12 @@ export default async function SummaryDetailPage({ params }) {
             href={`/summary/${summaryId}/notes/new`}>
             노트 생성
           </Link>
+        )}
+        {userId === summary.authorId && notes.length === 0 && (
+          <SummaryDeleteButton
+            className={styles['delete-button']}
+            summaryId={summaryId}
+          />
         )}
       </div>
 
