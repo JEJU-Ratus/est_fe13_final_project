@@ -2,8 +2,13 @@
 @use "styles/abstracts/typography" as typography;
 
 .summary-page {
-  background: color.$white-2;
+  flex: 1;
+  min-width: 0;
   min-height: 100vh;
+  padding: 0 48px;
+
+  background: color.$white-2;
+  box-sizing: border-box;
 }
 
 .summary-container {
@@ -11,6 +16,7 @@
   flex-direction: column;
   gap: 40px;
 
+  width: 100%;
   max-width: 1320px;
 
   margin: 0 auto;
@@ -28,6 +34,7 @@
 .summary-title {
   @include typography.text-36-bold;
   color: color.$black;
+  white-space: nowrap;
 }
 
 .bookmark-btn {
@@ -42,6 +49,7 @@
   height: 40px;
   padding: 0 24px;
 
+  flex-shrink: 0;
   background: color.$white;
   border-radius: 50px;
 
@@ -64,8 +72,12 @@
 
 .summary-content {
   display: grid;
-  grid-template-columns: repeat(4, 312px);
+  grid-template-columns: repeat(auto-fit, 312px);
   gap: 32px 24px;
+
+  width: 100%;
+  min-width: 0;
+  justify-content: center;
 }
 
 .scroll-sentinel {
@@ -73,31 +85,37 @@
   height: 1px;
 }
 
-@media (min-width: 481px) and (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1024px) {
   .summary-page {
-    width: 100%;
-    padding: 0;
+    padding: 0 32px;
   }
 
   .summary-container {
-    width: 715px;
-    margin-left: calc(12.5% + 26px);
+    width: 100%;
+    max-width: 648px;
+    margin: 0 auto;
+    padding: 64px 0;
+  }
+
+  .summary-header {
+    padding: 0;
   }
 
   .summary-content {
-    width: 100%;
-
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 24px;
-    row-gap: 32px;
+    grid-template-columns: repeat(2, 312px);
+    gap: 32px 24px;
+    justify-content: start;
   }
 }
 
-@media (max-width: 480px) {
+@media (min-width: 480px) and (max-width: 768px) {
   .summary-page {
-    width: 100%;
     padding: 0 20px;
+  }
+
+  .summary-container {
+    gap: 32px;
+    padding: 48px 0;
   }
 
   .summary-header {
@@ -119,7 +137,6 @@
 
   .summary-title {
     @include typography.text-24-semibold;
-
     color: color.$black;
   }
 
@@ -135,11 +152,12 @@
 
   .summary-content {
     width: 100%;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 1fr;
     row-gap: 32px;
 
     > article {
       width: 100%;
+      min-width: 0;
     }
   }
 
