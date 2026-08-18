@@ -8,7 +8,7 @@
 
 로그인 사용자의 `/mypage/summaries`와 모든 작성자의 공개 요약본 소속 노트를 보여주는 `/allnote`에 같은 학습노트 전체 목록 화면을 제공한다. 페이지 크기는 12개로 고정하고 `createdAt`과 `noteId`의 복합 커서로 최신순 추가 조회를 안정화한다. 두 라우트는 기능 전용 Client Component인 `AllNotes`를 공유하며, 기존 `NoteItem`, `Banner`, `EmptyState`, `CommonModal`, `AuthGuard`의 계약을 재사용한다.
 
-이 기능은 새 Supabase 테이블·마이그레이션·RLS·비밀번호 저장 방식·공개 API를 중복해서 만들지 않는다. UI MVP 단계에서는 새로 추가하는 `src/mocks/all-notes.js` 화면 검증용 어댑터를 사용하고, UI 승인 후 `002-summary-detail`이 소유한 영속 데이터·인증·RLS 계약에 실제 loader를 연결한다.
+이 기능은 새 Supabase 테이블·마이그레이션·RLS·비밀번호 저장 방식·공개 API를 중복해서 만들지 않는다. 기존 Supabase 브라우저 클라이언트와 `002-summary-detail`이 소유한 영속 데이터·인증·RLS 계약을 사용해 실제 목록 loader를 연결한다.
 
 ## 기술 배경
 
@@ -35,7 +35,7 @@
 - 검색, 북마크, 학습노트 CRUD, 퀴즈, 새 API, 새 패키지와 프로젝트 구조에 없는 새 폴더를 추가하지 않는다. `AGENTS.md`와 명세에 정의된 정식 `mypage/summaries` 라우트 폴더는 예외가 아니다.
 - 현재 소스의 `/mypage/mysummaries`와 명세의 `/mypage/summaries` 경로 충돌은 삭제·이름 변경 없이 기록하고 구현 전에 영향 범위를 확인한다.
 
-**작업 규모**: UI 검증용 mock 어댑터 1개 추가, 정식 내 목록 라우트 1개 추가, 전체 노트 라우트 `/allnote` 1개 추가, 두 화면이 공유하는 `AllNotes` Client Component와 SCSS Module 각 1개 추가, UI MVP 후 기존 Supabase loader·RLS 검증 연결. 기존 공통 컴포넌트와 인증·Supabase 기반 파일은 재사용한다.
+**작업 규모**: 정식 내 목록 라우트 1개, 전체 노트 라우트 `/allnote` 1개, 두 화면이 공유하는 `AllNotes` Client Component와 SCSS Module을 구현하고 기존 Supabase loader·RLS 계약에 연결한다. 기존 공통 컴포넌트와 인증·Supabase 기반 파일은 재사용한다.
 
 ## 헌법 점검
 
@@ -49,7 +49,7 @@
 - [x] `/mypage/mysummaries`와 `/mypage/summaries`의 기존 충돌을 사용자에게 보고하고 기존 파일 삭제·이름 변경을 계획하지 않았다.
 - [x] 모든 Spec Kit 산출물을 한국어로 작성했다.
 
-**설계 후 재점검**: 통과. 추가한 설계는 화면 검증용 mock 계약을 소비하는 UI MVP와, 이후 승인된 기존 Supabase 조회·인증·RLS 계약을 연결하는 두 라우트 및 하나의 기능 전용 Client Component로 제한된다. 복합 커서는 목록 안정성을 위한 데이터 계약이며 새 외부 의존성이나 스키마 변경이 아니다. 구현은 `feature/all-notes` 기능 브랜치에서 진행한다.
+**설계 후 재점검**: 통과. 추가한 설계는 승인된 기존 Supabase 조회·인증·RLS 계약을 연결하는 두 라우트와 하나의 기능 전용 Client Component로 제한된다. 복합 커서는 목록 안정성을 위한 데이터 계약이며 새 외부 의존성이나 스키마 변경이 아니다. 구현은 `feature/all-notes` 기능 브랜치에서 진행한다.
 
 ## Phase 0: 조사 결과
 
@@ -68,7 +68,7 @@
 
 ### 모델 경계
 
-- `StudyNoteListItem`은 `noteId`, `summaryId`, `authorNickname`, `topic`, `createdAt`, `createdAtDisplay`, `quizStatus`만 화면에 필요한 형태로 갖는다.
+- `StudyNoteListItem`은 `noteId`, `summaryId`, `authorNickname`, `title`, `createdAt`, `createdAtDisplay`, `quizStatus`만 화면에 필요한 형태로 갖는다.
 - `StudyNoteListPage`는 `totalCount`, 최대 12개의 `items`, `nextCursor`, `hasMore`를 반환한다.
 - 목록 범위는 `mine` 또는 `all`이며 사용자 식별자는 `mine` 범위에서 서비스가 현재 인증 세션으로 결정한다.
 - 공개 여부 필터와 목록 Client 상태를 조회 데이터와 분리하여 잠긴 요약본 소속 항목이 렌더링되지 않게 한다.
@@ -122,9 +122,9 @@ src/
 
 ## 준비 단계 점검 결과
 
-- T001: `AGENTS.md`, Constitution, 기능 명세, 구현 계획과 목록 계약을 확인했다. UI MVP는 mock 어댑터를 사용하고 실제 Supabase 연결은 T026 이후로 분리한다.
+- T001: `AGENTS.md`, Constitution, 기능 명세, 구현 계획과 목록 계약을 확인했다. 목록은 실제 Supabase 연결을 사용한다.
 - T002: 현재 `src/app/(site)/mypage/mysummaries/page.js`와 `/mypage/page.js`의 기존 경로는 유지한다. 전체 노트 목록은 `src/app/(site)/allnote/page.js`를 정식 진입점으로 추가하고, `src/app/(site)/summary/[summaryId]/notes/page.js` 목록 파일은 만들지 않으며 `new`와 `[noteId]` 하위 경로만 유지한다.
-- T003: `AuthGuard`는 인증 확인 전 `Loading`, 비로그인 시 `CommonModal mode="requireLogin"`, 인증 후 children 렌더링을 담당한다. `NoteItem`은 상세 링크와 상태·작성자·주제·작성일 props를, `Banner`는 이미지·내부/외부 목적지 props를, `EmptyState`는 message를, `CommonModal`은 오류·자동 이동·닫기 동작을, `NotePwModal`은 비밀번호 입력 UI를 담당하므로 공개 props를 변경하지 않는다. `package.json`의 실행 검증 명령은 `npm run lint`와 `npm run build`이며 별도 테스트 스크립트는 없다.
+- T003: `AuthGuard`는 인증 확인 전 `Loading`, 비로그인 시 `CommonModal mode="requireLogin"`, 인증 후 children 렌더링을 담당한다. `NoteItem`은 상세 링크와 상태·작성자·제목·작성일 props를, `Banner`는 이미지·내부/외부 목적지 props를, `EmptyState`는 message를, `CommonModal`은 오류·자동 이동·닫기 동작을 담당하므로 공개 props를 변경하지 않는다. `package.json`의 실행 검증 명령은 `npm run lint`와 `npm run build`이며 별도 테스트 스크립트는 없다.
 
 ## 기술 설계
 
@@ -148,8 +148,8 @@ src/
 ### 표시와 접근성
 
 - 상단에는 기존 `Banner`와 `총 {count}개의 학습노트`를 표시한다. 배너에는 별도 CTA·텍스트 버튼을 추가하지 않는다.
-- 행은 기존 `NoteItem`의 상태 이미지, 작성자, 주제, 작성일을 사용한다. 작성일은 어댑터에서 `YYYY.MM.DD`로 정규화하고 퍼센트 값을 전달하지 않는다.
-- 긴 작성자명·주제는 `AllNotes.module.scss`의 열별 overflow 규칙으로 경계를 유지한다.
+- 행은 기존 `NoteItem`의 상태 이미지, 작성자, 제목, 작성일을 사용한다. 작성일은 조회 결과에서 `YYYY.MM.DD`로 정규화하고 퍼센트 값을 전달하지 않는다.
+- 긴 작성자명·제목은 `AllNotes.module.scss`의 열별 overflow 규칙으로 경계를 유지한다.
 - 기존 `EmptyState`의 접근성 의미와 `CommonModal`의 접근성 계약을 유지한다. 새 focus trap·Escape 동작·모달 구조를 추가하지 않는다.
 - 데스크톱 Figma 기준의 배치·크기·색상은 기존 SCSS 토큰과 제공된 프레임을 따른다. 모바일·태블릿 별도 레이아웃은 만들지 않는다.
 
@@ -163,12 +163,12 @@ src/
 ## 구현 순서
 
 1. 구현 시작 전 `feature/all-notes` 브랜치와 현재 `feature/summary-detail`의 작업 범위를 확인하고, `/mypage/mysummaries`를 유지한 채 `/mypage/summaries`를 추가할지 팀에 공유한다.
-2. UI MVP에서는 `src/mocks/all-notes.js`의 목록 범위, 표시 필드, 접근·오류 상태를 계약과 대조한다. UI 리뷰 후 `002-summary-detail`의 DB·RLS 선행 조건을 확인하고 기존 조회 모델·잠금 인증·Supabase 공통 클라이언트의 서비스 계약으로 교체할 때도 새 스키마·API는 만들지 않는다.
+2. 기존 Supabase 조회 결과의 목록 범위, 표시 필드, 접근·오류 상태를 계약과 대조한다. `002-summary-detail`의 DB·RLS 선행 조건을 확인하고 기존 조회 모델·잠금 인증·Supabase 공통 클라이언트의 서비스 계약을 사용하며 새 스키마·API는 만들지 않는다.
 3. `src/components/AllNotes.jsx`에 scope·초기/추가 로딩·복합 cursor·중복 키·observer cleanup 상태를 구성한다.
 4. `Banner`, 목록 상단 개수, `NoteItem`, `EmptyState`, `CommonModal`을 기존 props와 책임으로 연결하고 데스크톱 SCSS Module을 작성한다.
 5. 두 `page.js`에 각각 `mine`과 `all` scope를 연결하고, 오류 후속 이동과 Header 레이아웃을 확인한다. 기존 `/mypage/mysummaries` 파일은 삭제·이름 변경하지 않는다.
-6. [quickstart.md](./quickstart.md)의 mock 기반 공개·보호·빈·오류·무한 스크롤·배너 시나리오를 검증해 UI MVP를 확정한다.
-7. UI MVP 승인 후 `002-summary-detail`의 schema·RLS 적용 상태를 확인하고, 기존 `src/lib/summary-detail.js` 조회 계약을 `StudyNoteListPage` 실제 loader로 연결한다.
+6. [quickstart.md](./quickstart.md)의 실제 Supabase 공개·보호·빈·오류·무한 스크롤·배너 시나리오를 검증한다.
+7. `002-summary-detail`의 schema·RLS 적용 상태를 확인하고, 기존 조회 계약과 `AllNotes`의 실제 loader 연결 상태를 검증한다.
 8. 실제 데이터·잠금 세션·RLS 시나리오를 검증한 뒤 `npm run lint`, `npm run build`, `git diff --check`를 실행하고 변경 파일이 승인된 범위에 머무는지 검토한다.
 
 ## 복잡성 기록
