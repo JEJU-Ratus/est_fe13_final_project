@@ -56,7 +56,7 @@
 
 - 기능 전용 API Route를 새로 만들면 브라우저에서 호출하기 쉬우나, 기존 프로젝트에 없는 통신 계층과 인증 전달 규칙을 추가하게 되므로 제외했다.
 - 이 기능에서 Supabase 마이그레이션까지 함께 만들면 목록을 독립적으로 완성할 수 있지만, `002-summary-detail`의 영속 데이터 작업과 중복되고 작업 범위가 커진다.
-- 개발 중 mock 데이터는 화면·상태 검증에 사용할 수 있으나 영속 결과와 혼합하지 않는다. 실제 연결 시 기존 서비스 계약의 결과만 사용한다.
+- 목록 검증은 실제 Supabase 서비스 계약의 결과를 사용하며, 영속 데이터와 별도의 목데이터를 운영 경로에 섞지 않는다.
 
 참고: [Supabase SSR 클라이언트 생성](https://supabase.com/docs/guides/auth/server-side/creating-a-client), [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [Supabase Changelog](https://supabase.com/changelog)
 
@@ -79,7 +79,7 @@
 
 ## 결정 5: 표시 데이터는 어댑터에서 정규화하고 기존 UI 컴포넌트를 변경하지 않는다
 
-**결정**: 목록 조회 결과를 화면 모델로 정규화한다. 날짜는 `YYYY.MM.DD`, 퀴즈 상태는 `completed` 또는 `notStarted`, 긴 닉네임·주제는 행 스타일의 ellipsis로 처리한다. `NoteItem`에는 `summaryId`, `noteId`, `authorNickname`, `topic`, `createdAt`, `quizStatus`를 기존 props 형태로 전달한다.
+**결정**: 목록 조회 결과를 화면 모델로 정규화한다. 날짜는 `YYYY.MM.DD`, 퀴즈 상태는 `completed` 또는 `notStarted`, 긴 닉네임·제목은 행 스타일의 ellipsis로 처리한다. `NoteItem`에는 `summaryId`, `noteId`, `authorNickname`, `title`, `createdAt`, `quizStatus`를 전달한다.
 
 **근거**:
 

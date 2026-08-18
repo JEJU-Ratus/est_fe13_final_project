@@ -10,7 +10,7 @@ import Loading from "./Loading";
 
 const menuItems = [
   {
-    label: "요약 노트 생성",
+    label: "요약 노트 생성 (HOME)",
     icon: "assignment_add",
     href: "/",
   },
