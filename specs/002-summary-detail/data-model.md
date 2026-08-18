@@ -48,7 +48,7 @@ Supabase Auth가 관리하는 사용자 원본이며 신규 콘텐츠와 북마�
 
 ### Summary (`public.summaries`)
 
-학습노트와 북마크가 참조하는 영속 요약본이다. 이번 증분에서는 조회만 제공하고 생성·수정·삭제 UI와 정책은 열지 않는다.
+학습노트와 북마크가 참조하는 영속 요약본이다. 이번 증분에서는 조회와 작성자 본인 삭제를 제공하며 생성·수정 UI와 정책은 열지 않는다.
 
 | 필드 | 형태 | 필수 | 기본값·제약 |
 |---|---|---:|---|
@@ -65,6 +65,7 @@ Supabase Auth가 관리하는 사용자 원본이며 신규 콘텐츠와 북마�
 
 - 공개 요약본은 방문자와 로그인 사용자가 조회할 수 있다.
 - 비공개 요약본은 잠금 인증 기능이 없으므로 작성자만 조회할 수 있다.
+- 학습노트가 하나라도 소속된 요약본은 삭제할 수 없다.
 - 존재하지 않거나 조회할 수 없는 요약본은 애플리케이션에서 찾을 수 없음으로 처리한다.
 
 **AI 요약 화면 구조**:
@@ -87,7 +88,7 @@ ai_summary
 | 필드 | 형태 | 필수 | 기본값·제약 |
 |---|---|---:|---|
 | `id` | UUID | 예 | Primary Key, `gen_random_uuid()` |
-| `summary_id` | UUID | 예 | `summaries.id` 참조, `ON DELETE CASCADE` |
+| `summary_id` | UUID | 예 | `summaries.id` 참조, `ON DELETE RESTRICT` |
 | `author_id` | UUID | 예 | `auth.users.id` 참조, `ON DELETE RESTRICT` |
 | `title` | text | 예 | `btrim(title) = title`, 1–50자 |
 | `learned_summary` | text | 예 | 기본값 `""`, trim 저장, 최대 1,000자 |
@@ -151,7 +152,7 @@ Profile 0..1 ── 1 AuthUser  (닉네임 표시용 ID 대응)
 | 엔티티 | 주체 | SELECT | INSERT | UPDATE | DELETE |
 |---|---|---|---|---|---|
 | Summary | 방문자 | 공개 항목 | 불가 | 불가 | 불가 |
-| Summary | 로그인 사용자 | 공개 항목 또는 본인 작성 항목 | 불가 | 불가 | 불가 |
+| Summary | 로그인 사용자 | 공개 항목 또는 본인 작성 항목 | 불가 | 불가 | 본인 작성 행 |
 | LearningNote | 방문자 | 공개 요약본 소속 | 불가 | 불가 | 불가 |
 | LearningNote | 로그인 사용자 | 접근 가능한 요약본 소속 | 본인을 작성자로 생성 | 본인 작성 및 상위 접근 가능 행 | 본인 작성 및 상위 접근 가능 행 |
 | Bookmark | 방문자 | 불가 | 불가 | 불가 | 불가 |
@@ -173,7 +174,7 @@ Profile 0..1 ── 1 AuthUser  (닉네임 표시용 ID 대응)
 
 | 객체 | `anon` | `authenticated` |
 |---|---|---|
-| `summaries` | SELECT | SELECT |
+| `summaries` | SELECT | SELECT, DELETE |
 | `learning_notes` | SELECT | SELECT, DELETE, 지정 컬럼 INSERT·UPDATE |
 | `bookmarks` | 없음 | SELECT, DELETE, `user_id`, `summary_id` INSERT |
 | `get_learning_note_author_names` | EXECUTE | EXECUTE |
