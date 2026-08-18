@@ -72,7 +72,7 @@ src/components/AllNotes.module.scss
 | `scope` | `mine` \| `all` | 목록 범위 |
 | `summaryId` | 문자열 \| 생략 | 전체 목록에서는 생략하며 행 데이터의 식별자를 상세 링크에 사용 |
 | `banner` | `BannerData` | 상단 배너에 전달할 정규화된 데이터 |
-| `loadPage` | 목록 조회 함수 경계 | 현재 scope와 cursor로 다음 페이지를 요청 |
+| `loadPage` | 내부 실제 목록 loader | 현재 scope와 cursor로 다음 페이지를 요청 |
 | `initialPage` | `StudyNoteListPage` \| 초기 미제공 | 기존 서비스가 서버에서 첫 페이지를 전달하는 경우 사용 |
 | `accessState` | 생략 가능 | `/allnote`는 공개 목록으로 고정하며 별도 잠금 인증 상태를 사용하지 않음 |
 
@@ -91,7 +91,7 @@ src/components/AllNotes.module.scss
 | 컴포넌트 | 이 기능에서의 사용 |
 |---|---|
 | `AuthGuard` | 내 목록 페이지 전체 보호 |
-| `NoteItem` | 상태 이미지, 닉네임, 주제, 작성일과 상세 링크 표시 |
+| `NoteItem` | 상태 이미지, 닉네임, 제목, 작성일과 상세 링크 표시 |
 | `Banner` | 상단 광고 이미지와 유효한 목적지의 전체 클릭 영역 |
 | `EmptyState` | 정상 빈 목록의 고정 안내 문구 |
 | `CommonModal` | 일반 오류와 존재하지 않는 요약본 안내 |
