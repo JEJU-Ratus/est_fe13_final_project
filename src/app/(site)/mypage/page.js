@@ -686,7 +686,7 @@ export default function Mypage() {
           >
             <div className={styles["section-heading"]}>
               <h2 id="learning-note-title">내 학습노트 리스트</h2>
-              <Link href="/allnote?scope=mine" className={styles["more-link"]}>
+              <Link href="/mypage/myallnotes" className={styles["more-link"]}>
                 <span>더보기</span>
                 <span
                   className={`material-symbols-outlined ${styles["more-icon"]}`}
