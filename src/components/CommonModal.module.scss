@@ -132,3 +132,34 @@
     background: color.$white-2;
   }
 }
+
+// 삭제와 취소를 같은 크기의 둥근 직사각형 버튼으로 구분한다.
+.modal-container[data-mode="confirmDelete"] {
+  .button-group {
+    gap: 16px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    box-sizing: border-box;
+    width: 100px;
+    min-width: 100px;
+    height: 44px;
+    padding: 12px 20px;
+    border-radius: 8px;
+  }
+
+  .primary-button {
+    color: color.$white;
+    background: red;
+    border-color: red;
+  }
+
+  .secondary-button {
+    color: color.$fda-orange;
+    background: color.$white;
+    border: 1px solid color.$fda-orange;
+    visibility: visible;
+    opacity: 1;
+  }
+}
