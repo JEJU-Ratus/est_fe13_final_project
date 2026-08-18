@@ -44,7 +44,7 @@ export default function SummaryDeleteButton({ className, summaryId }) {
       }
 
       setConfirmOpen(false);
-      router.replace("/allnote");
+      router.replace("/summary");
       router.refresh();
     } catch (error) {
       console.error("요약본 삭제 요청 실패:", error);
