@@ -1,15 +1,23 @@
-"use client";
+import AllNotes from '@/components/AllNotes';
 
-import AllNotes from "@/components/AllNotes";
-import { loadMockStudyNotePage, MOCK_BANNERS } from "@/mocks/all-notes";
+const ALL_NOTES_BANNER = {
+  imageSrc: '/images/banner.webp',
+  alt: '프론트엔드 스킬업 이벤트',
+};
 
-export default function AllNotePage() {
+export default async function AllNotePage({ searchParams }) {
+  const params = await searchParams;
+  const summaryId =
+    typeof params?.summaryId === 'string' ? params.summaryId : null;
+  const scope = summaryId ? 'summary' : 'all';
+
   return (
     <AllNotes
-      scope="all"
-      loadPage={loadMockStudyNotePage}
-      banner={MOCK_BANNERS.validInternal}
-      accessState="public"
+      key={`${scope}:${summaryId ?? ''}`}
+      scope={scope}
+      summaryId={summaryId ?? undefined}
+      banner={ALL_NOTES_BANNER}
+      accessState='public'
     />
   );
 }
