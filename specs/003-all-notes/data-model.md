@@ -27,12 +27,12 @@
 | `noteId` | 문자열 식별자 | 예 | 학습노트의 고유 식별자. `summaryId`와 조합한 키가 목록 중복 판정에 사용된다. |
 | `summaryId` | 문자열 식별자 | 예 | 소속 요약본 식별자. 상세 경로 생성에 사용한다. |
 | `authorNickname` | 문자열 | 예 | 작성자 닉네임. 누락된 표시 값은 기존 학습노트 조회 계약의 fallback을 사용한다. |
-| `topic` | 문자열 | 예 | 소속 요약본의 주제. 긴 값은 열 안에서 줄바꿈·말줄임 규칙으로 표시한다. |
+| `title` | 문자열 | 예 | 학습노트 제목. 긴 값은 열 안에서 말줄임 규칙으로 표시한다. |
 | `createdAt` | ISO 날짜-시간 문자열 | 예 | 정렬과 커서 계산의 원본 값. |
 | `createdAtDisplay` | `YYYY.MM.DD` 문자열 | 예 | 행의 작성일 영역에 표시한다. 퍼센트 값은 포함하지 않는다. |
 | `quizStatus` | `completed` \| `notStarted` | 예 | 퀴즈 완료 여부를 `NoteItem`의 컬러·회색 이미지로 매핑한다. |
 
-목록 화면은 제목, 본문, 퀴즈 진행률을 별도 필드로 표시하지 않는다. `NoteItem`의 기존 props에 맞춰 `createdAtDisplay`를 `createdAt` 표시 값으로 전달한다.
+목록 화면은 본문과 퀴즈 진행률을 별도 필드로 표시하지 않는다. `learning_notes.title`을 `NoteItem`의 제목 표시 값으로 전달하고 `createdAtDisplay`를 작성일 표시 값으로 사용한다.
 
 ### `StudyNoteCursor`
 

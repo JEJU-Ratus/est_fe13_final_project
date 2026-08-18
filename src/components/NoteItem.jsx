@@ -17,11 +17,13 @@ export default function NoteItem({
   summaryId,
   noteId,
   authorNickname,
+  title,
   topic,
   createdAt,
   quizStatus,
 }) {
   const status = QUIZ_STATUS[quizStatus] ?? QUIZ_STATUS.notStarted;
+  const displayTitle = title ?? topic;
 
   return (
     <Link className={styles["note-item"]} href={`/summary/${summaryId}/notes/${noteId}`}>
@@ -32,7 +34,7 @@ export default function NoteItem({
         <span className={styles["status-label"]}>{status.label}</span>
       </span>
       <span className={styles["author-cell"]}>{authorNickname}</span>
-      <span className={styles["topic-cell"]}>{topic}</span>
+      <span className={styles["topic-cell"]}>{displayTitle}</span>
       <time className={styles["date-cell"]}>{createdAt}</time>
     </Link>
   );

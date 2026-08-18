@@ -2,17 +2,225 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { verifyMockSummaryNotePassword } from "@/mocks/all-notes";
 import Banner from "@/components/Banner";
 import CommonModal from "@/components/CommonModal";
 import EmptyState from "@/components/EmptyState";
 import Loading from "@/components/Loading";
 import NoteItem from "@/components/NoteItem";
 import NotePwModal from "@/components/NotePwModal";
+import { getSummaryContent } from "@/lib/api/summary";
+import { createClient } from "@/lib/supabase/client";
 import styles from "./AllNotes.module.scss";
 
 const EMPTY_MESSAGE = "학습 노트 리스트가 아직 생성되지 않았습니다.";
 const PASSWORD_ERROR_MESSAGE = "비밀번호가 일치하지 않습니다.";
+const STUDY_NOTE_PAGE_SIZE = 12;
+const STUDY_NOTE_SELECT =
+  "id,summary_id,author_id,title,is_quiz_completed,created_at";
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function createStudyNoteError(message, code = "REQUEST_FAILED") {
+  const error = new Error(message);
+  error.code = code;
+  return error;
+}
+
+function isUuid(value) {
+  return typeof value === "string" && UUID_PATTERN.test(value);
+}
+
+function formatCreatedAt(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+  }).formatToParts(date);
+  const partMap = new Map(parts.map(part => [part.type, part.value]));
+
+  return `${partMap.get("year")}.${partMap.get("month")}.${partMap.get("day")}`;
+}
+
+function normalizeStudyNoteScope(scope) {
+  if (scope?.type === "all") {
+    return { type: "all" };
+  }
+
+  if (scope?.type === "mine") {
+    return { type: "mine" };
+  }
+
+  if (scope?.type === "summary" && isUuid(scope.summaryId)) {
+    return { type: "summary", summaryId: scope.summaryId };
+  }
+
+  throw createStudyNoteError("요약본을 찾을 수 없습니다.", "NOT_FOUND");
+}
+
+function applyStudyNoteScope(query, scope, publicSummaryIds, userId) {
+  if (scope.type === "mine") {
+    return query.eq("author_id", userId);
+  }
+
+  if (scope.type === "summary") {
+    return query.eq("summary_id", scope.summaryId);
+  }
+
+  return query.in("summary_id", publicSummaryIds);
+}
+
+function applyStudyNoteCursor(query, cursor) {
+  if (!cursor) {
+    return query;
+  }
+
+  return query.or(
+    `created_at.lt.${cursor.createdAt},and(created_at.eq.${cursor.createdAt},id.lt.${cursor.noteId})`,
+  );
+}
+
+function normalizeStudyNote(row, profileMap) {
+  return {
+    noteId: row.id,
+    summaryId: row.summary_id,
+    authorNickname: profileMap.get(row.author_id) ?? "알 수 없는 사용자",
+    title: row.title ?? "",
+    createdAt: row.created_at,
+    createdAtDisplay: formatCreatedAt(row.created_at),
+    quizStatus: row.is_quiz_completed ? "completed" : "notStarted",
+  };
+}
+
+async function loadStudyNotePage(scope, cursor = null) {
+  const normalizedScope = normalizeStudyNoteScope(scope);
+  const normalizedCursor = cursor === null ? null : normalizeCursor(cursor);
+
+  if (cursor !== null && !normalizedCursor) {
+    throw createStudyNoteError("학습노트 페이지 정보를 확인할 수 없습니다.");
+  }
+
+  const supabase = createClient();
+  let publicSummaryIds = null;
+  let userId = null;
+
+  if (normalizedScope.type === "mine") {
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      console.error("현재 사용자 조회 실패:", userError);
+      throw createStudyNoteError("학습노트 목록을 조회할 수 없습니다.");
+    }
+
+    if (!userData?.user?.id) {
+      throw createStudyNoteError("로그인이 필요합니다.", "UNAUTHENTICATED");
+    }
+
+    userId = userData.user.id;
+  }
+
+  if (normalizedScope.type === "all") {
+    const { data: summaries, error: summaryError } = await supabase
+      .from("summaries")
+      .select("id")
+      .eq("is_locked", false);
+
+    if (summaryError) {
+      console.error("공개 요약본 조회 실패:", summaryError);
+      throw createStudyNoteError("학습노트 목록을 조회할 수 없습니다.");
+    }
+
+    publicSummaryIds = (summaries ?? []).map(summary => summary.id);
+
+    if (publicSummaryIds.length === 0) {
+      return {
+        totalCount: 0,
+        items: [],
+        nextCursor: null,
+        hasMore: false,
+      };
+    }
+  }
+
+  const countQuery = applyStudyNoteScope(
+    supabase
+      .from("learning_notes")
+      .select("id", { count: "exact", head: true }),
+    normalizedScope,
+    publicSummaryIds,
+    userId,
+  );
+  let pageQuery = applyStudyNoteScope(
+    supabase.from("learning_notes").select(STUDY_NOTE_SELECT),
+    normalizedScope,
+    publicSummaryIds,
+    userId,
+  );
+
+  pageQuery = applyStudyNoteCursor(pageQuery, normalizedCursor)
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
+    .range(0, STUDY_NOTE_PAGE_SIZE);
+
+  const [countResponse, pageResponse] = await Promise.all([
+    countQuery,
+    pageQuery,
+  ]);
+
+  if (countResponse.error) {
+    console.error("학습노트 수 조회 실패:", countResponse.error);
+    throw createStudyNoteError("학습노트 목록을 조회할 수 없습니다.");
+  }
+
+  if (pageResponse.error) {
+    console.error("학습노트 목록 조회 실패:", pageResponse.error);
+    throw createStudyNoteError("학습노트 목록을 조회할 수 없습니다.");
+  }
+
+  const rows = pageResponse.data ?? [];
+  const pageRows = rows.slice(0, STUDY_NOTE_PAGE_SIZE);
+  const authorIds = [
+    ...new Set(pageRows.map(row => row.author_id).filter(Boolean)),
+  ];
+  let profileMap = new Map();
+
+  if (authorIds.length > 0) {
+    const { data: profiles, error: profileError } = await supabase
+      .from("profiles")
+      .select("id,nickname")
+      .in("id", authorIds);
+
+    if (profileError) {
+      console.error("학습노트 작성자 조회 실패:", profileError);
+    } else {
+      profileMap = new Map(
+        (profiles ?? []).map(profile => [profile.id, profile.nickname]),
+      );
+    }
+  }
+
+  const lastRow = pageRows[pageRows.length - 1];
+  const hasMore = rows.length > STUDY_NOTE_PAGE_SIZE;
+
+  return {
+    totalCount: countResponse.count ?? 0,
+    items: pageRows.map(row => normalizeStudyNote(row, profileMap)),
+    nextCursor: hasMore
+      ? { createdAt: lastRow.created_at, noteId: lastRow.id }
+      : null,
+    hasMore,
+  };
+}
 
 function createScope(scope, summaryId) {
   if (scope === "all") {
@@ -112,7 +320,7 @@ export default function AllNotes({
   scope = "mine",
   summaryId,
   banner,
-  loadPage,
+  loadPage = loadStudyNotePage,
   initialPage,
   accessState = "checking",
 }) {
@@ -372,26 +580,20 @@ export default function AllNotes({
     setIsPasswordSubmitting(true);
 
     try {
-      const result = await verifyMockSummaryNotePassword(summaryId, password);
-
-      if (!result?.isValid) {
-        if (result?.code === "NOT_FOUND") {
-          setResolvedAccessState("notFound");
-        } else if (result?.code === "REQUEST_FAILED") {
-          setResolvedAccessState("error");
-        } else {
-          setPasswordError(result?.errorMessage ?? PASSWORD_ERROR_MESSAGE);
-        }
-
-        return;
-      }
+      await getSummaryContent(summaryId, password);
 
       scopeVersionRef.current += 1;
       requestTrackerRef.current = createRequestTracker(scopeKey);
       setResolvedAccessState("authorized");
       setListState(createInitialState(null, true));
-    } catch {
-      setResolvedAccessState("error");
+    } catch (error) {
+      if (error?.code === "INVALID_PASSWORD" || error?.status === 403) {
+        setPasswordError(error.message ?? PASSWORD_ERROR_MESSAGE);
+      } else if (error?.code === "SUMMARY_NOT_FOUND" || error?.status === 404) {
+        setResolvedAccessState("notFound");
+      } else {
+        setResolvedAccessState("error");
+      }
     } finally {
       setIsPasswordSubmitting(false);
     }
@@ -457,7 +659,7 @@ export default function AllNotes({
           <div className={styles["all-notes-table-header"]} role="row">
             <span role="columnheader">상태</span>
             <span role="columnheader">작성자</span>
-            <span role="columnheader">주제</span>
+            <span role="columnheader">제목</span>
             <span role="columnheader">작성일</span>
           </div>
 
@@ -475,7 +677,7 @@ export default function AllNotes({
                   summaryId={item.summaryId}
                   noteId={item.noteId}
                   authorNickname={item.authorNickname}
-                  topic={item.topic}
+                  title={item.title}
                   createdAt={item.createdAtDisplay}
                   quizStatus={item.quizStatus}
                 />
