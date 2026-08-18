@@ -15,7 +15,7 @@ description: "요약 및 학습노트 상세 기능 구현 작업 목록"
 
 **구성**: 다섯 사용자 스토리를 독립적으로 구현·검증할 수 있게 묶는다. 사용자 승인에 따라 실제 인증·데이터 서비스 관문은 서비스 연결 작업만 차단하며, 하드코딩 제품 데이터 없이 정적 UI 작업을 먼저 수행한다.
 
-> **범위 변경 (2026-08-14)**: 사용자의 요청에 따라 `src/app/(site)/summary/[summaryId]/layout.js`는 이번 작업에서 제외한다. 기존 Client Component와 mock 기반 공통 레이아웃은 변경하지 않으며, 해당 파일을 직접 대상으로 하는 작업은 범위 제외로 처리한다. 실제 DB 연결은 공통 레이아웃 아래의 요약 상세 페이지와 학습노트 경로에 한정한다.
+> **범위 변경 (2026-08-18)**: 사용자의 요청에 따라 `src/app/(site)/summary/[summaryId]/layout.js`는 이번 작업에서 제외한다. 기존 Client Component와 mock 기반 공통 레이아웃은 변경하지 않으며, 해당 파일을 직접 대상으로 하는 작업은 범위 제외로 처리한다. 요약본 삭제는 이번 증분에 포함하고, 요약본 생성·수정·잠금·퀴즈는 계속 제외한다.
 
 ## 형식: `[ID] [P?] [스토리?] 설명과 파일 경로`
 
@@ -100,7 +100,7 @@ description: "요약 및 학습노트 상세 기능 구현 작업 목록"
 - [X] T022 [US3] `src/app/(site)/summary/[summaryId]/layout.js`에 계약의 `isLocked`·`isSummaryVerified` 선행 판정과 기존 `NotePwModal`을 연결해 인증 전 보호 콘텐츠 비노출, 불일치 인라인 오류, 검증 중 중복 제출 차단과 성공 후 하위 경로 공유를 구현한다. (사용자 요청으로 범위 제외)
 - [X] T023 [P] [US3] `src/app/(site)/summary/[summaryId]/notes/new/page.js`에 비로그인 직접 접근 시 `/login`으로 이동하는 권한 분기를 실제 Supabase 세션 경계로 구현한다.
 - [X] T024 [P] [US3] `src/app/(site)/summary/[summaryId]/notes/[noteId]/edit/page.js`에 비작성자 직접 접근 시 현재 요약 상세 `/summary/[summaryId]`로 이동하는 소유권 분기를 실제 서비스 경계로 구현한다.
-- [X] T025 [US3] `src/app/(site)/summary/[summaryId]/page.js`와 `src/app/(site)/summary/[summaryId]/notes/[noteId]/page.js`에서 학습노트 생성·수정·삭제 버튼을 로그인 및 작성자 권한에 따라 조건부 렌더링하고 활성화한다. 요약본 삭제는 현재 증분 범위에서 제외한다.
+- [X] T025 [US3] `src/app/(site)/summary/[summaryId]/page.js`와 `src/app/(site)/summary/[summaryId]/notes/[noteId]/page.js`에서 학습노트 생성·수정·삭제 버튼을 로그인 및 작성자 권한에 따라 조건부 렌더링하고 활성화한다.
 - [X] T026 [US3] `src/app/(site)/summary/[summaryId]/layout.js`에 비밀번호 모달 닫기 시 이전 페이지 이동, 시스템 오류 시 비밀번호 모달 종료 후 `CommonModal error`, 원문 비밀번호 미보관을 구현하고 외부 서비스의 브라우저 세션 인증 상태만 소비한다. (사용자 요청으로 범위 제외)
 - [ ] T027 [US3] `specs/002-summary-detail/quickstart.md`의 시나리오 3·5를 실행해 네 경로 보호, 불일치 재입력, 같은 세션 재인증 생략, 새 세션 재인증, 비로그인·비작성자 차단과 권한별 버튼 노출을 독립 검증한다.
 
@@ -116,9 +116,9 @@ description: "요약 및 학습노트 상세 기능 구현 작업 목록"
 
 ### 사용자 스토리 4 구현
 
-- [ ] T028 [P] [US4] `src/app/(site)/summary/[summaryId]/page.js`에 요약본 작성자 전용 삭제 버튼, `CommonModal confirmDelete`, 계약의 요약본·소속 학습노트 단일 삭제 연산과 성공 후 `/allnote` 이동을 구현한다.
+- [X] T028 [P] [US4] `src/app/(site)/summary/[summaryId]/page.js`, `src/app/(site)/summary/[summaryId]/SummaryDeleteButton.jsx`, `src/app/(site)/summary/[summaryId]/actions.js`에 학습노트가 없는 요약본의 작성자 전용 삭제 버튼, `CommonModal confirmDelete`, 요약본 삭제 연산과 성공 후 `/allnote` 이동을 구현한다.
 - [X] T029 [P] [US4] `src/app/(site)/summary/[summaryId]/notes/[noteId]/page.js`에 학습노트 작성자 전용 삭제 버튼, `CommonModal confirmDelete`, 대상 학습노트 삭제 연산과 성공 후 `/summary/[summaryId]` 이동을 구현한다.
-- [ ] T030 [US4] `src/app/(site)/summary/[summaryId]/page.js`와 `src/app/(site)/summary/[summaryId]/notes/[noteId]/page.js`에서 취소 시 무변경·현재 페이지 유지, 승인 요청 중 단일 `Loading`과 중복 삭제 차단, 실패 시 현재 상태 보존과 `CommonModal error`를 구현한다.
+- [X] T030 [US4] `src/app/(site)/summary/[summaryId]/page.js`와 `src/app/(site)/summary/[summaryId]/notes/[noteId]/page.js`에서 취소 시 무변경·현재 페이지 유지, 승인 요청 중 중복 삭제 차단, 실패 시 현재 상태 보존과 `CommonModal error`를 구현한다.
 - [ ] T031 [US4] `specs/002-summary-detail/quickstart.md`의 시나리오 6을 실행해 취소·승인, 소유권, 연관 삭제 범위, 중복 차단과 3초 이내 `/allnote` 이동을 독립 검증한다.
 
 **확인 지점**: 삭제 취소는 데이터를 바꾸지 않고 작성자가 승인한 삭제만 정확한 범위로 한 번 실행된다.

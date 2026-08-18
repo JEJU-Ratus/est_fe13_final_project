@@ -24,7 +24,7 @@
 
 **성능 목표**: 준비된 검증 데이터에서 조회·쓰기 확정 결과를 3초 이내 표시하고, 다른 사용자의 학습노트 변경 성공 사례와 중복 북마크를 0건으로 유지
 
-**제약 사항**: 기존 `profiles` 컬럼·데이터와 공통 Supabase 클라이언트·Proxy를 변경하지 않는다. 새 패키지, 로컬 Supabase, Docker와 `seed.sql`을 추가하지 않는다. 요약본 CRUD, 잠금 인증, 퀴즈 저장은 구현하지 않는다. 비공개 요약본은 잠금 기능 전까지 작성자 외 사용자에게 공개하지 않는다. 서비스 역할 키를 애플리케이션에 사용하지 않는다.
+**제약 사항**: 기존 `profiles` 컬럼·데이터와 공통 Supabase 클라이언트·Proxy를 변경하지 않는다. 새 패키지, 로컬 Supabase, Docker와 `seed.sql`을 추가하지 않는다. 요약본 생성·수정, 잠금 인증, 퀴즈 저장은 구현하지 않으며 요약본 삭제만 사용자 승인으로 포함한다. 비공개 요약본은 잠금 기능 전까지 작성자 외 사용자에게 공개하지 않는다. 서비스 역할 키를 애플리케이션에 사용하지 않는다.
 
 **작업 규모**: 신규 DB 테이블 3개와 RLS·GRANT·인덱스, 요약 상세 4개 경로의 mock 조회 교체, 학습노트 폼·소유자 동작·북마크 동작의 최소 Client Component 경계
 
@@ -86,6 +86,7 @@ src/
             ├── actions.js
             ├── layout.js
             ├── page.js
+            ├── SummaryDeleteButton.jsx
             └── notes/
                 ├── StudyNoteForm.jsx
                 ├── StudyNoteForm.module.scss
@@ -96,7 +97,7 @@ src/
                     └── edit/page.js
 ```
 
-**구조 결정**: 서버 전용 읽기·화면 정규화는 기존 `src/lib`의 단일 `summary-detail.js`, 변경 계약은 상세 기능 경로의 `actions.js`에 제한한다. 학습노트 생성·수정에서만 사용하는 폼은 `notes` 경로에, 상세 페이지에서만 사용하는 삭제 버튼은 `[noteId]` 경로에 배치한다. 새 서비스 폴더, Route Handler, 외부 상태 관리 계층은 만들지 않는다.
+**구조 결정**: 서버 전용 읽기·화면 정규화는 기존 `src/lib`의 단일 `summary-detail.js`, 변경 계약은 상세 기능 경로의 `actions.js`에 제한한다. 학습노트 생성·수정에서만 사용하는 폼은 `notes` 경로에, 요약본 삭제 버튼은 `[summaryId]` 경로에, 학습노트 삭제 버튼은 `[noteId]` 경로에 배치한다. 새 서비스 폴더, Route Handler, 외부 상태 관리 계층은 만들지 않는다.
 
 ## Phase 0: 조사 결과
 
@@ -118,7 +119,7 @@ src/
 
 - `summaries.author_id`, `learning_notes.author_id`, `bookmarks.user_id`는 `auth.users.id`를 참조한다.
 - `learning_notes.summary_id`, `bookmarks.summary_id`는 `summaries.id`를 참조한다.
-- 요약본 삭제 시 학습노트와 북마크는 `ON DELETE CASCADE`, Auth 사용자 삭제 시 작성 콘텐츠는 `ON DELETE RESTRICT`, 북마크는 `ON DELETE CASCADE`를 사용한다.
+- 요약본 삭제는 소속 학습노트가 없는 경우만 허용한다. `learning_notes.summary_id`는 `ON DELETE RESTRICT`를 유지하고, 북마크의 `summary_id`는 `ON DELETE CASCADE`를 사용한다.
 - UUID 식별자는 `gen_random_uuid()`, 시간 필드는 현재 시각을 기본값으로 사용한다.
 - 제목과 본문은 DB에서 `btrim(value) = value`, 필수·길이 제약을 적용해 직접 요청도 정규화 규칙을 우회하지 못하게 한다.
 - `ai_summary`는 object 형태 JSON만 허용하고 서버에서 화면에 필요한 내부 구조를 검증한다.
@@ -133,7 +134,7 @@ src/
 
 - 모든 신규 공개 스키마 테이블에 RLS를 활성화한다.
 - 기본 테이블·컬럼 권한을 명시적으로 회수한 뒤 필요한 SELECT·INSERT·UPDATE·DELETE 컬럼만 역할별로 부여한다.
-- `summaries`: 공개 항목 또는 본인 작성 항목만 SELECT 가능하며 현재 증분에서는 쓰기 정책을 열지 않는다.
+- `summaries`: 공개 항목 또는 본인 작성 항목만 SELECT 가능하며 DELETE는 본인 작성 요약본에만 허용한다. 생성·수정 정책은 현재 증분에서 열지 않는다.
 - `learning_notes`: 접근 가능한 요약본의 노트만 SELECT 가능하다. INSERT·UPDATE·DELETE는 작성자 조건과 현재 상위 요약본 접근 조건을 함께 적용한다.
 - `learning_notes`의 INSERT·UPDATE 권한은 사용자가 입력할 수 있는 필드로 제한해 ID·관계·작성자·시각·퀴즈 상태를 조작하지 못하게 한다.
 - `bookmarks`: 현재 사용자의 행만 SELECT·INSERT·DELETE 가능하다. SELECT·INSERT는 접근 가능한 요약본만 대상으로 하고 DELETE는 비공개 전환 후에도 본인 관계를 정리하도록 사용자 조건만 적용한다.
@@ -146,10 +147,11 @@ src/
 2. 요약 상세는 소속 학습노트와 공개 닉네임을 최신순으로 조회한다.
 3. 작성·수정·상세 페이지는 `summaryId`와 `noteId` 관계를 함께 확인하고 결과가 없으면 404 처리한다.
 4. 생성·수정 Action은 입력을 정규화·검증하고 인증 사용자를 작성자로 강제한다.
-5. 삭제 Action은 작성자와 상위 요약본 접근 조건이 일치하는 행만 삭제한다.
-6. 북마크 저장은 유일 키 충돌 시 변경하지 않고 현재 사용자 관계를 다시 조회해 저장 상태 하나로 확정하며, 해제는 본인 관계만 삭제한다.
-7. 변경 성공 후 경로를 재검증하고 생성·수정은 학습노트 상세, 삭제는 `/summary/{summaryId}`로 이동한다.
-8. 실패 시 구조화된 오류 결과를 반환해 입력과 마지막 확정 UI 상태를 유지한다.
+5. 요약본 삭제 Action은 인증 사용자와 요약본 작성자가 일치하고 소속 학습노트가 없는 행만 삭제한다.
+6. 학습노트 삭제 Action은 작성자와 상위 요약본 접근 조건이 일치하는 행만 삭제한다.
+7. 북마크 저장은 유일 키 충돌 시 변경하지 않고 현재 사용자 관계를 다시 조회해 저장 상태 하나로 확정하며, 해제는 본인 관계만 삭제한다.
+8. 변경 성공 후 경로를 재검증하고 생성·수정은 학습노트 상세, 학습노트 삭제는 `/summary/{summaryId}`, 요약본 삭제는 `/allnote`로 이동한다.
+9. 실패 시 구조화된 오류 결과를 반환해 입력과 마지막 확정 UI 상태를 유지한다.
 
 인터페이스별 입력·출력·오류는 [summary-detail-contract.md](./contracts/summary-detail-contract.md)를 따른다.
 
