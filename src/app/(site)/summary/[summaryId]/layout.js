@@ -23,9 +23,7 @@ export async function generateMetadata({ params }) {
   return {
     title: `${summary.title} | 프다!`,
     description: summary.excerpt || `${summary.topic} 요약 노트`,
-    robots: summary.is_locked
-      ? { index: false, follow: false }
-      : { index: true, follow: true },
+    robots: summary.is_locked ? { index: false, follow: false } : { index: true, follow: true },
   };
 }
 
