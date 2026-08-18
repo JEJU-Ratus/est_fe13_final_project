@@ -44,9 +44,7 @@ export default function Header() {
   const loginHref = ["/signup", "/signup/complete"].includes(pathname)
     ? "/login"
     : `/login?returnTo=${encodeURIComponent(pathname || "/")}`;
-  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(() =>
-    COLLAPSED_PATHS.includes(pathname),
-  );
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(() => COLLAPSED_PATHS.includes(pathname));
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isPreparingModalOpen, setIsPreparingModalOpen] = useState(false);
   const [profileNickname, setProfileNickname] = useState("user name");
@@ -132,9 +130,7 @@ export default function Header() {
     setIsPreparingModalOpen(true);
   }
 
-  const headerClassName = [styles.header, isHeaderCollapsed && styles["is-collapsed"]]
-    .filter(Boolean)
-    .join(" ");
+  const headerClassName = [styles.header, isHeaderCollapsed && styles["is-collapsed"]].filter(Boolean).join(" ");
 
   //로그아웃
   async function handleLogout() {
@@ -163,10 +159,7 @@ export default function Header() {
               height={36}
             />
             {/* 아이콘 전환은 장식 표현이므로 스크린 리더에는 버튼의 "헤더 펼치기" 이름만 전달합니다. */}
-            <span
-              className={`material-symbols-outlined ${styles["collapsed-panel-icon"]}`}
-              aria-hidden="true"
-            >
+            <span className={`material-symbols-outlined ${styles["collapsed-panel-icon"]}`} aria-hidden="true">
               left_panel_open
             </span>
           </button>
@@ -184,9 +177,7 @@ export default function Header() {
             aria-expanded={!isHeaderCollapsed}
             onClick={handleCollapse}
           >
-            <span className={`material-symbols-outlined left_panel_close ${styles.icon}`}>
-              left_panel_close
-            </span>
+            <span className={`material-symbols-outlined left_panel_close ${styles.icon}`}>left_panel_close</span>
           </button>
         )}
       </div>
@@ -223,11 +214,7 @@ export default function Header() {
             </div>
           ) : (
             <div className={styles["guest-buttons"]}>
-                  <Link
-                    href={loginHref}
-                    className={styles["login-button"]}
-                    type="button"
-                  >
+              <Link href={loginHref} className={styles["login-button"]} type="button">
                 로그인
               </Link>
               <Link href="/signup" className={styles["signup-button"]} type="button">
@@ -242,14 +229,13 @@ export default function Header() {
         {menuItems.map(menu => {
           const menuContent = (
             <>
-              <span
-                className={`material-symbols-outlined ${styles["menu-icon-slot"]}`}
-                aria-hidden="true"
-              >
+              <span className={`material-symbols-outlined ${styles["menu-icon-slot"]}`} aria-hidden="true">
                 {menu.icon}
               </span>
 
               {!isHeaderCollapsed && <span className={styles["menu-label"]}>{menu.label}</span>}
+
+              {isHeaderCollapsed && <span className={styles["collapsed-menu-tooltip"]}>{menu.label}</span>}
             </>
           );
 
@@ -266,13 +252,7 @@ export default function Header() {
               className={styles["menu-item"]}
               type="button"
               key={menu.label}
-              onClick={
-                menu.requiresLogin
-                  ? handleMypageClick
-                  : menu.modalMode
-                    ? handleQuizClick
-                    : undefined
-              }
+              onClick={menu.requiresLogin ? handleMypageClick : menu.modalMode ? handleQuizClick : undefined}
             >
               {menuContent}
             </button>
@@ -283,9 +263,7 @@ export default function Header() {
       {isHeaderCollapsed ? (
         <div className={styles["collapsed-user-slot"]}>
           <Image
-            className={`${styles["collapsed-profile-image"]} ${
-              !isAuthenticated ? styles["is-guest"] : ""
-            }`}
+            className={`${styles["collapsed-profile-image"]} ${!isAuthenticated ? styles["is-guest"] : ""}`}
             src={isAuthenticated ? profileImageUrl : "/images/main_profile.webp"}
             alt={isAuthenticated ? "프로필 이미지" : "비로그인 사용자 프로필 이미지"}
             width={30}
@@ -308,11 +286,7 @@ export default function Header() {
         loginHref="/login?returnTo=%2Fmypage"
         onClose={() => setIsLoginModalOpen(false)}
       />
-      <CommonModal
-        isOpen={isPreparingModalOpen}
-        mode="preparing"
-        onClose={() => setIsPreparingModalOpen(false)}
-      />
+      <CommonModal isOpen={isPreparingModalOpen} mode="preparing" onClose={() => setIsPreparingModalOpen(false)} />
       {isLoggingOut && <Loading />}
     </aside>
   );
