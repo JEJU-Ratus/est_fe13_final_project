@@ -17,6 +17,7 @@
 - 🌐[배포 서비스](https://est-fe13-final-project.vercel.app)
 - 📑[기능 명세](./docs/specs)
 - 📑[Supabase 개발 환경 안내](./supabase/README.md)
+- 🤖[AI 개발환경 및 협업 가이드](./docs/AI-개발환경-및-협업가이드.md)
 
 ---
 
