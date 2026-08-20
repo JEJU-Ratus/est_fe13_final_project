@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 
-import CommonModal from "@/components/CommonModal";
 import QuizModal from "@/components/QuizModal";
 import { createClient } from "@/lib/supabase/client";
 
@@ -29,7 +28,6 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
   const [quiz, setQuiz] = useState(null);
   const [isQuizUnavailable, setQuizUnavailable] = useState(true);
-  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
 
   const bookmarkLabel = isBookmarked ? "북마크 삭제" : "북마크 담기";
 
@@ -64,25 +62,6 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
 
     checkBookmarkStatus();
   }, [summaryId]);
-
-  // 학습노트 직접 접근 시 로그인 확인
-  useEffect(() => {
-    async function checkNoteLogin() {
-      if (type !== "auth" || !noteId) return;
-
-      const supabase = createClient();
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        setLoginModalOpen(true);
-      }
-    }
-
-    checkNoteLogin();
-  }, [type, noteId]);
 
   // 퀴즈 풀기 버튼 노출 여부 확인
   useEffect(() => {
@@ -290,10 +269,6 @@ export default function AiSummaryLayoutClient({ summaryId, type }) {
         />
       </>
     );
-  }
-
-  if (type === "auth") {
-    return <CommonModal isOpen={isLoginModalOpen} mode="suggestLogin" onClose={() => setLoginModalOpen(false)} />;
   }
 
   return null;
