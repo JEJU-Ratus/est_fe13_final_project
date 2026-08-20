@@ -1,4 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { cookies } from "next/headers";
+import {
+  getSummaryAccessCookieName,
+  verifySummaryAccessToken,
+} from "@/lib/summary-access";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -179,7 +185,35 @@ export async function getSummaryNotes(summaryId) {
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const supabaseAdmin = createAdminClient();
+  const [summaryResult, userId] = await Promise.all([
+    supabaseAdmin
+      .from("summaries")
+      .select("author_id,is_locked")
+      .eq("id", summaryId)
+      .maybeSingle(),
+    getClaimsUserId(supabase),
+  ]);
+
+  if (summaryResult.error || !summaryResult.data) {
+    return [];
+  }
+
+  const summary = summaryResult.data;
+  let hasAccess = !summary.is_locked || summary.author_id === userId;
+
+  if (!hasAccess) {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get(getSummaryAccessCookieName(summaryId))?.value;
+
+    hasAccess = await verifySummaryAccessToken(accessToken, summaryId);
+  }
+
+  if (!hasAccess) {
+    return [];
+  }
+
+  const { data, error } = await supabaseAdmin
     .from("learning_notes")
     .select(
       "id,summary_id,author_id,title,learning_summary,learning_reflection,reference_materials,is_quiz_completed,created_at,updated_at",
@@ -193,7 +227,7 @@ export async function getSummaryNotes(summaryId) {
     throw new Error("학습노트 목록을 조회할 수 없습니다.");
   }
 
-  return attachNoteAuthors(supabase, data ?? []);
+  return attachNoteAuthors(supabaseAdmin, data ?? []);
 }
 
 export async function getStudyNote(summaryId, noteId) {

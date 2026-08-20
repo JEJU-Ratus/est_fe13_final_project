@@ -63,6 +63,8 @@ export default function SummaryContent({ summaryId }) {
 
       setContent(summaryContent);
       setIsPasswordOpen(false);
+      // 접근 쿠키 발급 후 서버 컴포넌트의 학습노트 목록을 다시 조회합니다.
+      router.refresh();
     } catch (error) {
       if (error.code === "INVALID_PASSWORD" || error.status === 403) {
         setPasswordError("비밀번호가 일치하지 않습니다.");
