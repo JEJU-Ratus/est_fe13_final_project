@@ -58,9 +58,6 @@ export default async function AiSummaryLayout({ children, params }) {
 
   return (
     <main className={styles["Ai-page"]}>
-      {/* 로그인하지 않은 상태로 학습노트에 직접 접근하면 로그인 모달 표시 */}
-      <AiSummaryLayoutClient summaryId={summaryId} type="auth" />
-
       <div className={styles["Ai-container"]}>
         <section className={styles["ai-summary"]}>
           {/* 요약 노트 제목 + 북마크 영역 */}
